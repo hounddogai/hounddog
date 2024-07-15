@@ -9,7 +9,7 @@ pub struct TypescriptScanner;
 impl BaseScanner for TypescriptScanner {
     fn visit_node(state: &mut FileScanContext, node: &Node) -> Result<VisitChildren> {
         match (node.kind()) {
-            "identifier" => {}
+            "identifier" |
             "property_identifier"  => {
                 let text = state.get_node_text(node);
                 if let Some(data_element) = state.find_data_element(&text) {
@@ -24,6 +24,8 @@ impl BaseScanner for TypescriptScanner {
             "method_definition" => {}
             "function_declaration" => {}
             "type_identifier" => {}
+            "member_expression" => {}
+
             _ => {}
         }
         Ok(VisitChildren::Yes)
