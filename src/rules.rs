@@ -32,7 +32,7 @@ pub fn get_local_data_sinks(dir: &Path) -> Result<HashMap<Language, HashMap<Stri
     for entry in read_dir(data_sinks_dir)? {
         let path = entry?.path();
         if path.is_file() && path.extension().map_or(false, |ext| ext == "json") {
-            match serde_json::from_str::<DataSink>(&read_to_string(&path)?) {
+              match serde_json::from_str::<DataSink>(&read_to_string(&path)?) {
                 Ok(mut data_sink) => {
                     let remediation_path = remediations_dir.join(format!("{}.md", data_sink.id));
                     if remediation_path.exists() {

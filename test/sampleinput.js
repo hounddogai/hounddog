@@ -14,6 +14,7 @@ class Person {
 
     // Method to display person's information
     displayInfo(): void {
+        console.log(ssn);
         console.log(`Name: ${this.fullName}`);
         console.log(`Phone Number: ${this.phoneNumber}`);
         console.log(`SSN: ${this.ssn}`);
