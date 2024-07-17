@@ -4,6 +4,7 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::Result;
+use git2::PushOptions;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use tree_sitter::Node;
@@ -98,6 +99,7 @@ impl PartialEq for DataElement {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct DataSinkMatchRule {
+    pub clue : Option<String>,
     #[serde(deserialize_with = "deserialize_regex_option")]
     #[serde(serialize_with = "serialize_regex_option")]
     #[serde(default)]
