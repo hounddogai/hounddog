@@ -27,7 +27,7 @@ pub fn get_local_data_elements(dir: &Path) -> Result<HashMap<String, DataElement
 pub fn get_local_data_sinks(dir: &Path) -> Result<HashMap<Language, HashMap<String, DataSink>>> {
     let data_sinks_dir = dir.join("data-sinks");
     let remediations_dir = dir.join("remediations");
-    
+
     let mut data_sinks: HashMap<Language, HashMap<String, DataSink>> = HashMap::new();
     for entry in read_dir(data_sinks_dir)? {
         let path = entry?.path();

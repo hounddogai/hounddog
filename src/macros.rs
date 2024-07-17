@@ -47,16 +47,19 @@ macro_rules! print_err {
     };
 }
 
-
 #[macro_export]
 macro_rules! print_header {
     ($($arg:tt)*) => {
-        println!("\n{}", format!($($arg)*).bold().underline())
+        println!("{}", format!($($arg)*).bold().underline())
     };
 }
 
 #[macro_export]
-macro_rules! console_url_link {
+macro_rules! console_url {
+    // If only the URL is provided
+    ($url:expr) => {
+        format!("{}", $url).truecolor(92, 145, 239).underline()
+    };
     ($file:expr, $line:expr, $column:expr) => {
         format!("{}:{}:{}", $file, $line, $column).truecolor(92, 145, 239).underline()
     };
@@ -66,16 +69,28 @@ macro_rules! console_url_link {
 macro_rules! console_label {
     (sensitivity: $sensitivity:expr) => {
         match $sensitivity {
-            crate::enums::Sensitivity::Critical => " CRITICAL ".bold().truecolor(255, 255, 255).on_truecolor(255, 0, 0),
-            crate::enums::Sensitivity::Medium => "  MEDIUM  ".bold().truecolor(255, 255, 255).on_truecolor(255, 100, 0),
-            crate::enums::Sensitivity::Low => "   LOW   ".bold().truecolor(0, 0, 0).on_truecolor(241, 194, 50)
+            crate::enums::Sensitivity::Critical => {
+                " CRITICAL ".bold().truecolor(255, 255, 255).on_truecolor(255, 0, 0)
+            }
+            crate::enums::Sensitivity::Medium => {
+                "  MEDIUM  ".bold().truecolor(255, 255, 255).on_truecolor(255, 100, 0)
+            }
+            crate::enums::Sensitivity::Low => {
+                "   LOW   ".bold().truecolor(0, 0, 0).on_truecolor(241, 194, 50)
+            }
         }
     };
     (severity: $severity:expr) => {{
         match $severity {
-            crate::enums::Severity::Critical => " CRITICAL ".bold().truecolor(255, 255, 255).on_truecolor(255, 0, 0),
-            crate::enums::Severity::Medium =>  "  MEDIUM  ".bold().truecolor(255, 255, 255).on_truecolor(255, 100, 0),
-            crate::enums::Severity::Low => "   LOW    ".bold().truecolor(0, 0, 0).on_truecolor(241, 194, 50),
+            crate::enums::Severity::Critical => {
+                " CRITICAL ".bold().truecolor(255, 255, 255).on_truecolor(255, 0, 0)
+            }
+            crate::enums::Severity::Medium => {
+                "  MEDIUM  ".bold().truecolor(255, 255, 255).on_truecolor(255, 100, 0)
+            }
+            crate::enums::Severity::Low => {
+                "   LOW    ".bold().truecolor(0, 0, 0).on_truecolor(241, 194, 50)
+            }
         }
     }};
 }
@@ -93,9 +108,9 @@ macro_rules! console_text {
     (severity: $severity:expr, $($arg:tt)*) => {{
         let text = format!($($arg)*);
         match $severity {
-            crate::enums::Severity::Critical => text.truecolor(255, 0, 0),
-            crate::enums::Severity::Medium => text.truecolor(255, 100, 0),
-            crate::enums::Severity::Low => text.truecolor(241, 194, 50),
+            crate::enums::Severity::Critical => text.bold().truecolor(255, 0, 0),
+            crate::enums::Severity::Medium => text.bold().truecolor(255, 100, 0),
+            crate::enums::Severity::Low => text.bold().truecolor(241, 194, 50),
         }
     }};
 }
@@ -104,6 +119,22 @@ macro_rules! console_text {
 macro_rules! console_note {
     ($($arg:tt)*) => {
         format!("{}", format!($($arg)*).dimmed())
+    };
+}
+
+#[macro_export]
+macro_rules! markdown_url {
+    ($url:expr) => {
+        format!(
+            "<span style=\"color:rgba(92, 145, 239, 1); font-family: monospace;\">{}</span>",
+            $url
+        )
+    };
+    ($file:expr, $line:expr, $column:expr) => {
+        format!(
+            "<span style=\"color:rgba(92, 145, 239, 1); font-family: monospace;\">{}:{}:{}</span>",
+            $file, $line, $column
+        )
     };
 }
 
@@ -172,4 +203,3 @@ macro_rules! sentry_err {
         })
     };
 }
-

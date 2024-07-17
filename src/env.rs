@@ -1,7 +1,7 @@
+use crate::enums::{CiType, HoundDogEnv};
+use crate::{env_bool, env_str};
 use std::env;
 use std::path::PathBuf;
-use crate::{env_bool, env_str};
-use crate::enums::{CiType, HoundDogEnv};
 
 #[derive(Debug)]
 pub struct Environment {

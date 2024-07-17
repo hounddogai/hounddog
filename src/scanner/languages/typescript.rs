@@ -1,10 +1,11 @@
+use std::collections::VecDeque;
+
+use anyhow::Result;
+use tree_sitter::Node;
+
 use crate::enums::VisitChildren;
 use crate::scanner::languages::base::BaseScanner;
 use crate::structs::{DataElementOccurrence, FileScanContext, Vulnerability};
-use anyhow::Result;
-use std::collections::VecDeque;
-use std::os::macos::raw::stat;
-use tree_sitter::{Node, TreeCursor};
 
 pub struct TypescriptScanner;
 
@@ -63,6 +64,7 @@ impl BaseScanner for TypescriptScanner {
 
     fn leave_node(state: &mut FileScanContext, node: &Node) {}
 }
+
 fn find_all_child_member_expressions(node: Node) -> Vec<Node> {
     let mut all_children = vec![node]; // Start with the current node
 
@@ -77,6 +79,7 @@ fn find_all_child_member_expressions(node: Node) -> Vec<Node> {
 
     all_children
 }
+
 pub fn get_child_by_field<'a>(node: &'a Node, field: &str) -> Node<'a> {
     node.child_by_field_name(field).unwrap()
 }

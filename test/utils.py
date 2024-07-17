@@ -28,7 +28,7 @@ def do_something():
         ssn,
         "{}".format(username),
         "this is username" + username,
-        )
+    )
 
 
 def do_something_else():

@@ -2,15 +2,32 @@ use std::fmt;
 
 use anyhow::Result;
 use regex::Regex;
-use serde::{de, Serialize, Serializer};
-use serde::Deserializer;
+use serde::{de, Deserializer};
 
-pub fn serialize_regex<S>(regex: &Regex, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    regex.as_str().serialize(serializer)
-}
+// pub fn serialize_regex<S>(regex: &Regex, serializer: S) -> Result<S::Ok, S::Error>
+// where
+//     S: Serializer,
+// {
+//     regex.as_str().serialize(serializer)
+// }
+//
+// pub fn serialize_regex_option<S>(regex: &Option<Regex>, serializer: S) -> Result<S::Ok, S::Error>
+// where
+//     S: Serializer,
+// {
+//     match regex {
+//         Some(r) => r.as_str().serialize(serializer),
+//         None => serializer.serialize_none(),
+//     }
+// }
+//
+// pub fn serialize_regex_vec<S>(regexes: &Vec<Regex>, serializer: S) -> Result<S::Ok, S::Error>
+// where
+//     S: Serializer,
+// {
+//     let patterns: Vec<String> = regexes.iter().map(|r| r.as_str().to_string()).collect();
+//     patterns.serialize(serializer)
+// }
 
 pub fn deserialize_regex<'d, D>(deserializer: D) -> Result<Regex, D::Error>
 where
@@ -21,41 +38,34 @@ where
         type Value = Regex;
 
         fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(formatter, "a valid regex pattern")
+            write!(formatter, "a valid non-empty regex pattern")
         }
 
         fn visit_str<E>(self, value: &str) -> Result<Regex, E>
         where
             E: de::Error,
         {
+            if value.trim().is_empty() {
+                return Err(de::Error::custom("regex pattern cannot be empty"));
+            }
             Regex::new(value).map_err(de::Error::custom)
         }
     }
     deserializer.deserialize_str(V)
 }
 
-pub fn serialize_regex_option<S>(regex: &Option<Regex>, serializer: S) -> Result<S::Ok, S::Error>
+pub fn deserialize_regex_option<'de, D>(deserializer: D) -> Result<Option<Regex>, D::Error>
 where
-    S: Serializer,
-{
-    match regex {
-        Some(r) => r.as_str().serialize(serializer),
-        None => serializer.serialize_none(),
-    }
-}
-
-pub fn deserialize_regex_option<'d, D>(deserializer: D) -> Result<Option<Regex>, D::Error>
-where
-    D: Deserializer<'d>,
+    D: Deserializer<'de>,
 {
     struct V;
-    impl<'d> de::Visitor<'d> for V {
+    impl<'de> de::Visitor<'de> for V {
         type Value = Option<Regex>;
 
         fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
             write!(formatter, "a valid regex pattern or null")
         }
-        
+
         fn visit_none<E>(self) -> Result<Option<Regex>, E>
         where
             E: de::Error,
@@ -65,20 +75,12 @@ where
 
         fn visit_some<D>(self, deserializer: D) -> Result<Option<Regex>, D::Error>
         where
-            D: Deserializer<'d>,
+            D: Deserializer<'de>,
         {
             deserialize_regex(deserializer).map(Some)
         }
     }
     deserializer.deserialize_option(V)
-}
-
-pub fn serialize_regex_vec<S>(regexes: &Vec<Regex>, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-{
-    let patterns: Vec<String> = regexes.iter().map(|r| r.as_str().to_string()).collect();
-    patterns.serialize(serializer)
 }
 
 pub fn deserialize_regex_vec<'d, D>(deserializer: D) -> Result<Vec<Regex>, D::Error>
@@ -99,7 +101,9 @@ where
         {
             let mut regexes = Vec::new();
             while let Some(value) = seq.next_element::<String>()? {
-                regexes.push(Regex::new(&value).map_err(de::Error::custom)?);
+                if !value.trim().is_empty() {
+                    regexes.push(Regex::new(&value).map_err(de::Error::custom)?);
+                }
             }
             Ok(regexes)
         }

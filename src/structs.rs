@@ -5,8 +5,10 @@ use std::path::PathBuf;
 
 use anyhow::Result;
 use git2::PushOptions;
+use indexmap::IndexMap;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use strum::IntoEnumIterator;
 use tree_sitter::Node;
 
 use crate::enums::{GitProvider, Language, OutputFormat, ScopeType, Sensitivity, Severity, Source};
@@ -14,46 +16,67 @@ use crate::scanner::database::ScanDatabase;
 use crate::utils::file::get_file_language;
 use crate::utils::git::get_url_link;
 use crate::utils::hash::calculate_md5_hash;
-use crate::utils::serde::{
-    deserialize_regex, deserialize_regex_option, deserialize_regex_vec, serialize_regex,
-    serialize_regex_option, serialize_regex_vec,
-};
+use crate::utils::serde::{deserialize_regex, deserialize_regex_option, deserialize_regex_vec};
 
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct UserInfo {
+pub struct User {
     pub org_id: String,
     pub org_name: String,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Clone, Debug, Default, Serialize)]
 pub struct FileStats {
     pub file_count: usize,
     pub line_count: usize,
 }
 
-impl FileStats {
-    pub fn new() -> FileStats {
-        FileStats { file_count: 0, line_count: 0 }
-    }
-}
-
-#[derive(Debug, Serialize)]
-pub struct DirectoryInfo {
-    pub git_remote_url: String,
-    pub git_repo_name: String,
-    pub git_branch: String,
-    pub git_commit: String,
+#[derive(Clone, Debug, Serialize)]
+pub struct Repository {
+    pub path: PathBuf,
+    pub base_url: String,
+    pub name: String,
+    pub branch: String,
+    pub commit: String,
     pub git_provider: Option<GitProvider>,
     pub per_lang_file_stats: HashMap<Language, FileStats>,
     pub total_file_stats: FileStats,
 }
 
-pub fn return_true() -> bool {
+impl Repository {
+    pub fn get_dir_stats_table_rows(&self) -> Vec<Vec<String>> {
+        let mut rows: Vec<Vec<String>> = Language::iter()
+            .filter_map(|language| {
+                self.per_lang_file_stats.get(&language).and_then(|stats| {
+                    if stats.file_count > 0 {
+                        Some(vec![
+                            language.to_string(),
+                            stats.file_count.to_string(),
+                            stats.line_count.to_string(),
+                        ])
+                    } else {
+                        None
+                    }
+                })
+            })
+            .collect();
+
+        if rows.len() > 1 {
+            rows.push(vec![
+                "Total".to_string(),
+                self.total_file_stats.file_count.to_string(),
+                self.total_file_stats.line_count.to_string(),
+            ]);
+        }
+        rows
+    }
+}
+
+fn return_true() -> bool {
     true
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct DataElement {
     pub id: String,
@@ -61,10 +84,8 @@ pub struct DataElement {
     #[serde(default)]
     pub description: String,
     #[serde(deserialize_with = "deserialize_regex_vec")]
-    #[serde(serialize_with = "serialize_regex_vec")]
     pub include_patterns: Vec<Regex>,
     #[serde(deserialize_with = "deserialize_regex_vec")]
-    #[serde(serialize_with = "serialize_regex_vec")]
     pub exclude_patterns: Vec<Regex>,
     #[serde(default = "return_true")]
     pub is_enabled: bool,
@@ -97,16 +118,18 @@ impl PartialEq for DataElement {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct DataSinkMatchRule {
     pub clue : Option<String>,
     #[serde(deserialize_with = "deserialize_regex_option")]
     #[serde(serialize_with = "serialize_regex_option")]
     #[serde(default)]
+    #[serde(deserialize_with = "deserialize_regex_option")]
     pub regex: Option<Regex>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct DataSink {
     pub id: String,
@@ -150,10 +173,9 @@ impl PartialEq for DataSink {
 
 impl Eq for DataSink {}
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct Sanitizer {
     #[serde(deserialize_with = "deserialize_regex")]
-    #[serde(serialize_with = "serialize_regex")]
     pub pattern: Regex,
     pub source: Source,
     pub description: String,
@@ -169,7 +191,7 @@ pub struct DataElementOccurrence {
     pub sensitivity: Sensitivity,
     pub language: Language,
     pub code_segment: String,
-    #[serde(rename(deserialize = "file"))]
+    pub absolute_file_path: String,
     pub relative_file_path: String,
     pub line_start: usize,
     pub line_end: usize,
@@ -199,26 +221,28 @@ impl DataElementOccurrence {
             sensitivity: data_element.sensitivity.clone(),
             hash: calculate_md5_hash(format!(
                 "{}|{}|{}|{}|{}",
-                ctx.config.scan_dir_info.git_repo_name,
-                ctx.config.scan_dir_info.git_branch,
+                ctx.config.repository.name,
+                ctx.config.repository.branch,
                 data_element.id.clone(),
                 ctx.relative_file_path.display().to_string(),
                 ctx.get_node_text(node)
             )),
             language: ctx.language.clone(),
             code_segment: ctx.get_code_line(node),
+            absolute_file_path: ctx.absolute_file_path.display().to_string(),
             relative_file_path: ctx.relative_file_path.display().to_string(),
             line_start,
             line_end,
             column_start,
             column_end,
             url_link: get_url_link(
-                &ctx.config.scan_dir_info.git_provider,
-                &ctx.config.scan_dir_info.git_remote_url,
-                &ctx.config.scan_dir_info.git_commit,
+                &ctx.config.repository.base_url,
+                &ctx.config.repository.commit,
                 &ctx.display_file_path,
+                &ctx.config.repository.git_provider,
                 line_start,
                 line_end,
+                column_start,
             ),
             source: data_element.source.clone(),
             tags: data_element.tags.clone(),
@@ -236,6 +260,7 @@ pub struct Vulnerability {
     pub severity: Severity,
     pub language: Language,
     pub code_segment: String,
+    pub absolute_file_path: String,
     pub relative_file_path: String,
     pub line_start: usize,
     pub line_end: usize,
@@ -266,8 +291,8 @@ impl Vulnerability {
             data_element_names: data_elements.iter().map(|elem| elem.name.clone()).collect(),
             hash: calculate_md5_hash(format!(
                 "{}|{}|{}|{}|{}",
-                ctx.config.scan_dir_info.git_repo_name,
-                ctx.config.scan_dir_info.git_branch,
+                ctx.config.repository.name,
+                ctx.config.repository.branch,
                 data_sink.id.clone(),
                 ctx.relative_file_path.display().to_string(),
                 ctx.get_node_text(node).trim(),
@@ -285,18 +310,20 @@ impl Vulnerability {
                 .unwrap(),
             language: ctx.language.clone(),
             code_segment: ctx.get_code_block(node),
+            absolute_file_path: ctx.absolute_file_path.display().to_string(),
             relative_file_path: ctx.relative_file_path.display().to_string(),
             line_start,
             line_end,
             column_start,
             column_end,
             url_link: get_url_link(
-                &ctx.config.scan_dir_info.git_provider,
-                &ctx.config.scan_dir_info.git_remote_url,
-                &ctx.config.scan_dir_info.git_commit,
+                &ctx.config.repository.base_url,
+                &ctx.config.repository.commit,
                 &ctx.display_file_path,
+                &ctx.config.repository.git_provider,
                 line_start,
                 line_end,
+                column_start,
             ),
             cwe: data_sink.cwe.clone(),
             owasp: data_sink.owasp.clone(),
@@ -308,84 +335,210 @@ impl Vulnerability {
     }
 }
 
-#[derive(Debug)]
-pub struct ScanConfig<'a> {
-    pub scan_dir_path: &'a PathBuf,
-    pub scan_dir_info: &'a DirectoryInfo,
-    pub data_elements: &'a HashMap<String, DataElement>,
-    pub data_sinks: &'a HashMap<Language, HashMap<String, DataSink>>,
-    pub sanitizers: &'a Vec<Sanitizer>,
-    pub output_filename: &'a Option<String>,
-    pub output_format: &'a OutputFormat,
-    pub skip_data_elements: HashSet<String>,
-    pub skip_data_sinks: HashSet<String>,
-    pub skip_occurrence_hashes: HashSet<String>,
-    pub skip_vulnerability_hashes: HashSet<String>,
+#[derive(Debug, Serialize)]
+pub struct DataflowVisualization {
+    pub data_element_id: String,
+    pub mermaid: String,
 }
 
-impl<'a> ScanConfig<'a> {
+#[derive(Debug)]
+pub struct ScanConfig {
+    pub is_debug: bool,
+    pub is_paid_features_enabled: bool,
+    pub repository: Repository,
+    pub data_elements: HashMap<String, DataElement>,
+    pub data_sinks: HashMap<Language, HashMap<String, DataSink>>,
+    pub sanitizers: Vec<Sanitizer>,
+    pub output_filename: Option<String>,
+    pub output_format: OutputFormat,
+    pub skip_data_elements: HashSet<String>,
+    pub skip_data_sinks: HashSet<String>,
+    pub skip_occurrences: HashSet<String>,
+    pub skip_vulnerabilities: HashSet<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ScanResults<'a> {
+    pub repository: &'a Repository,
+    #[serde(skip)]
+    pub output_filename: &'a Option<String>,
+    #[serde(skip)]
+    pub output_format: &'a OutputFormat,
+    #[serde(skip)]
+    pub data_elements: &'a HashMap<String, DataElement>,
+    #[serde(skip)]
+    pub data_sinks: &'a HashMap<Language, HashMap<String, DataSink>>,
+    pub vulnerabilities: Vec<Vulnerability>,
+    pub occurrences: Vec<DataElementOccurrence>,
+}
+
+impl<'a> ScanResults<'a> {
     pub fn new(
-        scan_dir_path: &'a PathBuf,
-        scan_dir_info: &'a DirectoryInfo,
-        data_elements: &'a HashMap<String, DataElement>,
-        data_sinks: &'a HashMap<Language, HashMap<String, DataSink>>,
-        sanitizers: &'a Vec<Sanitizer>,
-        output_filename: &'a Option<String>,
-        output_format: &'a OutputFormat,
-        skip_data_elements: &'a Vec<String>,
-        skip_data_sinks: &'a Vec<String>,
-        skip_occurrence_hashes: &'a Vec<String>,
-        skip_vulnerability_hashes: &'a Vec<String>,
-    ) -> ScanConfig<'a> {
-        ScanConfig {
-            scan_dir_path,
-            scan_dir_info,
-            data_elements,
-            data_sinks,
-            sanitizers,
-            output_filename,
-            output_format,
-            skip_data_elements: skip_data_elements
-                .iter()
-                .map(|data_element_id| data_element_id.to_lowercase())
-                .collect(),
-            skip_data_sinks: skip_data_sinks
-                .iter()
-                .map(|data_sink_id| data_sink_id.to_lowercase())
-                .collect(),
-            skip_occurrence_hashes: skip_occurrence_hashes
-                .iter()
-                .map(|hash| hash.to_uppercase())
-                .collect(),
-            skip_vulnerability_hashes: skip_vulnerability_hashes
-                .iter()
-                .map(|hash| hash.to_uppercase())
-                .collect(),
+        config: &'a ScanConfig,
+        mut vulnerabilities: Vec<Vulnerability>,
+        mut occurrences: Vec<DataElementOccurrence>,
+    ) -> ScanResults<'a> {
+
+        vulnerabilities.sort_by(|a, b| a.severity.cmp(&b.severity));
+        occurrences.sort_by(|a, b| a.sensitivity.cmp(&b.sensitivity));
+
+        ScanResults {
+            repository: &config.repository,
+            output_filename: &config.output_filename,
+            output_format: &config.output_format,
+            data_elements: &config.data_elements,
+            data_sinks: &config.data_sinks,
+            vulnerabilities,
+            occurrences,
         }
+    }
+
+    pub fn search_data_elements(&self, ids: &Vec<String>) -> Vec<&DataElement> {
+        ids.iter().filter_map(|id| self.data_elements.get(id)).collect()
     }
 
     pub fn get_data_element(&self, id: &str) -> &DataElement {
         self.data_elements.get(id).unwrap()
     }
-}
 
-#[derive(Debug, Serialize)]
-pub struct ScanResults {
-    pub data_element_occurrences: Vec<DataElementOccurrence>,
-    pub vulnerabilities: Vec<Vulnerability>,
-}
+    pub fn get_data_sink(&self, language: &Language, id: &str) -> Option<&DataSink> {
+        self.data_sinks.get(language).and_then(|map| map.get(id))
+    }
 
-impl ScanResults {
-    pub fn new(
-        data_element_occurrences: Vec<DataElementOccurrence>,
-        mut vulnerabilities: Vec<Vulnerability>,
-    ) -> ScanResults {
-        vulnerabilities.sort_by(|a, b| a.severity.cmp(&b.severity));
-        ScanResults {
-            data_element_occurrences,
-            vulnerabilities,
+    pub fn get_remediation(&self, language: &Language, id: &str) -> Option<&String> {
+        self.get_data_sink(language, id).map(|sink| &sink.remediation)
+    }
+
+    pub fn get_data_element_id_to_occurrences(
+        &self,
+    ) -> HashMap<&String, Vec<&DataElementOccurrence>> {
+        self.occurrences.iter().fold(HashMap::new(), |mut map, occurrence| {
+            map.entry(&occurrence.data_element_id).or_insert_with(Vec::new).push(occurrence);
+            map
+        })
+    }
+
+    pub fn get_sensitive_datamap_table_rows(&self) -> Vec<Vec<String>> {
+        let mut elem_to_count: Vec<(&DataElement, usize)> = self
+            .occurrences
+            .iter()
+            .map(|occurrence| &occurrence.data_element_id)
+            .fold(HashMap::new(), |mut map, id| {
+                *map.entry(id).or_insert(0) += 1;
+                map
+            })
+            .into_iter()
+            .map(|(id, count)| (self.data_elements.get(id).unwrap(), count))
+            .collect();
+
+        elem_to_count.sort_by_key(|(elem, _)| (&elem.sensitivity, &elem.name));
+        elem_to_count
+            .iter()
+            .map(|(data_element, count)| {
+                vec![
+                    data_element.sensitivity.to_string(),
+                    data_element.name.to_string(),
+                    data_element.id.to_string(),
+                    count.to_string(),
+                    data_element.tags.join(", "),
+                    data_element.source.to_string(),
+                ]
+            })
+            .collect()
+    }
+
+    pub fn get_vulnerability_counts(&self) -> VulnerabilityCounts {
+        VulnerabilityCounts {
+            critical: self
+                .vulnerabilities
+                .iter()
+                .filter(|v| v.severity == Severity::Critical)
+                .count(),
+            medium: self.vulnerabilities.iter().filter(|v| v.severity == Severity::Medium).count(),
+            low: self.vulnerabilities.iter().filter(|v| v.severity == Severity::Low).count(),
+            total: self.vulnerabilities.len(),
         }
     }
+
+    pub fn get_dataflow_visualizations(&self) -> IndexMap<String, String> {
+        let elem_id_to_files =
+            self.occurrences.iter().fold(HashMap::new(), |mut map, occurrence| {
+                map.entry(&occurrence.data_element_id)
+                    .or_insert_with(HashSet::new)
+                    .insert(&occurrence.relative_file_path);
+                map
+            });
+
+        let elem_id_and_file_to_vulnerabilities: HashMap<(&String, &String), Vec<&Vulnerability>> =
+            self.vulnerabilities.iter().fold(HashMap::new(), |mut map, v| {
+                v.data_element_ids.iter().for_each(|elem_id| {
+                    map.entry((elem_id, &v.relative_file_path)).or_insert_with(Vec::new).push(v);
+                });
+                map
+            });
+
+        let mut elem_id_to_mermaid = IndexMap::new();
+
+        for (elem_id, elem_files) in elem_id_to_files {
+            let elem = self.data_elements.get(elem_id).unwrap();
+            let mut elem_data_sinks = HashSet::new();
+            let mut mermaid = "flowchart LR\n".to_string();
+            let color = match elem.sensitivity {
+                Sensitivity::Critical => "fill:#FF0000,color:#FFFFFF",
+                Sensitivity::Medium => "fill:#FF6400,color:#FFFFFF",
+                Sensitivity::Low => "fill:#F1C232,color:#000000",
+            };
+            mermaid.push_str(&format!("{}({})\n", elem_id, elem.name));
+            mermaid.push_str(&format!("style {} {}\n", elem_id, color));
+
+            for file in elem_files {
+                let file_stem = file.split('/').last().unwrap();
+                let file_id = &format!("{}#{}", elem_id, file.replace("/", "-"));
+
+                mermaid.push_str(&format!("{}({})\n", file_id, file_stem));
+                mermaid.push_str(&format!("style {} fill:#808080,color:#FFFFFF\n", file_id));
+                mermaid.push_str(&format!("{} --> {}\n", elem_id, file_id));
+
+                elem_id_and_file_to_vulnerabilities
+                    .get(&(elem_id, file))
+                    .unwrap_or(&vec![])
+                    .iter()
+                    .for_each(|v| {
+                        match self
+                            .data_sinks
+                            .get(&v.language)
+                            .and_then(|map| map.get(&v.data_sink_id))
+                        {
+                            Some(data_sink) => {
+                                elem_data_sinks.insert((&data_sink.id, &data_sink.name));
+                                mermaid.push_str(&format!(
+                                    "{} --> |<a href='{}'>L{}</a>| {}\n",
+                                    file_id, v.url_link, v.line_start, v.data_sink_id
+                                ));
+                            }
+                            None => {}
+                        }
+                    });
+            }
+            for (data_sink_id, data_sink_name) in elem_data_sinks {
+                mermaid.push_str(&format!("{}({})\n", data_sink_id, data_sink_name));
+                mermaid.push_str(&format!("style {} {}\n", data_sink_id, color));
+            }
+            elem_id_to_mermaid.insert(elem_id.clone(), mermaid);
+        }
+        elem_id_to_mermaid.sort_by(|a, _, b, _| {
+            let e1 = self.data_elements.get(a).unwrap();
+            let e2 = self.data_elements.get(b).unwrap();
+            e1.sensitivity.cmp(&e2.sensitivity).then_with(|| e1.name.cmp(&e2.name))
+        });
+        elem_id_to_mermaid
+    }
+}
+
+pub struct ScanUpload {
+    pub directory_info: Repository,
+    pub vulnerabilities: Vec<Vulnerability>,
+    pub data_element_occurrences: Vec<DataElementOccurrence>,
 }
 
 pub struct CodeScope {
@@ -405,7 +558,7 @@ impl<'a> CodeScope {
 
 pub struct FileScanContext<'a> {
     pub database: &'a ScanDatabase,
-    pub config: &'a ScanConfig<'a>,
+    pub config: &'a ScanConfig,
     pub absolute_file_path: &'a PathBuf,
     pub relative_file_path: &'a Path,
     pub display_file_path: String,
@@ -423,7 +576,7 @@ impl<'a> FileScanContext<'a> {
         file_path: &'a PathBuf,
         file_source: &'a [u8],
     ) -> FileScanContext<'a> {
-        let relative_file_path = file_path.strip_prefix(&scan_config.scan_dir_path).unwrap();
+        let relative_file_path = file_path.strip_prefix(&scan_config.repository.path).unwrap();
 
         FileScanContext {
             database: scan_database,
@@ -490,7 +643,7 @@ impl<'a> FileScanContext<'a> {
         }
 
         // If the name is an alias, use the original name.
-        let orig_name: String = self
+        let original_name: String = self
             .scopes
             .iter()
             .rev()
@@ -500,10 +653,9 @@ impl<'a> FileScanContext<'a> {
         let data_sink = self
             .config
             .data_sinks
-            .get(&self.language)
-            .unwrap()
+            .get(&self.language)?
             .values()
-            .find(|data_sink| data_sink.is_match(&orig_name));
+            .find(|data_sink| data_sink.is_match(&original_name));
 
         match data_sink {
             Some(data_sink) => {
@@ -577,21 +729,21 @@ impl<'a> FileScanContext<'a> {
     }
 
     pub fn put_occurrence(&self, occurrence: DataElementOccurrence) -> Result<()> {
-        if !self.config.skip_occurrence_hashes.contains(&occurrence.hash) {
+        if !self.config.skip_occurrences.contains(&occurrence.hash) {
             self.database.put_data_element_occurrence(&occurrence).unwrap();
         }
         Ok(())
     }
 
     pub fn put_vulnerability(&self, vulnerability: Vulnerability) -> Result<()> {
-        if !self.config.skip_vulnerability_hashes.contains(&vulnerability.hash) {
+        if !self.config.skip_vulnerabilities.contains(&vulnerability.hash) {
             self.database.put_vulnerability(&vulnerability).unwrap()
         }
         Ok(())
     }
 }
 
-pub struct VulnerabilitySummary {
+pub struct VulnerabilityCounts {
     pub critical: usize,
     pub medium: usize,
     pub low: usize,

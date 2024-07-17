@@ -17,11 +17,11 @@ pub mod database;
 pub mod languages;
 
 pub fn run_scan(config: &ScanConfig) -> Result<ScanResults> {
-    let database = ScanDatabase::new(env::temp_dir().join("hounddog.db").as_path());
+    let database = initialize_database();
     let mut py_parser = initialize_parser(language_python());
     let mut ts_parser = initialize_parser(language_typescript());
 
-    for file in get_files_in_dir(&config.scan_dir_path) {
+    for file in get_files_in_dir(&config.repository.path) {
         let _ = match file.extension().unwrap_or_default().to_str().unwrap() {
             "py" => PythonScanner::scan_file(&database, config, &mut py_parser, &file),
             "js" | "jsx" | "ts" | "tsx" => {
@@ -30,11 +30,17 @@ pub fn run_scan(config: &ScanConfig) -> Result<ScanResults> {
             _ => Ok(()),
         };
     }
-    Ok(ScanResults::new(database.get_data_element_occurrences()?, database.get_vulnerabilities()?))
+    let vulnerabilities = database.get_vulnerabilities()?;
+    let occurrences = database.get_data_element_occurrences()?;
+    Ok(ScanResults::new(config, vulnerabilities, occurrences))
 }
 
 fn initialize_parser(language: Language) -> Parser {
     let mut parser = Parser::new();
     parser.set_language(&language).unwrap();
     parser
+}
+
+fn initialize_database() -> ScanDatabase {
+    ScanDatabase::new(env::temp_dir().join("hounddog.db").as_path())
 }

@@ -1,10 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="scan --output-format=markdown" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="command" value="run -- scan --dir=test --output-format=markdown" />
+    <option name="command" value="run -- scan --dir=test --output-format=markdown --debug" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <envs>
       <env name="HOUNDDOG_ENV" value="dev" />
-      <env name="HOUNDDOG_API_KEY" value="" />
     </envs>
     <option name="emulateTerminal" value="true" />
     <option name="channel" value="DEFAULT" />
