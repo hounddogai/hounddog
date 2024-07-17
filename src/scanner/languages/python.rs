@@ -2,15 +2,12 @@ use anyhow::Result;
 use tree_sitter::Node;
 
 use crate::enums::VisitChildren;
+use crate::scanner::common::{get_child_by_field, get_children, get_children_by_field};
 use crate::scanner::languages::BaseScanner;
-use crate::scanner::common::{
-    get_child_by_field, get_children, get_children_by_field,
-};
-use crate::structs::{DataElementOccurrence, Vulnerability};
 use crate::structs::FileScanContext;
+use crate::structs::{DataElementOccurrence, Vulnerability};
 
 pub struct PythonScanner;
-
 
 impl BaseScanner for PythonScanner {
     fn visit_node(ctx: &mut FileScanContext, node: &Node) -> Result<VisitChildren> {

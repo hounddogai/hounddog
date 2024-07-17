@@ -1,13 +1,11 @@
 use anyhow::Result;
-use std::collections::HashMap;
-
 use serde::Serialize;
 
 use crate::enums::{Sensitivity, Severity, Source};
-use crate::structs::{ScanConfig, ScanResults};
+use crate::structs::ScanResults;
 
 #[derive(Serialize)]
-pub struct DataElement {
+struct DataElement {
     id: String,
     name: String,
     sensitivity: Sensitivity,
@@ -16,14 +14,14 @@ pub struct DataElement {
 }
 
 #[derive(Serialize)]
-pub struct DataElementOccurrence {
+struct DataElementOccurrence {
     data_element: String,
     count: usize,
     locations: Vec<DataElementOccurrenceLocation>,
 }
 
 #[derive(Serialize)]
-pub struct DataElementOccurrenceLocation {
+struct DataElementOccurrenceLocation {
     hash: String,
     code_segment: String,
     file: String,
@@ -32,7 +30,7 @@ pub struct DataElementOccurrenceLocation {
 }
 
 #[derive(Serialize)]
-pub struct VulnerabilityRule {
+struct VulnerabilityRule {
     id: String,
     name: String,
     description: String,
@@ -42,7 +40,7 @@ pub struct VulnerabilityRule {
 }
 
 #[derive(Serialize)]
-pub struct Vulnerability {
+struct Vulnerability {
     hash: String,
     code_segment: String,
     file: String,
@@ -55,7 +53,7 @@ pub struct Vulnerability {
 }
 
 #[derive(Serialize)]
-pub struct CacilianReport {
+pub struct CacilianJson {
     repository: String,
     repository_url: String,
     branch: String,
@@ -66,32 +64,21 @@ pub struct CacilianReport {
     vulnerabilities: Vec<Vulnerability>,
 }
 
-pub fn export_cacilian_json(config: &ScanConfig, results: &ScanResults) -> Result<CacilianReport> {
-    let current_time = chrono::offset::Local::now();
-    let file_path = match &config.output_filename {
-        Some(path) => &config.scan_dir_path.join(path),
-        None => &config
-            .scan_dir_path
-            .join(current_time.format("hounddog-%Y-%m-%d-%H-%M-%S.json").to_string()),
+pub fn generate_cacilian_output(results: &ScanResults) -> Result<CacilianJson> {
+    let now = chrono::offset::Local::now();
+    let file_path = match &results.output_filename {
+        Some(path) => &results.repository.path.join(path),
+        None => &results
+            .repository
+            .path
+            .join(now.format("hounddog-%Y-%m-%d-%H-%M-%S.cacilian.json").to_string()),
     };
-
-    let elem_id_to_occurrences =
-        results
-            .data_element_occurrences
-            .iter()
-            .fold(HashMap::new(), |mut map, occurrence| {
-                map.entry(occurrence.data_element_id.clone())
-                    .or_insert_with(Vec::new)
-                    .push(occurrence);
-                map
-            });
-
-    let report = CacilianReport {
-        repository: config.scan_dir_info.git_repo_name.clone(),
-        repository_url: config.scan_dir_info.git_remote_url.clone(),
-        branch: config.scan_dir_info.git_branch.clone(),
-        commit: config.scan_dir_info.git_commit.clone(),
-        data_elements: config
+    let cacilian_json = CacilianJson {
+        repository: results.repository.name.clone(),
+        repository_url: results.repository.base_url.clone(),
+        branch: results.repository.branch.clone(),
+        commit: results.repository.commit.clone(),
+        data_elements: results
             .data_elements
             .values()
             .map(|data_element| DataElement {
@@ -103,10 +90,11 @@ pub fn export_cacilian_json(config: &ScanConfig, results: &ScanResults) -> Resul
             })
             .collect(),
 
-        data_element_occurrences: elem_id_to_occurrences
+        data_element_occurrences: results
+            .get_data_element_id_to_occurrences()
             .iter()
             .map(|(id, occurrences)| DataElementOccurrence {
-                data_element: id.clone(),
+                data_element: (*id).clone(),
                 count: occurrences.len(),
                 locations: occurrences
                     .iter()
@@ -120,7 +108,7 @@ pub fn export_cacilian_json(config: &ScanConfig, results: &ScanResults) -> Resul
                     .collect(),
             })
             .collect(),
-        vulnerability_rules: config
+        vulnerability_rules: results
             .data_sinks
             .values()
             .flat_map(|map| map.values())
@@ -149,8 +137,7 @@ pub fn export_cacilian_json(config: &ScanConfig, results: &ScanResults) -> Resul
             })
             .collect(),
     };
-
-    serde_json::to_writer_pretty(std::fs::File::create(file_path)?, &report)?;
+    serde_json::to_writer_pretty(std::fs::File::create(file_path)?, &cacilian_json)?;
     println!("file://{}", file_path.display());
-    Ok(report)
+    Ok(cacilian_json)
 }

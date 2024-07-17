@@ -18,10 +18,9 @@ pub fn parse_git_remote_url(remote_url: &str) -> Result<(String, String)> {
     } else if remote_url.contains("://") {
         let parsed = Url::parse(&remote_url)
             .map_err(|_| err!("Failed to parse Git remote URL: {}", remote_url))?;
-        let domain = parsed.domain().ok_or(err!(
-            "Failed to get domain from Git remote URL: {}",
-            remote_url
-        ))?;
+        let domain = parsed
+            .domain()
+            .ok_or(err!("Failed to get domain from Git remote URL: {}", remote_url))?;
         let scheme = match parsed.scheme() {
             "ssh" => "https",
             scheme => scheme,
@@ -126,27 +125,29 @@ pub fn get_git_diff_files(repo: &Repository, baseline: Option<&str>) -> Result<V
 }
 
 pub fn get_url_link(
-    git_provider: &Option<GitProvider>,
-    remote_url: &str,
+    url_base: &str,
     commit: &str,
     relative_file_path: &str,
+    git_provider: &Option<GitProvider>,
     line_start: usize,
     line_end: usize,
+    column_start: usize,
 ) -> String {
     match git_provider {
         Some(GitProvider::GitHub) => format!(
-            "{}/blob/{}/{}#L{}-L{}",
-            remote_url, commit, relative_file_path, line_start, line_end
+            "{}/blob/{:.10}/{}#L{}-L{}",
+            url_base, commit, relative_file_path, line_start, line_end
         ),
         Some(GitProvider::GitLab) => format!(
-            "{}/-/blob/{}/{}#L{}-{}",
-            remote_url, commit, relative_file_path, line_start, line_end
+            "{}/-/blob/{:.10}/{}#L{}-{}",
+            url_base, commit, relative_file_path, line_start, line_end
         ),
         Some(GitProvider::Bitbucket) => format!(
-            "{}/src/{}/{}#lines-{}:{}",
-            remote_url, commit, relative_file_path, line_start, line_end
+            "{}/src/{:.10}/{}#lines-{}:{}",
+            url_base, commit, relative_file_path, line_start, line_end
         ),
-        _ => remote_url.to_string(),
+        // Probably file:// URLs
+        _ => format!("{}/{}:{}:{}", url_base, relative_file_path, line_start, column_start),
     }
 }
 

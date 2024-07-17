@@ -1,10 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="scan --output-format=cacilian" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
-    <option name="command" value="run -- scan --dir=test --output-format=cacilian" />
+    <option name="command" value="run -- scan --dir=test --output-format=cacilian --debug" />
     <option name="workingDirectory" value="file://$PROJECT_DIR$" />
     <envs>
       <env name="HOUNDDOG_ENV" value="dev" />
-      <env name="HOUNDDOG_API_KEY" value="" />
     </envs>
     <option name="emulateTerminal" value="true" />
     <option name="channel" value="DEFAULT" />

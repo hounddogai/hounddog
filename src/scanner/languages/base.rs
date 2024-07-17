@@ -1,16 +1,13 @@
-use std::collections::HashMap;
 use std::path::PathBuf;
 
 use anyhow::Result;
-use regex::Regex;
 use tree_sitter::{Node, Parser};
 
-use crate::enums::{Language, VisitChildren};
+use crate::enums::VisitChildren;
 use crate::err;
 use crate::scanner::database::ScanDatabase;
 use crate::structs::FileScanContext;
 use crate::structs::ScanConfig;
-use crate::utils::file::get_file_language;
 
 pub trait BaseScanner {
     /// Visit a node in the abstract syntax tree (AST).

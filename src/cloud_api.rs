@@ -8,23 +8,22 @@ use serde::Deserialize;
 
 use crate::enums::{HoundDogEnv, Language};
 use crate::sentry_err;
-use crate::structs::{DataElement, DataSink, Sanitizer, UserInfo};
+use crate::structs::{DataElement, DataSink, Sanitizer, ScanResults, User};
 
 #[derive(Deserialize)]
 pub struct PaginatedResponse<T> {
     pub items: Vec<T>,
-    pub count: usize,
 }
 
 pub struct HoundDogCloudApi {
-    http_client: HttpClient,
+    http: HttpClient,
     base_url: String,
 }
 
 impl HoundDogCloudApi {
     pub fn new(env: &HoundDogEnv, api_key: &str) -> Result<Self> {
         Ok(Self {
-            http_client: HttpClient::builder()
+            http: HttpClient::builder()
                 .default_headers({
                     let auth_header = format!("Bearer {}", api_key);
                     let mut headers = HeaderMap::new();
@@ -46,7 +45,7 @@ impl HoundDogCloudApi {
     }
 
     fn send_request<T: DeserializeOwned>(&self, request: HttpRequest) -> Result<T> {
-        match self.http_client.execute(request) {
+        match self.http.execute(request) {
             Ok(response) => {
                 if response.status().is_success() {
                     let response_text = response.text()?;
@@ -65,23 +64,15 @@ impl HoundDogCloudApi {
         }
     }
 
-    pub fn get_auth_metadata(&self) -> Result<UserInfo> {
-        let request = self
-            .http_client
-            .get(format!("{}/users/current/", self.base_url))
-            .build()
-            .unwrap();
+    pub fn authenticate(&self) -> Result<User> {
+        let request = self.http.get(format!("{}/users/current/", self.base_url)).build()?;
+        let user = self.send_request(request)?;
 
-        Ok(self.send_request(request)?)
+        Ok(user)
     }
 
     pub fn get_data_elements(&self) -> Result<HashMap<String, DataElement>> {
-        let request = self
-            .http_client
-            .get(format!("{}/data-elements/", self.base_url))
-            .build()
-            .unwrap();
-
+        let request = self.http.get(format!("{}/data-elements/", self.base_url)).build()?;
         let data_elements: PaginatedResponse<DataElement> = self.send_request(request)?;
         Ok(data_elements
             .items
@@ -91,9 +82,7 @@ impl HoundDogCloudApi {
     }
 
     pub fn get_data_sinks(&self) -> Result<HashMap<Language, HashMap<String, DataSink>>> {
-        let request =
-            self.http_client.get(format!("{}/data-sinks/", self.base_url)).build().unwrap();
-
+        let request = self.http.get(format!("{}/data-sinks/", self.base_url)).build()?;
         let data_sinks: PaginatedResponse<DataSink> = self.send_request(request)?;
         Ok(data_sinks.items.into_iter().fold(HashMap::new(), |mut map, data_sink| {
             map.entry(data_sink.language)
@@ -104,10 +93,18 @@ impl HoundDogCloudApi {
     }
 
     pub fn get_sanitizers(&self) -> Result<Vec<Sanitizer>> {
-        let request =
-            self.http_client.get(format!("{}/sanitizers/", self.base_url)).build().unwrap();
-
+        let request = self.http.get(format!("{}/sanitizers/", self.base_url)).build()?;
         let sanitizers: PaginatedResponse<Sanitizer> = self.send_request(request)?;
         Ok(sanitizers.items)
+    }
+
+    pub fn upload_scan_results(&self, scan_results: &ScanResults) -> Result<()> {
+        let request = self
+            .http
+            .post(format!("{}/scan-results/", self.base_url))
+            .body(serde_json::to_string(scan_results)?)
+            .build()?;
+        self.send_request(request)?;
+        Ok(())
     }
 }

@@ -4,20 +4,19 @@ use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
-use git2::Repository;
 use ignore::WalkBuilder;
 use strum::IntoEnumIterator;
 
 use crate::enums::{CiType, GitProvider, Language};
 use crate::err;
-use crate::structs::{DirectoryInfo, FileStats};
-use crate::utils::git::{get_git_commit, get_git_branch, parse_git_remote_url};
+use crate::structs::{Repository, FileStats};
+use crate::utils::git::{get_git_branch, get_git_commit, parse_git_remote_url};
 
-pub fn get_dir_info(path: &PathBuf, ci_type: &Option<CiType>) -> Result<DirectoryInfo> {
+pub fn get_repository_info(path: &PathBuf, ci_type: &Option<CiType>) -> Result<Repository> {
     let mut per_lang_file_stats = Language::iter()
-        .map(|lang| (lang, FileStats::new()))
+        .map(|lang| (lang, FileStats::default()))
         .collect::<HashMap<Language, FileStats>>();
-    let mut total_file_stats = FileStats::new();
+    let mut total_file_stats = FileStats::default();
 
     for file in get_files_in_dir(path) {
         if let Some(language) = get_file_language(&file) {
@@ -33,7 +32,7 @@ pub fn get_dir_info(path: &PathBuf, ci_type: &Option<CiType>) -> Result<Director
     }
 
     if path.join(".git").is_dir() {
-        let repo = Repository::open(path)?;
+        let repo = git2::Repository::open(path)?;
         let git_remote_url = repo
             .find_remote("origin")
             .map_err(|_| err!("Failed to access Git remote origin"))?
@@ -42,36 +41,32 @@ pub fn get_dir_info(path: &PathBuf, ci_type: &Option<CiType>) -> Result<Director
             .map(|url| url.trim_end_matches('/').trim_end_matches(".git").to_string())?
             .to_lowercase();
 
-        let (git_remote_url, git_repo_name) = parse_git_remote_url(&git_remote_url)?;
-        let git_branch = get_git_branch(&repo, &ci_type)?;
-        let git_commit = get_git_commit(&repo, &ci_type)?;
-        let git_provider = match &git_remote_url {
+        let (remote_url, repo_name) = parse_git_remote_url(&git_remote_url)?;
+        let branch = get_git_branch(&repo, &ci_type)?;
+        let commit = get_git_commit(&repo, &ci_type)?;
+        let git_provider = match &remote_url {
+            url if url.contains("bitbucket") => Some(GitProvider::Bitbucket),
             url if url.contains("github") => Some(GitProvider::GitHub),
             url if url.contains("gitlab") => Some(GitProvider::GitLab),
-            url if url.contains("bitbucket") => Some(GitProvider::Bitbucket),
             _ => None,
         };
-        Ok(DirectoryInfo {
-            git_remote_url,
-            git_repo_name,
-            git_branch,
-            git_commit,
+        Ok(Repository {
+            path: path.clone(),
+            base_url: remote_url,
+            name: repo_name,
+            branch,
+            commit,
             git_provider,
             per_lang_file_stats,
             total_file_stats,
         })
     } else {
-        Ok(DirectoryInfo {
-            git_remote_url: format!(
-                "file://{}",
-                path.display().to_string().trim_start_matches('/')
-            ),
-            git_repo_name: format!(
-                "local/{}",
-                path.file_stem().unwrap().to_string_lossy().to_string()
-            ),
-            git_branch: "main".to_string(),
-            git_commit: "HEAD".to_string(),
+        Ok(Repository {
+            path: path.clone(),
+            base_url: format!("file://{}", path.display()),
+            name: format!("local/{}", path.file_stem().unwrap().to_string_lossy()),
+            branch: "main".to_string(),
+            commit: "HEAD".to_string(),
             git_provider: None,
             per_lang_file_stats,
             total_file_stats,

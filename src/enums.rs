@@ -112,6 +112,7 @@ pub enum Language {
     CSharp,
     GraphQL,
     Java,
+    Javascript,
     Kotlin,
     Python,
     Ruby,
