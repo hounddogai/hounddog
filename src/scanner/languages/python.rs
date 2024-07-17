@@ -86,13 +86,15 @@ impl BaseScanner for PythonScanner {
             }
             "attribute" | "identifier" if node.end_byte() - node.start_byte() > 1 => {
                 let text = ctx.get_node_text(node);
-                if let Some(data_element) = ctx.find_data_element(&text) {
-                    let _ = ctx.put_occurrence(DataElementOccurrence::from_node(
-                        ctx,
-                        node,
-                        &data_element,
-                    ));
-                    return Ok(VisitChildren::No); // Do not look at parts of the same attribute again.
+                for data_elem in ctx.find_data_element(&text) {
+                    if let Some(data_element) = data_elem {
+                        let _ = ctx.put_occurrence(DataElementOccurrence::from_node(
+                            ctx,
+                            node,
+                            &data_element,
+                        ));
+                        return Ok(VisitChildren::No); // Do not look at parts of the same attribute again.
+                    }
                 }
             }
             "call" => {
@@ -105,8 +107,10 @@ impl BaseScanner for PythonScanner {
                         match arg.kind() {
                             "identifier" => {
                                 let arg_text = ctx.get_node_text(&arg);
-                                if let Some(elem) = ctx.find_data_element(&arg_text) {
-                                    data_elements.push(elem);
+                                for element in ctx.find_data_element(&arg_text) {
+                                    if let Some(elem) = element {
+                                        data_elements.push(elem);
+                                    }
                                 }
                             }
                             _ => (),

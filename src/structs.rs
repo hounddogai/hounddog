@@ -374,7 +374,6 @@ impl<'a> ScanResults<'a> {
         mut vulnerabilities: Vec<Vulnerability>,
         mut occurrences: Vec<DataElementOccurrence>,
     ) -> ScanResults<'a> {
-
         vulnerabilities.sort_by(|a, b| a.severity.cmp(&b.severity));
         occurrences.sort_by(|a, b| a.sensitivity.cmp(&b.sensitivity));
 
@@ -562,8 +561,9 @@ pub struct FileScanContext<'a> {
     pub language: Language,
     scopes: Vec<CodeScope>,
     data_sinks_cache: HashMap<String, &'a DataSink>,
+
     data_elements_cache: HashMap<String, &'a DataElement>,
-    pub data_element_aliases: HashMap<String, String>
+    pub data_element_aliases: HashMap<String, Vec<String>>,
 }
 
 impl<'a> FileScanContext<'a> {
@@ -590,10 +590,12 @@ impl<'a> FileScanContext<'a> {
         }
     }
 
-    pub fn set_data_element_aliases(&mut self, left : String, right : String){
-        self.data_element_aliases.insert(left, right);
-
-
+    pub fn set_data_element_aliases(&mut self, left: String, right: String) {
+        let values = vec![right];
+        self.data_element_aliases
+            .entry(left)
+            .or_insert_with(Vec::new)
+            .extend(values.iter().map(|v| v.to_string()));
     }
     pub fn enter_global_scope(&mut self) {
         self.scopes.push(CodeScope::new(ScopeType::Global, "global".to_string()));
@@ -619,14 +621,18 @@ impl<'a> FileScanContext<'a> {
         self.scopes.last().unwrap()
     }
 
-    pub fn find_data_element(&mut self, name: &str) -> Option<&'a DataElement> {
+    pub fn find_data_element(&mut self, name: &str) -> Vec<Option<&'a DataElement>> {
         if let Some(data_element) = self.data_elements_cache.get(name) {
-            return Some(data_element);
+            return vec![Some(data_element)];
         }
-        if let Some(data_element_name) = self.data_element_aliases.get(name) {
-            let option = self.data_elements_cache.get(data_element_name);
-            return option.copied();
-        } 
+        if let Some(data_element_names) = self.data_element_aliases.get(name) {
+            let mut options = vec![];
+            for data_element_name in data_element_names {
+                let option = self.data_elements_cache.get(data_element_name);
+                options.push(option.copied());
+            }
+            return options;
+        }
 
         let normalized_name = name.replace(".", "_");
         let data_element = self
@@ -635,11 +641,10 @@ impl<'a> FileScanContext<'a> {
             .values()
             .find(|data_element| data_element.is_match(&normalized_name));
 
-
         match data_element {
             Some(data_element) => {
                 self.data_elements_cache.insert(name.to_string(), data_element);
-                Some(data_element)
+                vec![Some(data_element)]
             }
             None => None,
         }

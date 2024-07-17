@@ -14,13 +14,15 @@ impl BaseScanner for TypescriptScanner {
         match (node.kind()) {
             "identifier" | "property_identifier" => {
                 let text = state.get_node_text(node);
-                if let Some(data_element) = state.find_data_element(&text) {
-                    let _ = state.put_occurrence(DataElementOccurrence::from_node(
-                        state,
-                        node,
-                        &data_element,
-                    ));
-                    return Ok(VisitChildren::No); // Do not look at parts of the same attribute again.
+                for data_elem in state.find_data_element(&text) {
+                    if let Some(data_element) = data_elem {
+                        let _ = state.put_occurrence(DataElementOccurrence::from_node(
+                            state,
+                            node,
+                            &data_element,
+                        ));
+                        return Ok(VisitChildren::No); // Do not look at parts of the same attribute again.
+                    }
                 }
             }
             "method_definition" => {}
@@ -53,8 +55,10 @@ impl BaseScanner for TypescriptScanner {
                             "identifier" | "property_identifier" => {
 
                                 let arg_text = state.get_node_text(&arg);
-                                if let Some(elem) = state.find_data_element(&arg_text) {
-                                    data_elements.push(elem);
+                                for data_element in state.find_data_element(&arg_text) {
+                                    if let Some(elem) = data_element {
+                                        data_elements.push(elem);
+                                    }
                                 }
                             }
                             _ => (),
