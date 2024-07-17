@@ -27,6 +27,18 @@ impl BaseScanner for TypescriptScanner {
             "function_declaration" => {}
             "type_identifier" => {}
             "member_expression" => {}
+            "assignment_expression" => {
+                let left_node = node.child_by_field_name("left").unwrap();
+                let left_node_text = state.get_node_text(&left_node);
+
+                if let Some(right_node) = node.child_by_field_name("right") {
+                    let children = find_all_child_member_expressions(right_node);
+                    for child in children{
+                        state.set_data_element_aliases(left_node_text.clone(),
+                                                       state.get_node_text(&child));
+                    }
+                }
+            }
             "call_expression" => {
                 let func_node = get_child_by_field(node, "function");
 
@@ -39,6 +51,7 @@ impl BaseScanner for TypescriptScanner {
                     {
                         match arg.kind() {
                             "identifier" | "property_identifier" => {
+
                                 let arg_text = state.get_node_text(&arg);
                                 if let Some(elem) = state.find_data_element(&arg_text) {
                                     data_elements.push(elem);

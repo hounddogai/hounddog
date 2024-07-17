@@ -563,6 +563,7 @@ pub struct FileScanContext<'a> {
     scopes: Vec<CodeScope>,
     data_sinks_cache: HashMap<String, &'a DataSink>,
     data_elements_cache: HashMap<String, &'a DataElement>,
+    pub data_element_aliases: HashMap<String, String>
 }
 
 impl<'a> FileScanContext<'a> {
@@ -585,9 +586,15 @@ impl<'a> FileScanContext<'a> {
             scopes: vec![],
             data_sinks_cache: HashMap::new(),
             data_elements_cache: HashMap::new(),
+            data_element_aliases: HashMap::new(),
         }
     }
 
+    pub fn set_data_element_aliases(&mut self, left : String, right : String){
+        self.data_element_aliases.insert(left, right);
+
+
+    }
     pub fn enter_global_scope(&mut self) {
         self.scopes.push(CodeScope::new(ScopeType::Global, "global".to_string()));
     }
@@ -616,6 +623,10 @@ impl<'a> FileScanContext<'a> {
         if let Some(data_element) = self.data_elements_cache.get(name) {
             return Some(data_element);
         }
+        if let Some(data_element_name) = self.data_element_aliases.get(name) {
+            let option = self.data_elements_cache.get(data_element_name);
+            return option.copied();
+        } 
 
         let normalized_name = name.replace(".", "_");
         let data_element = self
@@ -623,6 +634,7 @@ impl<'a> FileScanContext<'a> {
             .data_elements
             .values()
             .find(|data_element| data_element.is_match(&normalized_name));
+
 
         match data_element {
             Some(data_element) => {
