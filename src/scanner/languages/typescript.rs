@@ -1,32 +1,83 @@
-use std::collections::VecDeque;
-
 use anyhow::Result;
+use std::collections::{HashSet, VecDeque};
+use std::env::var;
 use tree_sitter::Node;
 
 use crate::enums::VisitChildren;
 use crate::scanner::languages::base::BaseScanner;
-use crate::structs::{DataElementOccurrence, FileScanContext, Vulnerability};
+use crate::structs::{DataElement, DataElementOccurrence, FileScanContext, Vulnerability};
 
 pub struct TypescriptScanner;
 
 impl BaseScanner for TypescriptScanner {
     fn visit_node(state: &mut FileScanContext, node: &Node) -> Result<VisitChildren> {
         match (node.kind()) {
+            "variable_declarator" => {
+                let var_decl_name = state.get_node_name(&node);
+                let value_node = node.child_by_field_name("value").unwrap();
+                let value_children = find_all_child_member_expressions(value_node);
+
+                let mut child_names: HashSet<String> = HashSet::new();
+                for val_child in value_children {
+                    if val_child.kind() == "property_identifier" {
+                        child_names.insert(state.get_node_text(&val_child));
+                    }
+                }
+                for child_name in child_names {
+                    {
+                        let found_data_elems = state.find_data_element(&child_name);
+                        for fde in found_data_elems {
+                            if let Some(fde) = fde {
+                                state.set_associated_data_elements(
+                                    var_decl_name.to_string(),
+                                    fde.id.to_string(),
+                                );
+                            }
+                        }
+                    }
+                }
+            }
             "identifier" | "property_identifier" => {
                 let text = state.get_node_text(node);
-                if let Some(data_element) = state.find_data_element(&text) {
-                    let _ = state.put_occurrence(DataElementOccurrence::from_node(
-                        state,
-                        node,
-                        &data_element,
-                    ));
-                    return Ok(VisitChildren::No); // Do not look at parts of the same attribute again.
+                for data_elem in state.find_data_element(&text) {
+                    if let Some(data_element) = data_elem {
+                        let _ = state.put_occurrence(DataElementOccurrence::from_node(
+                            state,
+                            node,
+                            &data_element,
+                        ));
+                        return Ok(VisitChildren::No); // Do not look at parts of the same attribute again.
+                    }
                 }
             }
             "method_definition" => {}
             "function_declaration" => {}
             "type_identifier" => {}
             "member_expression" => {}
+            "assignment_expression" => {
+                let left_node = node.child_by_field_name("left").unwrap();
+                let left_node_text = state.get_node_text(&left_node);
+
+                if let Some(right_node) = node.child_by_field_name("right") {
+                    let children = find_all_child_member_expressions(right_node);
+                    for child in children {
+                        if child.kind() == "identifier" || child.kind() == "property_identifier" {
+                            state.set_data_element_aliases(
+                                left_node_text.clone(),
+                                state.get_node_text(&child),
+                            );
+                        }
+                        for dem in state.find_data_element(&state.get_node_text(&child)) {
+                            if dem.is_some() {
+                                state.set_associated_data_elements(
+                                    left_node_text.clone(),
+                                    dem.unwrap().id.to_string(),
+                                );
+                            }
+                        }
+                    }
+                }
+            }
             "call_expression" => {
                 let func_node = get_child_by_field(node, "function");
 
@@ -40,13 +91,29 @@ impl BaseScanner for TypescriptScanner {
                         match arg.kind() {
                             "identifier" | "property_identifier" => {
                                 let arg_text = state.get_node_text(&arg);
-                                if let Some(elem) = state.find_data_element(&arg_text) {
-                                    data_elements.push(elem);
+                                for data_element in state.find_data_element(&arg_text) {
+                                    if let Some(elem) = data_element {
+                                        data_elements.push(elem);
+                                    }
+                                }
+                                if data_elements.len() == 0 {
+                                    if let Some(assoc_data_elems) =
+                                        state.associated_data_elements.get(&arg_text)
+                                    {
+                                        for assoc_data_elem in assoc_data_elems {
+                                            if let Some(detected) =
+                                                state.config.data_elements.get(assoc_data_elem)
+                                            {
+                                                data_elements.push(detected);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             _ => (),
                         }
                     }
+
                     if !data_elements.is_empty() {
                         let _ = state.put_vulnerability(Vulnerability::from_node(
                             state,

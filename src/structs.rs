@@ -4,15 +4,19 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::Result;
+use clap::builder::Str;
 use git2::PushOptions;
 use indexmap::IndexMap;
+use md5::digest::typenum::op;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use strum::IntoEnumIterator;
+use strum_macros::Display;
 use tree_sitter::Node;
 
 use crate::enums::{GitProvider, Language, OutputFormat, ScopeType, Sensitivity, Severity, Source};
 use crate::scanner::database::ScanDatabase;
+use crate::structs;
 use crate::utils::file::get_file_language;
 use crate::utils::git::get_url_link;
 use crate::utils::hash::calculate_md5_hash;
@@ -378,7 +382,6 @@ impl<'a> ScanResults<'a> {
         mut vulnerabilities: Vec<Vulnerability>,
         mut occurrences: Vec<DataElementOccurrence>,
     ) -> ScanResults<'a> {
-
         vulnerabilities.sort_by(|a, b| a.severity.cmp(&b.severity));
         occurrences.sort_by(|a, b| a.sensitivity.cmp(&b.sensitivity));
 
@@ -417,6 +420,7 @@ impl<'a> ScanResults<'a> {
             map
         })
     }
+
 
     pub fn get_sensitive_datamap_table_rows(&self) -> Vec<Vec<String>> {
         let mut elem_to_count: Vec<(&DataElement, usize)> = self
@@ -566,7 +570,9 @@ pub struct FileScanContext<'a> {
     pub language: Language,
     scopes: Vec<CodeScope>,
     data_sinks_cache: HashMap<String, &'a DataSink>,
+    pub associated_data_elements : HashMap<String, Vec<String>>,
     data_elements_cache: HashMap<String, &'a DataElement>,
+    pub data_element_aliases: HashMap<String, Vec<String>>,
 }
 
 impl<'a> FileScanContext<'a> {
@@ -588,9 +594,28 @@ impl<'a> FileScanContext<'a> {
             language: get_file_language(&file_path).unwrap(),
             scopes: vec![],
             data_sinks_cache: HashMap::new(),
+            associated_data_elements: HashMap::new(),
             data_elements_cache: HashMap::new(),
+            data_element_aliases: HashMap::new(),
         }
     }
+
+    pub fn set_associated_data_elements(&mut self, left:String, thing : String){
+
+        let values = vec![thing];
+        self.associated_data_elements
+            .entry(left)
+            .or_insert_with(Vec::new)
+            .extend(values.iter().map(|v| v.to_string()));
+    }
+    pub fn set_data_element_aliases(&mut self, left: String, right: String) {
+        let values = vec![right];
+        self.data_element_aliases
+            .entry(left)
+            .or_insert_with(Vec::new)
+            .extend(values.iter().map(|v| v.to_string()));
+    }
+
 
     pub fn enter_global_scope(&mut self) {
         self.scopes.push(CodeScope::new(ScopeType::Global, "global".to_string()));
@@ -616,10 +641,20 @@ impl<'a> FileScanContext<'a> {
         self.scopes.last().unwrap()
     }
 
-    pub fn find_data_element(&mut self, name: &str) -> Option<&'a DataElement> {
+    pub fn find_data_element(&mut self, name: &str) -> Vec<Option<&'a DataElement>> {
         if let Some(data_element) = self.data_elements_cache.get(name) {
-            return Some(data_element);
+            return vec![Some(data_element)];
         }
+        if let Some(data_element_names) = self.data_element_aliases.get(name) {
+            let mut options = vec![];
+            for data_element_name in data_element_names {
+                let option = self.data_elements_cache.get(data_element_name);
+                options.push(option.copied());
+
+            }
+            return options;
+        }
+
 
         let normalized_name = name.replace(".", "_");
         let data_element = self
@@ -631,9 +666,9 @@ impl<'a> FileScanContext<'a> {
         match data_element {
             Some(data_element) => {
                 self.data_elements_cache.insert(name.to_string(), data_element);
-                Some(data_element)
+                vec![Some(data_element)]
             }
-            None => None,
+            None => vec![None],
         }
     }
 
