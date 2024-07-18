@@ -5,7 +5,7 @@ use tree_sitter::Node;
 
 use crate::enums::VisitChildren;
 use crate::scanner::languages::base::BaseScanner;
-use crate::structs::{DataElementOccurrence, FileScanContext, Vulnerability};
+use crate::structs::{DataElement, DataElementOccurrence, FileScanContext, Vulnerability};
 
 pub struct TypescriptScanner;
 
@@ -35,9 +35,21 @@ impl BaseScanner for TypescriptScanner {
 
                 if let Some(right_node) = node.child_by_field_name("right") {
                     let children = find_all_child_member_expressions(right_node);
-                    for child in children{
-                        state.set_data_element_aliases(left_node_text.clone(),
-                                                       state.get_node_text(&child));
+                    for child in children {
+                        if child.kind() == "identifier" || child.kind() == "property_identifier" {
+                            state.set_data_element_aliases(
+                                left_node_text.clone(),
+                                state.get_node_text(&child),
+                            );
+                        }
+                        for dem in state.find_data_element(&state.get_node_text(&child)) {
+                            if dem.is_some() {
+                                state.set_associated_data_elements(
+                                    left_node_text.clone(),
+                                    dem.unwrap().id.to_string(),
+                                );
+                            }
+                        }
                     }
                 }
             }
@@ -53,17 +65,30 @@ impl BaseScanner for TypescriptScanner {
                     {
                         match arg.kind() {
                             "identifier" | "property_identifier" => {
-
                                 let arg_text = state.get_node_text(&arg);
                                 for data_element in state.find_data_element(&arg_text) {
                                     if let Some(elem) = data_element {
                                         data_elements.push(elem);
                                     }
                                 }
+                                if data_elements.len() == 0 {
+                                    if let Some(assoc_data_elems) =
+                                        state.associated_data_elements.get(&arg_text)
+                                    {
+                                        for assoc_data_elem in assoc_data_elems {
+                                            if let Some(detected) =
+                                                state.config.data_elements.get(assoc_data_elem)
+                                            {
+                                                data_elements.push(detected);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             _ => (),
                         }
                     }
+
                     if !data_elements.is_empty() {
                         let _ = state.put_vulnerability(Vulnerability::from_node(
                             state,
