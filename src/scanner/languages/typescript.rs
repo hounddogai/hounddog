@@ -1,6 +1,6 @@
-use std::collections::VecDeque;
-
 use anyhow::Result;
+use std::collections::{HashSet, VecDeque};
+use std::env::var;
 use tree_sitter::Node;
 
 use crate::enums::VisitChildren;
@@ -12,6 +12,31 @@ pub struct TypescriptScanner;
 impl BaseScanner for TypescriptScanner {
     fn visit_node(state: &mut FileScanContext, node: &Node) -> Result<VisitChildren> {
         match (node.kind()) {
+            "variable_declarator" => {
+                let var_decl_name = state.get_node_name(&node);
+                let value_node = node.child_by_field_name("value").unwrap();
+                let value_children = find_all_child_member_expressions(value_node);
+
+                let mut child_names: HashSet<String> = HashSet::new();
+                for val_child in value_children {
+                    if val_child.kind() == "property_identifier" {
+                        child_names.insert(state.get_node_text(&val_child));
+                    }
+                }
+                for child_name in child_names {
+                    {
+                        let found_data_elems = state.find_data_element(&child_name);
+                        for fde in found_data_elems {
+                            if let Some(fde) = fde {
+                                state.set_associated_data_elements(
+                                    var_decl_name.to_string(),
+                                    fde.id.to_string(),
+                                );
+                            }
+                        }
+                    }
+                }
+            }
             "identifier" | "property_identifier" => {
                 let text = state.get_node_text(node);
                 for data_elem in state.find_data_element(&text) {
