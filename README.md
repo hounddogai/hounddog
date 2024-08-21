@@ -1,172 +1,215 @@
-# HoundDog.ai
+# HoundDog.ai — Modern Privacy Code Scanner
 
-## What is it?
+[HoundDog.ai](https://hounddog.ai) is an ultra-fast privacy scanner that detects sensitive data flows and leaks in your code.
 
-[HoundDog.ai](https://hounddog.ai) is a state-of-the-art source code scanner
-(SAST command-line tool) that helps organizations shift-left with the following
-use cases:
+**It answers questions such as:**
 
-- **Proactive PII Leak Prevention**: Stop PII leaks in logs, files, cookies,
-  tokens, and third-party services early during code reviews to strengthen the
-  data security posture and avoid costly remediation in production.
-- **Third-Party Risk Mitigation**: Track third-party application dataflows and
-  detect data processing agreement violations before they become real problems.
-- **Automatic Data Mapping for Compliance**: Eliminate manual, error-prone
-  documentation of processing activities relying on spreadsheets and internal
-  surveys. Streamline the entire process while keeping pace with development
-  and eliminate surprises from new product changes.
+- What data is processed? (e.g., personal data, financial data, health data)
+- Where is data stored? (e.g., logs, files, databases)
+- Who is data shared with? (e.g., AWS, Stripe, internal microservices)
 
-### Free Features
+**It is useful for:**
 
-- Offline reports for point-in-time views of the sensitive data elements in
-  your codebase, along with their sensitivity levels, occurrence counts, and
-  relevant code snippets.
+- Early prevention of data leaks during development.
+- Automated and evidence-based data mapping for privacy compliance (e.g., GDPR, HIPAA).
+- Reducing engineering fatigue, stale data inventories, and regulatory fines.
 
-### Starter and Enterprise Features
+**Its technology:**
 
-- Continuous monitoring on vulnerable dataflows where PII is exposed in
-  cleartext through various media such as logs, files, cookies, tokens, and
-  third-party APIs.
-- Dataflow visualization.
-- CI/CD integration with GitHub Actions, GitLab CI/CD, CircleCI, Jenkins, Azure
-  Pipelines, BitBucket Pipelines etc.
-- Security dashboard integration with GitHub Enterprise and GitLab Ultimate.
-- Access to [HoundDog.ai Cloud Platform](https://app.hounddog.ai) for triaging
-  issues, creating Jira tasks, generating RoPA (Record of Processing Activities)
-  reports, and customizing scan rules.
-- (Coming soon) Automatic adjustments of scan rules based on your data
-  processing agreements for continuous DPA compliance and risk mitigation.
+- Runs as a standalone binary on your machine. Your code never leaves your environment by default.
+- Fast and ready for large codebases. It can scan 1 million+ lines of code in seconds on modern laptops.
+- Supports 100s of [data elements](./data-elements.md) and [sinks](./data-sinks.md) out of the box.
 
-## How is it different from other scanners?
+**HoundDog.ai in action:**
 
-- **Blazingly fast with a tiny footprint**: HoundDog.ai's code scanner is
-  written in Rust, a language well-known for its performance and memory safety.
-  It can scan 1 million lines of code in under a minute on modern hardware and
-  the unzipped binary is less than 25MBs in size. It is lightweight with minimal
-  impact on your build pipelines.
-- **High accuracy**: We provide a rich and carefully curated set of rules and
-  definitions covering multiple domains (e.g. PII, PHI, PIFI) out of the box.
-  The rules are continuously improved using AI workflows, reviewed by human
-  experts and tested against real-world codebases.
-- **Privacy-focused**: By default, the scanner runs only in your environment
-  and your source code never leaves your premises.
-- **100% complementary with other scanners**: Our goal is not to replace
-  Semgrep, Snyk, etc., but to fill an existing gap and be the best-in-class for
-  PII detection. Here are some of the security categories covered extensively
-  and uniquely by HoundDog.ai:
-  [CWE-201](https://cwe.mitre.org/data/definitions/201.html),
-  [CWE-209](https://cwe.mitre.org/data/definitions/209.html),
-  [CWE-312](https://cwe.mitre.org/data/definitions/312.html),
-  [CWE-313](https://cwe.mitre.org/data/definitions/313.html),
-  [CWE-315](https://cwe.mitre.org/data/definitions/315.html),
-  [CWE-532](https://cwe.mitre.org/data/definitions/532.html),
-  [CWE-539](https://cwe.mitre.org/data/definitions/539.html).
+![Demo GIF](https://raw.githubusercontent.com/hounddogai/hounddog/main/demo.gif)
 
-## Requirements
 
-- **Operating System:** Linux or macOS
-- **CPU Architecture:** x86-64 or ARM64
-- **Shell:** Bash, Zsh, or Fish
-- **Memory:** Minimum 1GB of free RAM on the host machine
-
-## Supported Languages
-
-- C# / .NET
-- Golang (coming soon)
-- GraphQL
-- Java
-- JavaScript
-- Kotlin
-- OpenAPI / Swagger
-- Python
-- Ruby
-- SQL
-- TypeScript
+Check out the [sample Markdown report](./sample-report.md) and [FAQ](#faq) for more information.
 
 ## Installation
 
-To install the standalone binary in your user directory
-at `~/.hounddog/bin/hounddog`:
+### Linux and macOS
 
 ```shell
-curl -fsSL https://install.hounddog.ai | bash
+curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh
 ```
 
-To install it system-wide at `/usr/local/bin/hounddog` (sudo required):
+### Windows
 
 ```shell
-curl -fsSL https://install.hounddog.ai | sudo bash
+irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
 ```
 
-To upgrade, run the above installation command again. To uninstall,
-see [Uninstallation](#uninstallation).
+Alternatively, you can download the binary directly from the [releases](https://github.com/hounddogai/hounddog/releases)
+page.
 
-HoundDog.ai is also available as a [Docker image](https://hub.docker.com/r/hounddogai/hounddog).
+### Uninstallation
+
+```shell
+# Linux and macOS
+rm -rf ~/.hounddog
+
+# Windows
+Remove-Item -Recurse -Force "$env:LocalAppData\hounddog"
+```
 
 ## Usage
 
-To scan a file or directory:
-
 ```shell
-hounddog scan [path] [options]
+hounddog scan [OPTIONS] [PATH]
 ```
 
-To see all available options:
+For a quick demonstration, you can scan our [test repository][test-repository]:
+
+[test-repository]: https://github.com/hounddogai/hounddog-test-python-app
 
 ```shell
-hounddog scan --help
+# Clone the test repository
+git clone https://github.com/hounddogai/hounddog-test-python-app
+
+# Scan the test repository
+hounddog scan hounddog-test-python-app
 ```
 
-## Quickstart
-
-To demonstrate the capabilities of the scanner, HoundDog.ai offers a test
-application with deliberate security flaws. First, clone the repository:
+By default, only *risky* dataflows are shown to minimize noise. Use `--all-dataflows` to see everything:
 
 ```shell
-git clone https://github.com/hounddogai/hounddog-test-healthcare-app
+hounddog scan hounddog-test-python-app --all-dataflows
 ```
 
-Then scan it with `--output-format=markdown` to generate a Markdown report:
+Use `--trace` to see detailed dataflow traces (one of our coolest features and useful for debugging):
 
 ```shell
-hounddog scan hounddog-test-healthcare-app --output-format=markdown
+hounddog scan hounddog-test-python-app --trace
 ```
 
-Open the generated file `hounddog-test-healthcare-app/hounddog-{timestamp}.md`
-on your browser.
-
-**Note:** We recommend using Google Chrome and the
-[Markdown Viewer](https://chromewebstore.google.com/detail/markdown-viewer/ckkdlimhmcjmikdlpkmbgfkaikojcbjk)
-extension, with **mermaid** and **toc** settings enabled
-(see [here](https://docs.hounddog.ai/scanner/markdown-report) for more details).
-
-## Uninstallation
-
-If installed in user directory at `~/.hounddog/bin/hounddog`:
+Use `--output-format=markdown` to generate a Markdown report:
 
 ```shell
-rm -r ~/.hounddog
+hounddog scan hounddog-test-python-app --output-format=markdown --output-file=report.md
 ```
 
-If installed system-wide at `/usr/local/bin/hounddog`:
+We recommend the [Markdown Viewer][md-viewer-ext] Chrome extension for viewing it (see [setup][md-viewer-doc]
+and [sample report](./sample-report.md)).
+
+[md-viewer-doc]: https://docs.hounddog.ai/scanner/markdown-report
+
+[md-viewer-ext]: https://chromewebstore.google.com/detail/markdown-viewer/ckkdlimhmcjmikdlpkmbgfkaikojcbjk
+
+To see the up-to-date list of supported data elements in HTML format:
 
 ```shell
-sudo rm /usr/local/bin/hounddog
+hounddog data-elements
 ```
 
-## Documentation
+To see the up-to-date list of supported data sinks in HTML format:
 
-Please refer to our [user documentation](https://docs.hounddog.ai/scanner) for
-detailed information on using the code scanner, and the cloud web application
-for paid users.
+```shell
+hounddog data-sinks
+```
+
+Use `--help` to see all subcommands and options:
+
+```shell
+hounddog [SUBCOMMAND] --help
+```
+
+## Features
+
+|                        | Free                                                        | Enterprise                                                  |
+|------------------------|-------------------------------------------------------------|-------------------------------------------------------------|
+| Supported Languages    | Python, JavaScript, TypeScript                              | Languages in Free + C#, Go, Java, SQL, GraphQL, OpenAPI     |
+| Usage Options          | CLI, IDE                                                    | CLI, IDE, GitHub Integration (Automated Scans, PR Reviews)  |
+| IDE Plugins            | [VS Code][vscode], [JetBrains][jetbrains], [Cursor][cursor] | [VS Code][vscode], [JetBrains][jetbrains], [Cursor][cursor] |
+| Dataflow Detection     | Limited Coverage                                            | Full Coverage                                               |
+| Dataflow Visualization | Limited Coverage                                            | Full Coverage                                               |
+| Rule Customization     | No                                                          | Custom Data Element and Data Sink Rules                     |
+| Privacy Reports        | No                                                          | RoPA, PIA, DPIA                                             |
+| Cloud Platform         | No                                                          | Issue Tracking, Alerts, SSO, RBAC, Audit Logs               |
+| On-Prem Deployment     | No                                                          | Included                                                    |
+| Support                | GitHub Issues + Email                                       | Priority Support with SLA + Dedicated Slack Channel         |
+
+[vscode]: https://marketplace.visualstudio.com/items?itemName=hounddog.hounddog-scanner
+
+[jetbrains]: https://plugins.jetbrains.com/plugin/25684-hounddog-ai
+
+[cursor]: https://open-vsx.org/extension/hounddog/hounddog-scanner
+
+## FAQ
+
+### How can I trust your scanner?
+
+Visit our [Trust Center](https://security.hounddog.ai/) to view our latest SOC2 report, penetration testing results,
+and SBOM details.
+
+### Does your scanner send my code to external servers?
+
+No. Scans run locally. Your code never leaves your machine.
+
+### Does your scanner use AI?
+
+AI is used to generate and update data detection rules for scaling coverage, but scans themselves run on a deterministic
+static analysis engine. This keeps scans fast, cheap, and free of hallucinations.
+
+### Why should I use your scanner instead of a large-language model?
+
+LLMs can discover issues that transitional SAST tools miss, but they are slow, expensive, and non-deterministic. SAST
+tools are faster, cheaper and predictable, but require high-effort rule maintenance and suffer from high false positive
+rates.
+
+HoundDog.ai’s vision is to combine the strengths of both approaches. Our scanning engine is fully rule-based and
+deterministic, with a rule specification expressive enough to model real-world code at compiler-level accuracy. AI is
+used selectively to scale coverage across thousands of code patterns without sacrificing performance, reliability, and
+trust.
+
+### How is your scanner different from secrets scanning tools like GitLeaks or TruffleHog?
+
+Secrets scanning tools look for credentials that are hardcoded directly in code, such as API keys, passwords, or tokens.
+For example:
+
+```python
+exposed_api_key = "sk-proj-1234567890-abcdefghijklmnopqrstuvwxyz"
+```
+
+HoundDog.ai, on the other hand, focuses on how sensitive data actually flows through code. It tracks values across
+various code paths such as assignment statements and transformations. For example:
+
+```python
+import logging
+import os
+
+logger = logging.getLogger(__name__)
+
+# HoundDog.ai detects that `foo` is an authentication token.
+foo = os.environ.get("MY_API_KEY")
+
+# HoundDog.ai traces values through various code paths.
+bar = {"message": f"api_key={foo}".strip()}
+
+# HoundDog.ai detects that `bar` contains an authentication token (tainted) and is leaked to a log.
+logger.info("data=%s", bar)
+```
+
+### How is your scanner different from Semgrep or CodeQL?
+
+DIY SAST tools like Semgrep and CodeQL are powerful and highly customizable, but their rules need significant upfront
+investment to learn and maintain.
+
+HoundDog.ai is a turnkey solution that provides broad, high-quality coverage of data elements and sinks out of the box,
+greatly reducing the rule authoring burden. It is designed specifically for dataflow analysis, scaling efficiently to
+large codebases, and detecting complex data flows that general-purpose solutions miss.
+
+### Your scanner missed a dataflow!
+
+Our rules are constantly evolving, and we are working hard on improving them. Please let us know any false positives or
+negatives, and we will be happy to address them.
 
 ## License
 
-View [license information](https://hounddog.ai/terms-of-service/) for
-HoundDog.ai's software.
+View [license information](https://hounddog.ai/terms-of-service/) for HoundDog.ai's software.
 
 ## Contact
 
-If you need any help or would like to send us feedback, please create a [GitHub
-issue](https://github.com/hounddogai/hounddog/issues) or shoot us an email
-at [support@hounddog.ai](mailto:support@hounddog.ai).
+If you have any questions or feedback, please create a [GitHub issue](https://github.com/hounddogai/hounddog/issues) or
+email us at [support@hounddog.ai](mailto:support@hounddog.ai).
