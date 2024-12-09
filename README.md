@@ -2,51 +2,21 @@
 
 ## What is it?
 
-[HoundDog.ai](https://hounddog.ai) is a source code scanner
-(a [SAST](https://en.wikipedia.org/wiki/Static_application_security_testing)
-command-line tool) that helps organizations with the following use cases:
+[HoundDog.ai](https://hounddog.ai) is a source code scanner and SAST (Static Application Security Testing) command-line
+tool that helps you with the following use cases:
 
-- **Proactive PII Leak Prevention**: Detect PII leaks in logs, files, cookies,
-  tokens, and third-party services early in the development cycle (e.g., during
-  code reviews and build pipelines) to strengthen the data security posture and
-  avoid costly remediation later in production.
-- **Third-Party Risk Mitigation**: Track third-party application dataflows and
-  detect data processing agreement violations *before* new product changes are
-  released to users.
-- **Automatic Data Mapping for Privacy Compliance**: Eliminate manual and
-  error-prone documentation of processing activities relying on spreadsheets and
-  internal surveys. Streamline the entire process and keep pace with development
-  to eliminate surprises.
+- **Proactive PII Leak Prevention**: Detect PII (Personally Identifiable Information) leaks through logs, files,
+  cookies, tokens, and third-party APIs early in the development cycle to strengthen the data security posture and
+  avoid costly remediation in production.
+- **Third-Party Risk Mitigation**: Track third-party dataflows and detect data processing agreement violations before
+  changes reach users.
+- **Automatic Data Mapping for Privacy Compliance**: Automate and streamline data processing documentation, replacing
+  error-prone spreadsheets and surveys with continuous monitoring that keeps pace with development.
 
-### Free Features
+## How is it different?
 
-- Source code scanning with
-  [standalone binary](https://github.com/hounddogai/hounddog/releases) or
-  [Docker image](https://hub.docker.com/r/hounddogai/hounddog).
-- Markdown reports for point-in-time views of the PII data elements in
-  your codebase, along with their sensitivity levels, occurrence counts,
-  file locations and code snippets.
-
-### Starter and Enterprise Features
-
-- Continuous monitoring on vulnerabilities exposing PII in cleartext through
-  logs, files, cookies, tokens, and third-party APIs.
-- Graphical visualizations displaying the flow of PII to various data sinks.
-- CI/CD integration with Azure Pipelines, BitBucket Pipelines, GitHub Actions,
-  GitLab CI/CD, CircleCI, Jenkins, etc.
-- Security dashboard integration with GitHub Enterprise and GitLab Ultimate.
-- Access to [HoundDog.ai Cloud Platform](https://app.hounddog.ai) for triaging
-  issues, creating Jira tasks, generating RoPA (Record of Processing Activities)
-  reports, and scan rules customization.
-- (Coming soon) Automatic configuration of scan rules based on your data
-  processing agreements for continuous DPA compliance and risk mitigation.
-
-## How is it different from other scanners?
-
-- **100% complementary with other scanners**: Our goal is not to replace CodeQL,
-  Semgrep, Snyk etc., but to fill an existing gap and be the best-in-class for
-  PII detection. Here are some of the common weakness enumerations covered
-  extensively and uniquely by HoundDog.ai:
+- **100% complementary to other scanners**: Our goal is not to replace CodeQL, Snyk etc., but to fill a critical gap and
+  be the best-in-class for PII leak detection. We extensively and uniquely cover CWEs such as
   [CWE-201](https://cwe.mitre.org/data/definitions/201.html),
   [CWE-209](https://cwe.mitre.org/data/definitions/209.html),
   [CWE-312](https://cwe.mitre.org/data/definitions/312.html),
@@ -54,135 +24,140 @@ command-line tool) that helps organizations with the following use cases:
   [CWE-315](https://cwe.mitre.org/data/definitions/315.html),
   [CWE-532](https://cwe.mitre.org/data/definitions/532.html),
   [CWE-539](https://cwe.mitre.org/data/definitions/539.html).
-- **Privacy-focused**: By default, HoundDog.ai's code scanner runs only in your
-  environment and your source code never leaves your premises.
-- **Blazingly fast with a tiny footprint**: HoundDog.ai's code scanner is
-  written in Rust, a language well-known for its performance and memory safety.
-  It can scan 1 million lines of code in under a minute on modern hardware, and
-  its unzipped binary is less than 25MBs in size. We strive to keep it super
-  lightweight and have minimal impact on your build pipelines.
-- **High accuracy**: We maintain a carefully curated set of rules and
-  definitions covering multiple domains (e.g. PII, PHI, PIFI) out of the box,
-  placing the highest priority on minimizing false positives. The rules are
-  continuously improved using AI workflows, reviewed by human experts and tested
-  against real-world codebases.
+- **Privacy-focused**: By default, the scanner runs in your environment. Your code never leaves your premises.
+- **Fast and lightweight**: Written in Rust for speed, safety and portability, the scanner can go through 1 million
+  lines of code in under a minute on modern hardware. The unzipped binary is less than 30MB in size.
+- **Highly accurate**: We maintain a carefully curated set of rules covering multiple domains (PII, PHI, PIFI). We
+  prioritize minimizing false positives and refine our rules regularly using AI-assisted workflows, human expert reviews
+  and real-world testing.
 
-## Requirements
+## Free Features
 
-- [Standalone Binary:](https://github.com/hounddogai/hounddog/releases)
+- Source code scanning with our [standalone binary](https://github.com/hounddogai/hounddog/releases) or
+  [Docker image](https://hub.docker.com/r/hounddogai/hounddog).
+- Markdown reports showing point-in-time views of the PII data elements including sensitivity levels, occurrence
+  counts, file locations and code snippets.
 
-    - Operating System: Linux or macOS
-    - CPU Architecture: x86-64 or ARM64
-    - Shell: Bash, Zsh, or Fish
-    - Memory: Minimum 1GB of free memory
+## Paid Features
 
-- [Docker Image:](https://hub.docker.com/r/hounddogai/hounddog)
-
-    - Docker Engine on Linux or Docker Desktop on Windows/macOS
-    - Memory: Minimum 1GB of free memory allocated to Docker
+- Monitoring on vulnerabilities exposing PII in cleartext (logs, files, cookies, tokens, and third-party APIs).
+- Graphical PII dataflow visualizations.
+- Integration with CI/CD pipelines and Jira.
+- Security dashboard integration with GitHub Enterprise and GitLab Ultimate.
+- Access to [HoundDog.ai Cloud Platform](https://app.hounddog.ai) for issue triage, RoPA (Record of Processing
+  Activities) reports, and scanner rules customization.
 
 ## Supported Languages
 
 - C# / .NET
 - Golang (coming soon)
-- GraphQL
 - Java
 - JavaScript
 - Kotlin
-- OpenAPI / Swagger
 - Python
 - Ruby
-- SQL
 - TypeScript
+
+## Requirements
+
+For [standalone binary](https://github.com/hounddogai/hounddog/releases):
+
+- **Operating System**: Linux, macOS, Windows
+- **CPU Architecture**: AMD64 (x86-64), ARM64
+- **Shell**: Bash, Zsh, Fish (Linux/macOS), or PowerShell (Windows)
+- **Memory**: 2GB+ of free memory
+
+For [Docker image](https://hub.docker.com/r/hounddogai/hounddog):
+
+- Docker Engine (Linux) or Docker Desktop (Windows/macOS)
+- Memory: 4GB+ allocated to Docker
+
+We recommend at least 4 CPU cores and 8GB of memory for optimal performance.
 
 ## Installation
 
-To install the standalone binary in your user directory
-at `~/.hounddog/bin/hounddog`:
+Run the commands below in your terminal to install the scanner or to upgrade to the latest version.
+
+### Linux and macOS
+
+To install in user directory at `~/.hounddog/bin/hounddog`:
 
 ```shell
-curl -fsSL https://install.hounddog.ai | bash
+curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh
 ```
 
-To install it system-wide at `/usr/local/bin/hounddog` (sudo required):
+To install system-wide at `/usr/local/bin/hounddog`:
 
 ```shell
-curl -fsSL https://install.hounddog.ai | sudo bash
+curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sudo sh
 ```
 
-To upgrade to the latest version, simply run the commands above again.
+### Windows
 
-You can alternatively download the binary and the checksum directly from
-our [releases page](https://github.com/hounddogai/hounddog/releases).
+To install the standalone executable at `%LocalAppData%\hounddog\bin\hounddog.exe` (in PowerShell):
+
+```powershell
+irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
+```
+
+### Manual Download
+
+Download the standalone binary and checksum files directly from our
+[releases page](https://github.com/hounddogai/hounddog/releases).
 
 ## Usage
 
-To scan a file or directory using the
-[standalone binary](https://github.com/hounddogai/hounddog/releases):
+To scan a directory using the standalone binary:
 
 ```shell
-hounddog scan [path] [options]
+hounddog scan [DIRPATH] [OPTIONS]
 ```
 
-To scan the current directory using the
-[Docker image](https://hub.docker.com/r/hounddogai/hounddog) instead:
+To scan a directory using the Docker image:
 
 ```shell
-docker run --pull=always -it --rm -v .:/data hounddogai/hounddog:latest hounddog scan
+docker run --pull=always -it --rm -v <DIRPATH>:/data hounddogai/hounddog hounddog scan [OPTIONS]
 ```
 
-To see all available command-line options:
+Use `--help` to see all available command-line options:
 
 ```shell
+# For standalone binary
 hounddog scan --help
+
+# For Docker image
+docker run --pull=always -it --rm hounddogai/hounddog hounddog scan --help
 ```
 
-By default, HoundDog.ai respects your `.gitignore` file. To exclude additional
-files and/or folders, create a `.hounddogignore` file at the root directory of
-your project and specify the file patterns in it using the
-[.gitignore format](https://git-scm.com/docs/gitignore/en). Here are some
-examples:
-
-```shell
-# Ignore dependencies
-node_modules/
-
-# Ignore a specific file
-config.js
-
-# Ignore all files in a directory
-test/*
-```
-
-Please refer to our [user documentation](https://docs.hounddog.ai/scanner) for
-more information, such as generating and using
-a [HoundDog.ai API key](https://docs.hounddog.ai/scanner/api-key) to
-unlock paid features and integrating the scanner with your CI/CD pipelines.
+HoundDog.ai respects your `.gitignore` file. To ignore additional files or folders, create a `.hounddogignore` file
+at the root of the target repository using the [.gitignore pattern format](https://git-scm.com/docs/gitignore). Please
+refer to our [documentation](https://docs.hounddog.ai/scanner) for using a HoundDog API key to unlock paid features.
 
 ## Quickstart
 
-To demonstrate the capabilities of the scanner, HoundDog.ai provides a [test
-web application](https://github.com/hounddogai/hounddog-test-healthcare-app)
-with deliberate security flaws. First, clone the repository:
+For quick demonstration, we provide a [test application](https://github.com/hounddogai/hounddog-test-healthcare-app)
+with deliberate security flaws.
+
+First, clone the repository:
 
 ```shell
 git clone https://github.com/hounddogai/hounddog-test-healthcare-app
 ```
 
-Then scan it with the `--output-format=markdown` option to generate an offline
-Markdown report:
+Scan it with the `--output-format=markdown` option to generate an offline Markdown report:
 
 ```shell
 hounddog scan hounddog-test-healthcare-app --output-format=markdown
 ```
 
-Open the generated file `hounddog-test-healthcare-app/hounddog-{timestamp}.md`
-on your browser. We recommend using Google Chrome and the
-[Markdown Viewer](https://chromewebstore.google.com/detail/markdown-viewer/ckkdlimhmcjmikdlpkmbgfkaikojcbjk)
-extension, with **mermaid** and **toc** settings enabled
-(see [this](https://docs.hounddog.ai/scanner/markdown-report) for more details).
+Open the generated file `hounddog-test-healthcare-app/hounddog-{timestamp}.md` on your browser. We recommend using the
+[Markdown Viewer](https://chromewebstore.google.com/detail/markdown-viewer/ckkdlimhmcjmikdlpkmbgfkaikojcbjk) Chrome
+extension with **mermaid** and **toc** settings enabled. See [this](https://docs.hounddog.ai/scanner/markdown-report)
+for more details.
 
 ## Uninstallation
+
+### Linux and macOS
 
 If installed in user directory at `~/.hounddog/bin/hounddog`:
 
@@ -196,6 +171,14 @@ If installed system-wide at `/usr/local/bin/hounddog`:
 sudo rm /usr/local/bin/hounddog
 ```
 
+### Windows
+
+If installed at `%LocalAppData%\hounddog\bin\hounddog.exe`:
+
+```powershell
+Remove-Item -Recurse -Force $env:LocalAppData\hounddog
+```
+
 ## License
 
 View [license information](https://hounddog.ai/terms-of-service/) for
@@ -203,6 +186,6 @@ HoundDog.ai's software.
 
 ## Contact
 
-If you need any help or would like to send us feedback, please create a [GitHub
-issue](https://github.com/hounddogai/hounddog/issues) or shoot us an email
-at [support@hounddog.ai](mailto:support@hounddog.ai).
+If you need any help or would like to send us feedback, please create a
+[GitHub issue](https://github.com/hounddogai/hounddog/issues) or shoot us an email at
+[support@hounddog.ai](mailto:support@hounddog.ai).
