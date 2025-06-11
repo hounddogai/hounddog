@@ -73,7 +73,7 @@ if [ "$(id -u)" -ne 0 ]; then
     # Add ~/.hounddog/bin to user's PATH in shell rc file.
     if ! grep -q "export PATH=\$PATH:\$HOME/.hounddog/bin" "${SHELL_RC}"; then
         echo "Adding ${HOME}/.hounddog/bin to PATH in ${SHELL_RC}..."
-        echo "export PATH=\$PATH:\$HOME/.hounddog/bin" >> "${SHELL_RC}"
+        printf "\nexport PATH=\$PATH:\$HOME/.hounddog/bin\n" >> "${SHELL_RC}"
         export PATH="${HOME}/.hounddog/bin:${PATH}"
     fi
 
