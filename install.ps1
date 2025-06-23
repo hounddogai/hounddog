@@ -114,7 +114,7 @@ try {
         Write-Host "`nHoundDog CLI installed successfully."
         Write-Host "Run 'hounddog --help' to get started. You may need to restart your terminal first."
     } else {
-        throw "Cannot find 'hounddog' command in PATH. This indicates an issue with extraction or PATH update."
+        throw "Cannot find 'hounddog' command in PATH."
     }
 } catch {
     Write-Host "$_ Aborting installation." -ForegroundColor Red
