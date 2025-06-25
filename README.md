@@ -53,7 +53,13 @@ curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh
 
 ### Windows
 
-To install the standalone executable at `%LocalAppData%\hounddog\bin\hounddog.exe` (in PowerShell):
+To install in user directory at `%LocalAppData%\hounddog\bin\hounddog.exe`:
+
+```powershell
+irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
+```
+
+To install system-wide at `C:\Program Files\hounddog\bin\hounddog.exe`, run the same command in an elevated PowerShell session (run as administrator):
 
 ```powershell
 irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
@@ -61,8 +67,7 @@ irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
 
 ### Manual Download
 
-Download the standalone binary and checksum files directly from our
-[releases page](https://github.com/hounddogai/hounddog/releases).
+Download the standalone binary from our [releases page](https://github.com/hounddogai/hounddog/releases). 
 
 ## Usage
 
@@ -149,10 +154,16 @@ sudo rm /usr/local/bin/hounddog
 
 ### Windows
 
-If installed at `%LocalAppData%\hounddog\bin\hounddog.exe`:
+If installed in user directory at `%LocalAppData%\hounddog\bin\hounddog.exe`:
 
 ```powershell
-Remove-Item -Recurse -Force $env:LocalAppData\hounddog
+Remove-Item -Recurse -Force "$env:LocalAppData\hounddog"
+```
+
+If installed system-wide, run in elevated PowerShell session (run as administrator):
+
+```powershell
+Remove-Item -Recurse -Force "$env:ProgramFiles\hounddog"
 ```
 
 ## Use Cases
