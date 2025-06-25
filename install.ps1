@@ -8,8 +8,6 @@ $ErrorActionPreference = 'Stop'
 # Disable progress bar for faster downloads.
 $ProgressPreference = 'SilentlyContinue'
 
-Write-Host "Installing HoundDog CLI..."
-
 # Check CPU architecture.
 $Arch = switch ($env:PROCESSOR_ARCHITECTURE) {
     'AMD64' { 'amd64' }
@@ -21,8 +19,23 @@ $DownloadUrl = "https://github.com/hounddogai/hounddog/releases/latest/download/
 $TempDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
 
 try {
-    # Set up the binary installation directory.
-    $InstallPath = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'HoundDog\bin'
+    # Determine if running with admin privileges
+    $IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+
+    # Set installation path and PATH scope based on privileges
+    if ($IsAdmin) {
+        # Admin: Install to Program Files and update System PATH
+        $InstallPath = Join-Path $env:ProgramFiles "hounddog\bin"
+        $PathScope = "Machine"
+        Write-Host "Installing HoundDog CLI for all users..."
+    } else {
+        # Non-admin: Install to user's local app data and update User PATH
+        $InstallPath = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'hounddog\bin'
+        $PathScope = "User"
+        Write-Host "Installing HoundDog CLI for current user only..."
+    }
+
+    # Create the installation directory if it doesn't exist
     if (Test-Path $InstallPath) {
         Remove-Item -Path "$InstallPath\*" -Force -Recurse -ErrorAction SilentlyContinue
     } else {
@@ -34,7 +47,7 @@ try {
 
     # Download and extract the ZIP archive to the installation directory.
     $ZipPath = Join-Path $TempDir 'hounddog.zip'
-    Write-Host "Downloading HoundDog CLI from $DownloadUrl ..."
+    Write-Host "Downloading ZIP from $DownloadUrl ..."
     Invoke-WebRequest -Uri $DownloadUrl -OutFile $ZipPath -UseBasicParsing
     Write-Host "Extracting ZIP to $InstallPath ..."
     Expand-Archive -Path $ZipPath -DestinationPath $InstallPath -Force
@@ -57,42 +70,38 @@ try {
     if ($ActualHash -ne $ExpectedHash) {
         throw "Checksum verification failed."
     }
-    Write-Host "Checksum verification successful."
 
-    # Get the current user PATH and split it by semicolon.
-    # Filter out any empty entries and trim whitespace.
-    # Use [System.Environment]::GetEnvironmentVariable with a safety check for null.
-    $CurrentUserPaths = @()
-    $RawUserPath = [System.Environment]::GetEnvironmentVariable('Path', 'User')
-    if ($RawUserPath) {
-        $CurrentUserPaths = $RawUserPath -split ';' | Where-Object { $_.Trim() -ne "" } | ForEach-Object { $_.Trim() }
-    }
+    # Update PATH based on admin status
+    $CurrentPath = [System.Environment]::GetEnvironmentVariable('Path', $PathScope)
 
-    # Create a new array for the updated PATH.
-    $UpdatedPathsArray = New-Object System.Collections.Generic.List[string]
-
-    # Add existing unique paths to the list.
-    foreach ($pathEntry in $CurrentUserPaths) {
-        if (-not $UpdatedPathsArray.Contains($pathEntry)) {
-            $UpdatedPathsArray.Add($pathEntry)
+    # Only add the HoundDog installation path if it's not already in the PATH
+    if ($CurrentPath -notlike "*$InstallPath*") {
+        # Ensure PATH ends with semicolon before appending
+        if ($CurrentPath -and -not $CurrentPath.EndsWith(';')) {
+            $CurrentPath = "$CurrentPath;"
         }
+        
+        # Add the new path
+        $NewPath = "$CurrentPath$InstallPath"
+        
+        try {
+            [Environment]::SetEnvironmentVariable('Path', $NewPath, $PathScope)
+            Write-Host "Added HoundDog CLI to $PathScope PATH."
+        } catch {
+            Write-Host "Failed to update $PathScope PATH: $_" -ForegroundColor Red
+            exit 1
+        }
+    } else {
+        $NewPath = $CurrentPath
     }
 
-    # Add the HoundDog installation path if it's not already there.
-    if (-not $UpdatedPathsArray.Contains($InstallPath)) {
-        $UpdatedPathsArray.Add($InstallPath)
-    }
-
-    # Join the unique paths with a semicolon.
-    $NewPath = ($UpdatedPathsArray | Where-Object { $_ -ne $null -and $_ -ne '' }) -join ';'
-
-    [Environment]::SetEnvironmentVariable('Path', $NewPath, 'User')
+    # Update current session's PATH
+    $env:Path = $NewPath
 
     # Test installation.
-    $env:Path = $NewPath
     if (Get-Command hounddog -ErrorAction SilentlyContinue) {
         Write-Host "`nHoundDog CLI installed successfully."
-        Write-Host "Run 'hounddog --help' to get started. You may need to restart your terminal first."
+        Write-Host "Run 'hounddog --help' to get started."
     } else {
         throw "Cannot find 'hounddog' command in PATH."
     }
