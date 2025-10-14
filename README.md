@@ -2,7 +2,13 @@
 
 ## What is it?
 
-[HoundDog.ai](https://hounddog.ai/)'s Privacy by Design Code Scanner helps organizations proactively detect and prevent the overexposure of sensitive data in high risk mediums, which could lead to privacy violations. The scanner embeds privacy into every stage of development, from IDE to CI. It discovers third party and AI integrations, including shadow AI, detects exposures of Personally Identifiable Information (PII), Protected Health Information (PHI), and authentication tokens in LLM prompts and other often overlooked surfaces such as logs, files, and third party SDKs, blocks unapproved data types before any code reaches production, and generates audit ready Privacy Impact Assessments prefilled with detected data flows and privacy risks.
+*Shift Left on Privacy. No Retrofitting. No Headaches.*
+
+If your company builds applications, do not let privacy be an afterthought. Most privacy teams spend hours chasing data maps. HoundDog.ai automates this process completely. No more blind spots from privacy tools that miss hidden AI or third party integrations, and no more chasing app owners for the latest data flows.
+
+HoundDog.ai’s static code scanner embeds privacy from IDE to CI. It maps sensitive data flows across AI and third party integrations (including shadow AI), detects privacy risks before code is deployed, and generates audit ready Records of Processing Activities and Privacy Impact Assessments prefilled with detected data flows and risks.
+
+Download it to your machine and try it for free. You can view the output in the CLI console and export it to a markdown file. See a sample report [**here**](https://github.com/hounddogai/hounddog/blob/main/hounddog-report.md).
 
 Our scanner can be used as a CLI that installs locally to scan cloned code repositories, or as IDE plugins that flag sensitive data leak issues as code is being written. The IDE plugins are available for [VSCode](https://marketplace.visualstudio.com/items?itemName=hounddog.hounddog-scanner), [Cursor](https://open-vsx.org/extension/hounddog/hounddog-scanner), [JetBrains](https://plugins.jetbrains.com/plugin/25684-hounddog-ai), and [Eclipse](https://marketplace.eclipse.org/content/hounddogai). The HoundDog.ai Cloud Platform (offered as part of the paid plan) also provides Source Code Management Platform Integrations - connecting directly to GitHub, GitLab, and Bitbucket (both cloud and enterprise versions) to automatically scan code, block PRs, and leave actionable PR comments.
 
@@ -112,15 +118,15 @@ docker run -v <path>:/data -e HOUNDDOG_API_KEY=$HOUNDDOG_API_KEY hounddogai/houn
 
 Please refer to our [documentation](https://docs.hounddog.ai/scanner) for using a HoundDog API key to unlock paid features.
 
-## Quickstart
+## Quickstart + Markdown Reports
 
-For quick demonstration, we provide a [test application](https://github.com/hounddogai/hounddog-test-healthcare-app)
-with deliberate security flaws.
+For quick demonstration, we provide a [test application](https://github.com/hounddogai/hounddog-test-python-app)
+with deliberate privacy flaws.
 
 First, clone the repository:
 
 ```shell
-git clone https://github.com/hounddogai/hounddog-test-healthcare-app
+git clone https://github.com/hounddogai/hounddog-test-python-app.git
 ```
 
 Scan it with the `--output-format=markdown` option to generate an offline Markdown report:
@@ -129,7 +135,7 @@ Scan it with the `--output-format=markdown` option to generate an offline Markdo
 hounddog scan hounddog-test-healthcare-app --output-format=markdown
 ```
 
-Open the generated file `hounddog-test-healthcare-app/hounddog-{timestamp}.md` on your browser. We recommend using the
+Open the generated file `hounddog-test-python-app/hounddog-report-{timestamp}.md` on your browser. We recommend using the
 [Markdown Viewer](https://chromewebstore.google.com/detail/markdown-viewer/ckkdlimhmcjmikdlpkmbgfkaikojcbjk) Chrome
 extension with **mermaid** and **toc** settings enabled. See [this](https://docs.hounddog.ai/scanner/markdown-report)
 for more details.
@@ -206,16 +212,16 @@ Relying on DLP is reactive, unreliable, and painfully slow. Teams often spend we
 - Data mapping, documenting all types of data collected, processed, and shared, is the cornerstone of all major privacy frameworks.
 - Today, many companies rely on manual surveys and spreadsheets for data collection, leading to incomplete and outdated data maps that fail to reflect the latest code changes.
 - Data privacy platforms still rely on reactive data collection, with discovery mechanisms that depend heavily on sampling and surface-level scans, making them prone to missing critical data flows.
-- These platforms require prior knowledge of all third-party tools in use, making them blind to shadow third-party integrations introduced directly in the code by developers.
+- These platforms require prior knowledge of all third-party tools in use, making them blind to shadow AI and third-party integrations introduced directly in the code by developers.
 - Operating post-deployment and disconnected from code-level changes, these tools create a significant lag in identifying and mitigating risks.
 
 **The Solution**
 
 - HoundDog.ai analyzes code early to deliver evidence-based data mapping at the speed of development.
-- Privacy teams can accurately document sensitive data flows across all storage mediums (e.g., logs, files, local storage, databases) and third-party integrations (APIs and SDKs).
+- Privacy teams can accurately document sensitive data flows across all storage mediums (e.g., logs, files, local storage, databases) as well as AI and third-party integrations (APIs and SDKs).
 - Real-time alerts notify teams when new sensitive data elements are introduced in the code, allowing time to review and address issues before they reach production.
 - Seamless integration across the development lifecycle (IDE, CI/CD) enables privacy by design at scale.
-- Automates the generation of RoPA, PIA, and DPIA reports, pre-populated with detected data flows and privacy risks—eliminating manual data collection via surveys and spreadsheets.
+- Automates the generation of RoPA, PIA, and DPIA reports, pre-populated with detected data flows and privacy risks - eliminating manual data collection via surveys and spreadsheets.
 
 </details>
 
