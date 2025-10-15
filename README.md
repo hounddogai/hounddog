@@ -140,6 +140,8 @@ Open the generated file `hounddog-test-python-app/hounddog-report-{timestamp}.md
 extension with **mermaid** and **toc** settings enabled. See [this](https://docs.hounddog.ai/scanner/markdown-report)
 for more details.
 
+See a sample report [**here**](https://github.com/hounddogai/hounddog/blob/main/hounddog-report.md).
+
 ## Uninstallation
 
 ### Linux and macOS
