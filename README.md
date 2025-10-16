@@ -132,7 +132,7 @@ git clone https://github.com/hounddogai/hounddog-test-python-app.git
 Scan it with the `--output-format=markdown` option to generate an offline Markdown report:
 
 ```shell
-hounddog scan hounddog-test-healthcare-app --output-format=markdown
+hounddog scan hounddog-test-python-app --output-format=markdown
 ```
 
 Open the generated file `hounddog-test-python-app/hounddog-report-{timestamp}.md` on your browser. We recommend using the
