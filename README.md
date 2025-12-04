@@ -8,7 +8,7 @@ If your company builds applications, do not let privacy be an afterthought. Most
 
 HoundDog.ai’s static code scanner embeds privacy from IDE to CI. It maps sensitive data flows across AI and third party integrations (including shadow AI), detects privacy risks before code is deployed, and generates audit ready Records of Processing Activities and Privacy Impact Assessments prefilled with detected data flows and risks.
 
-Download it to your machine and try it for free. You can view the output in the CLI console and export it to a markdown file. See a sample report [**here**](https://github.com/hounddogai/hounddog/blob/main/hounddog-report.md).
+Download it to your machine and try it for free. You can view the output in the CLI console and export it to a markdown file. See a sample report [**here**](https://github.com/hounddogai/hounddog/blob/main/hounddog-sample-report.md).
 
 Our scanner can be used as a CLI that installs locally to scan cloned code repositories, or as IDE plugins that flag sensitive data leak issues as code is being written. The IDE plugins are available for [VSCode](https://marketplace.visualstudio.com/items?itemName=hounddog.hounddog-scanner), [Cursor](https://open-vsx.org/extension/hounddog/hounddog-scanner), [JetBrains](https://plugins.jetbrains.com/plugin/25684-hounddog-ai), and [Eclipse](https://marketplace.eclipse.org/content/hounddogai). The HoundDog.ai Cloud Platform (offered as part of the paid plan) also provides Source Code Management Platform Integrations - connecting directly to GitHub, GitLab, and Bitbucket (both cloud and enterprise versions) to automatically scan code, block PRs, and leave actionable PR comments.
 
@@ -137,7 +137,7 @@ hounddog scan hounddog-test-python-app --output-format=markdown
 
 Open the generated file `hounddog-test-python-app/hounddog-report-{timestamp}.md` on your browser. We recommend using the
 [Markdown Viewer](https://chromewebstore.google.com/detail/markdown-viewer/ckkdlimhmcjmikdlpkmbgfkaikojcbjk) Chrome
-extension with **mermaid** and **toc** settings enabled. See [this](https://docs.hounddog.ai/scanner/markdown-report)
+extension with **mermaid** and **toc** settings enabled. See [this](https://github.com/hounddogai/hounddog/blob/main/hounddog-sample-report.md)
 for more details.
 
 See a sample report [**here**](https://github.com/hounddogai/hounddog/blob/main/hounddog-report.md).
