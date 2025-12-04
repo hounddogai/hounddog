@@ -137,10 +137,10 @@ hounddog scan hounddog-test-python-app --output-format=markdown
 
 Open the generated file `hounddog-test-python-app/hounddog-report-{timestamp}.md` on your browser. We recommend using the
 [Markdown Viewer](https://chromewebstore.google.com/detail/markdown-viewer/ckkdlimhmcjmikdlpkmbgfkaikojcbjk) Chrome
-extension with **mermaid** and **toc** settings enabled. See [this](https://github.com/hounddogai/hounddog/blob/main/hounddog-sample-report.md)
+extension with **mermaid** and **toc** settings enabled. See [this](https://docs.hounddog.ai/scanner/markdown-report)
 for more details.
 
-See a sample report [**here**](https://github.com/hounddogai/hounddog/blob/main/hounddog-report.md).
+See a sample report [**here**](https://github.com/hounddogai/hounddog/blob/main/hounddog-sample-report.md).
 
 ## Uninstallation
 
