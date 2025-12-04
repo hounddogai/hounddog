@@ -51,7 +51,6 @@ The table below shows the configuration parameters used for this scan.
 |Scanner Version|2.3.1|
 |Scanner Build|d7941312136a22de43e3c501e0eaf0d3e46fb73c|
 |Was `HOUNDDOG_API_KEY` provided?|No|
-|Scan Target Directory|<span style="color:rgba(51, 113, 212, 1);">/Users/amjadafanah/hounddog-workspace/hounddog-test-python-app</span>|
 |Git Source Code Manager Type|GitHub (Cloud)|
 |Git Repository|[hounddogai/hounddog\-test\-python\-app](<https://github.com/hounddogai/hounddog-test-python-app>)|
 |Git Branch|[main](<https://github.com/hounddogai/hounddog-test-python-app/tree/main>)|
