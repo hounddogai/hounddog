@@ -1,6 +1,7 @@
 # HoundDog.ai — Modern Privacy Code Scanner
 
-HoundDog.ai is a fast, lightweight scanner that detects sensitive data flows and potential leaks in your source code.
+HoundDog.ai is an ultra-fast, lightweight privacy scanner that detects sensitive dataflows and potential leaks in your
+source code.
 
 **It answers questions such as:**
 
@@ -10,16 +11,16 @@ HoundDog.ai is a fast, lightweight scanner that detects sensitive data flows and
 
 **It is useful for:**
 
-- Early prevention of data leaks during development
-- Automated and evidence-based data mapping for privacy compliance (e.g., GDPR, HIPAA)
-- Reducing engineering fatigue, stale data inventories, and regulatory fines
+- Early prevention of data leaks during development.
+- Automated and evidence-based data mapping for privacy compliance (e.g., GDPR, HIPAA).
+- Reducing engineering fatigue, stale data inventories, and regulatory fines.
 
 **HoundDog.ai in action:**
 
 ![Demo GIF](https://raw.githubusercontent.com/hounddogai/hounddog/main/demo.gif)
 
-Here is an [example Markdown output](./hounddog-sample-report.md) and the complete list
-of [data elements](./hounddog-data-elements.md) and [data sinks](./hounddog-data-sinks.md) supported.
+Check out the [sample Markdown report](./sample-report.md) and the list of [data elements](./data-elements.md)
+and [sinks](./data-sinks.md) supported by HoundDog.ai.
 
 ## Installation
 
@@ -51,50 +52,78 @@ Remove-Item -Recurse -Force "$env:LocalAppData\hounddog"
 ## Usage
 
 ```shell
-hounddog scan [PATH] [OPTIONS]
+hounddog scan [OPTIONS] [PATH]
 ```
 
-For a quick demonstration, you can scan a public [test repository][test-repository] with baked in data flows:
+For a quick demonstration, you can scan our [test repository][test-repository]:
 
-[test-repository]: https://github.com/hounddogai/hounddog-test-healthcare-app
+[test-repository]: https://github.com/hounddogai/hounddog-test-python-app
 
 ```shell
-# Clone
-git clone https://github.com/hounddogai/hounddog-test-healthcare-app
+# Clone the test repository
+git clone https://github.com/hounddogai/hounddog-test-python-app
 
-# Scan
-hounddog scan hounddog-test-healthcare-app
+# Scan the test repository
+hounddog scan hounddog-test-python-app
 ```
 
-You can also scan with the `--output-format=markdown` flag to generate a Markdown report:
+By default, only *risky* dataflows are shown to minimize noise. Use `--all-dataflows` to see everything:
 
 ```shell
-hounddog scan hounddog-test-python-app --output-format=markdown
+hounddog scan hounddog-test-python-app --all-dataflows
 ```
 
-We recommend using the [Markdown Viewer][md-viewer-ext] Chrome extension with **mermaid** and **toc** options enabled.
-See [instructions][md-viewer-doc] and a [sample report](./hounddog-sample-report.md) for more information.
+Use `--trace` to see detailed dataflow traces (one of our coolest features and useful for debugging):
+
+```shell
+hounddog scan hounddog-test-python-app --trace
+```
+
+Use `--output-format=markdown` to generate a Markdown report:
+
+```shell
+hounddog scan hounddog-test-python-app --output-format=markdown --output-file=report.md
+```
+
+We recommend the [Markdown Viewer][md-viewer-ext] Chrome extension for viewing the report (see [setup][md-viewer-doc]
+and [sample report](./sample-report.md)).
 
 [md-viewer-doc]: https://docs.hounddog.ai/scanner/markdown-report
 
 [md-viewer-ext]: https://chromewebstore.google.com/detail/markdown-viewer/ckkdlimhmcjmikdlpkmbgfkaikojcbjk
 
-To see all available commands, run `hounddog --help`.
+To see the up-to-date list of supported data elements:
+
+```shell
+hounddog data-elements
+```
+
+To see the up-to-date list of supported data sinks:
+
+```shell
+hounddog data-sinks
+```
+
+Use `--help` to see all subcommands and options:
+
+```shell
+hounddog [SUBCOMMAND] --help
+```
 
 ## Features
 
-|                         | Free                                                        | Enterprise                                                  |
-|-------------------------|-------------------------------------------------------------|-------------------------------------------------------------|
-| Supported Languages     | Python, JavaScript/TypeScript                               | Languages in Free + C#, Go, Java, SQL, GraphQL, OpenAPI     |
-| Usage Options           | CLI, IDE                                                    | CLI, IDE, GitHub Integration (Automated Scans, PR Reviews)  |
-| IDE Plugins             | [VS Code][vscode], [JetBrains][jetbrains], [Cursor][cursor] | [VS Code][vscode], [JetBrains][jetbrains], [Cursor][cursor] |
-| Data Flow Detection     | Limited Coverage                                            | Full Coverage                                               |
-| Data Flow Visualization | Limited Coverage                                            | Full Coverage                                               |
-| Rule Customization      | No                                                          | Custom Data Element and Data Sink Rules                     |
-| Privacy Reports         | No                                                          | RoPA, PIA, DPIA                                             |
-| Cloud Platform          | No                                                          | Issue Tracking, Alerts, SSO, RBAC, Audit Logs               |
-| On-Prem Deployment      | No                                                          | Included                                                    |
-| Support                 | GitHub Issues + Email                                       | Priority Support with SLA + Dedicated Slack Channel         |
+|                        | Free                                                        | Enterprise                                                  |
+|------------------------|-------------------------------------------------------------|-------------------------------------------------------------|
+| Supported Languages    | Python, JavaScript, TypeScript                              | Languages in Free + C#, Go, Java, SQL, GraphQL, OpenAPI     |
+| Usage Options          | CLI, IDE                                                    | CLI, IDE, GitHub Integration (Automated Scans, PR Reviews)  |
+| IDE Plugins            | [VS Code][vscode], [JetBrains][jetbrains], [Cursor][cursor] | [VS Code][vscode], [JetBrains][jetbrains], [Cursor][cursor] |
+| Dataflow Detection     | Limited Coverage                                            | Full Coverage                                               |
+| Dataflow Visualization | Limited Coverage                                            | Full Coverage                                               |
+| Rule Customization     | No                                                          | Custom Data Element and Data Sink Rules                     |
+| Privacy Reports        | No                                                          | RoPA, PIA, DPIA                                             |
+| Cloud Platform         | No                                                          | Issue Tracking, Alerts, SSO, RBAC, Audit Logs               |
+| On-Prem Deployment     | No                                                          | Included                                                    |
+| Support                | GitHub Issues + Email                                       | Priority Support with SLA + Dedicated Slack Channel         |
 
 [vscode]: https://marketplace.visualstudio.com/items?itemName=hounddog.hounddog-scanner
 
@@ -109,12 +138,12 @@ To see all available commands, run `hounddog --help`.
 Visit our [Trust Center](https://security.hounddog.ai/) to view our latest SOC2 report, penetration testing results,
 and SBOM details.
 
-### Does the scanner send my code to a server?
+### Does your scanner send my code to a server?
 
 No. Scans run locally. Your code never leaves your machine unless you are on a paid plan and explicitly configure the
 `HOUNDDOG_API_KEY` environment variable.
 
-### Does the scanner use AI?
+### Does your scanner use AI?
 
 AI is used to generate and update rules for scaling coverage, but scans themselves run on a deterministic static
 analysis engine. This keeps scans fast and free of hallucinations.
@@ -161,13 +190,13 @@ logger.info("data=%s", bar)
 ### How is your scanner different from Semgrep or CodeQL?
 
 DIY SAST tools like Semgrep and CodeQL are powerful and highly customizable, but their rules need significant upfront
-investment to learn and maintain, especially as the target codebases evolve.
+investment to learn and maintain.
 
 HoundDog.ai is a turnkey solution that provides broad, high-quality coverage of data elements and sinks out of the box,
-greatly reducing the rule authoring burden. It is designed specifically for inter-file data flow analysis, scaling
-efficiently to large codebases, and detecting complex data flows that general-purpose solutions miss.
+greatly reducing the rule authoring burden. It is designed specifically for dataflow analysis, scaling efficiently to
+large codebases, and detecting complex data flows that general-purpose solutions miss.
 
-### The scanner missed a data flow!
+### Your scanner missed a dataflow!
 
 Our rules are constantly evolving, and we are working hard on improving them. Please let us know any false positives or
 negatives, and we will be happy to address them.
@@ -178,5 +207,5 @@ View [license information](https://hounddog.ai/terms-of-service/) for HoundDog.a
 
 ## Contact
 
-If you need help or have feedback, please create a [GitHub issue](https://github.com/hounddogai/hounddog/issues) or
+If you have any questions or feedback, please create a [GitHub issue](https://github.com/hounddogai/hounddog/issues) or
 email us at [support@hounddog.ai](mailto:support@hounddog.ai).
