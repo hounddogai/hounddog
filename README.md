@@ -14,9 +14,11 @@ HoundDog.ai is a fast, lightweight scanner that detects sensitive data flows and
 - Automated and evidence-based data mapping for privacy compliance (e.g., GDPR, HIPAA)
 - Reducing engineering fatigue, stale data inventories, and regulatory fines
 
+**HoundDog.ai in action:**
+
 ![Demo GIF](https://raw.githubusercontent.com/hounddogai/hounddog/main/demo.gif)
 
-Here is an [example scan output](./hounddog-sample-report.md) and the complete list
+Here is an [example Markdown output](./hounddog-sample-report.md) and the complete list
 of [data elements](./hounddog-data-elements.md) and [data sinks](./hounddog-data-sinks.md) supported.
 
 ## Installation
