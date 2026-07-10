@@ -1,0 +1,118 @@
+# HoundDog.ai self-hosted starter stack.
+#
+# Quick start:
+#   1. ./setup.sh   (generates the .env file with the required settings)
+#   2. ./start.sh   (starts the stack)
+#   3. Open http://localhost:3300 and create your organization and admin account. Do this right
+#      away: until the first account exists, anyone who can reach the instance can claim it.
+#
+# Scale the API and worker horizontally with:
+#   docker compose up -d --scale api=3 --scale worker=2
+#
+# The REST API listens on http://localhost:8800 by default. Point the CLI scanner at it with:
+#   HOUNDDOG_ENV=self-hosted HOUNDDOG_API_URL=http://localhost:8800 HOUNDDOG_APP_URL=http://localhost:3300 HOUNDDOG_API_KEY=<api key> hounddog scan ...
+#
+# For deployments not on localhost, also set HOUNDDOG_APP_BASE_URL and HOUNDDOG_API_BASE_URL to
+# the URLs your users' browsers will reach (e.g. https://hounddog.example.com:3300).
+
+# Keep the stack grouped under this parent project name in Docker Compose and Docker Desktop.
+name: hounddog-self-hosted
+
+# Shared definition for the containers running the hounddogai/hounddog-self-hosted image; the role is
+# selected by `command`. The /data volume holds uploaded scan data.
+x-hounddog-self-hosted: &hounddog-self-hosted
+  image: hounddogai/hounddog-self-hosted:latest
+  restart: unless-stopped
+  environment:
+    HOUNDDOG_SECRET_KEY: ${HOUNDDOG_SECRET_KEY:?is required. Run ./setup.sh, or set a stable random string of 50+ characters. Encrypted data derives from it, so it must never change}
+    # Bundled Postgres (compose profile "postgres"); ignored when HOUNDDOG_POSTGRES_URL is set.
+    HOUNDDOG_POSTGRES_HOST: postgres
+    HOUNDDOG_POSTGRES_PORT: 5432
+    HOUNDDOG_POSTGRES_DB: hounddog
+    HOUNDDOG_POSTGRES_USER: hounddog
+    HOUNDDOG_POSTGRES_PASS: ${HOUNDDOG_POSTGRES_PASSWORD:-hounddog}
+    # External Postgres; when set, also remove COMPOSE_PROFILES=postgres from .env so the
+    # bundled database does not start.
+    HOUNDDOG_POSTGRES_URL: ${HOUNDDOG_POSTGRES_URL:-}
+    HOUNDDOG_APP_PORT: ${HOUNDDOG_APP_PORT:-3300}
+    HOUNDDOG_API_PORT: ${HOUNDDOG_API_PORT:-8800}
+    # When left empty, each URL is derived from its corresponding port.
+    HOUNDDOG_APP_BASE_URL: ${HOUNDDOG_APP_BASE_URL:-http://localhost:${HOUNDDOG_APP_PORT:-3300}}
+    HOUNDDOG_API_BASE_URL: ${HOUNDDOG_API_BASE_URL:-http://localhost:${HOUNDDOG_API_PORT:-8800}}
+    # Optional: bring your own LLM API key to enable AI features.
+    HOUNDDOG_ENABLE_AI: ${HOUNDDOG_ENABLE_AI:-0}
+    HOUNDDOG_GEMINI_API_KEY: ${HOUNDDOG_GEMINI_API_KEY:-}
+    HOUNDDOG_AWS_BEDROCK_API_KEY: ${HOUNDDOG_AWS_BEDROCK_API_KEY:-}
+  volumes:
+    - hounddog_data:/data
+  security_opt:
+    - no-new-privileges:true
+
+services:
+  postgres:
+    image: postgres:18.4-alpine
+    profiles: ["postgres"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: hounddog
+      POSTGRES_USER: hounddog
+      POSTGRES_PASSWORD: ${HOUNDDOG_POSTGRES_PASSWORD:-hounddog}
+    volumes:
+      # Postgres 18+ expects the volume at /var/lib/postgresql (data lives in a subdirectory).
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hounddog"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    security_opt:
+      - no-new-privileges:true
+
+  # One-shot migrations and scanner rules bootstrap; api and worker wait for it to complete so
+  # scaled replicas never run migrations concurrently.
+  init:
+    <<: *hounddog-self-hosted
+    command: init
+    restart: "no"
+
+  api:
+    <<: *hounddog-self-hosted
+    command: api
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:$${HOUNDDOG_API_PORT}/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+
+  worker:
+    <<: *hounddog-self-hosted
+    command: worker
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+  # The only service publishing host ports: serves the web UI and reverse-proxies the REST API
+  # across the api replicas.
+  caddy:
+    <<: *hounddog-self-hosted
+    command: caddy
+    depends_on:
+      api:
+        condition: service_started
+    ports:
+      - "${HOUNDDOG_APP_PORT:-3300}:${HOUNDDOG_APP_PORT:-3300}" # React UI
+      - "${HOUNDDOG_API_PORT:-8800}:${HOUNDDOG_API_PORT:-8800}" # REST API
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:$${HOUNDDOG_APP_PORT}/"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 10s
+
+volumes:
+  postgres_data:
+  hounddog_data:
