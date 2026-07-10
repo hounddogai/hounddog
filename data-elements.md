@@ -1,13 +1,13 @@
 # HoundDog.ai Data Elements
 
-Generated: 2026-03-26 18:26:38
+Generated: 2026-07-10 11:22:52
 
 | Sensitivity | Count |
 |---|---|
 | 🟥 Critical | 32 |
-| 🟧 Medium | 48 |
+| 🟧 Medium | 49 |
 | 🟨 Low | 20 |
-| **Total** | 100 |
+| **Total** | 101 |
 
 | Sensitivity | Data Element | Tags |
 |---|---|---|
@@ -89,6 +89,7 @@ Generated: 2026-03-26 18:26:38
 | 🟧 Medium | Sexual Orientation | PII |
 | 🟧 Medium | Sleep Pattern | PHI |
 | 🟧 Medium | Video Call History | PII |
+| 🟧 Medium | Visa Information | PII |
 | 🟧 Medium | Vital Sign | PHI |
 | 🟧 Medium | Voice Mail | PII |
 | 🟨 Low | Address | PII |

@@ -1,6 +1,6 @@
 # HoundDog.ai Data Sinks
 
-Generated: 2026-03-26 18:26:38
+Generated: 2026-07-10 11:22:52
 
 🟩 Supported  🟨 Partially Supported  🟥 Not Supported Yet  ⬜ Not Applicable
 
@@ -12,10 +12,13 @@ Generated: 2026-03-26 18:26:38
 | Adobe Commerce | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | ADP | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Adyen | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| AfterShip | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AgentMail | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Aha! | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Airship | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | Airtable | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
+| Akamai | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Algolia | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Amplitude | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Anthropic | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Apache Hive | ⬜ | 🟩 | 🟩 | ⬜ | 🟩 |
@@ -23,6 +26,7 @@ Generated: 2026-03-26 18:26:38
 | AppDynamics | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AppsFlyer | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | AppSignal | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Appwrite | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Arize AI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Asana | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Astronomer.io | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
@@ -256,7 +260,6 @@ Generated: 2026-03-26 18:26:38
 | Azure Compute | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Compute Fleet | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Confidential Ledger | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Container Apps | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
 | Azure Containers | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Cosmos DB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Data Box | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -328,12 +331,15 @@ Generated: 2026-03-26 18:26:38
 | Azure Visual Studio | 🟥 | 🟩 | 🟥 | 🟥 | 🟩 |
 | Azure Web PubSub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | BambooHR | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| BentoML | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| BigCommerce | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Bird | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bitbucket | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bitly | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Boomi | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Box | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Braintree | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Braze | ⬜ | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bugsnag | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bullhorn | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
 | Calendly | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
@@ -351,35 +357,76 @@ Generated: 2026-03-26 18:26:38
 | Cisco UCS | 🟩 | ⬜ | 🟥 | ⬜ | 🟥 |
 | Cisco Webex | 🟩 | 🟩 | 🟩 | 🟩 | 🟥 |
 | Clearbit | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Clerk | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | ClickHouse | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | ClickSend | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| ClickUp | ⬜ | 🟩 | ⬜ | ⬜ | 🟩 |
 | Cloudflare | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | CockroachDB | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
 | Coda | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Codat | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Cohere | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Commercetools | ⬜ | 🟩 | 🟩 | 🟩 | 🟩 |
 | Config Files | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Confluence | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Confluent | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Constant Contact | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
+| Contentful | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Cookies | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Copper | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Coralogix | ⬜ | 🟩 | ⬜ | ⬜ | 🟩 |
 | CoreWeave | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Coupa | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | CrewAI | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| CrowdStrike | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
+| Customer.io | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Databricks | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Datadog | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Datafold | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Deel | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | DeepSeek | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
+| Delighted | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Dell | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Demandbase | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Descope | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Digital River | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| DigitalOcean | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Discord | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Django | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Docusign | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| Domo | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Drift | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Drizzle | ⬜ | 🟨 | ⬜ | ⬜ | ⬜ |
 | Dropbox | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
+| Dropbox Sign | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| Duo | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Dynatrace | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| EasyPost | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Egnyte | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Elastic | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Environment Variables | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
+| Eventbrite | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Expedia | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
+| Facebook | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Fastly | ⬜ | 🟩 | ⬜ | ⬜ | 🟩 |
+| Favro | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Figma | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Files | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Firebase | 🟩 | 🟥 | 🟩 | 🟥 | 🟥 |
+| Fivetran | 🟩 | ⬜ | ⬜ | ⬜ | 🟩 |
+| FreshBooks | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Freshdesk | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Freshworks | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Front | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Fullstory | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
+| FusionAuth | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Gainsight | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
 | Genesys | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Ghost | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | GitHub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| GitLab | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| GoDaddy | 🟩 | ⬜ | ⬜ | 🟩 | 🟩 |
+| Gong | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Google | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Ads | 🟩 | 🟩 | 🟩 | 🟩 | 🟥 |
 | Google Analytics | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -519,34 +566,80 @@ Generated: 2026-03-26 18:26:38
 | Google Vertex AI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Workspace | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google YouTube | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
+| Gorgias | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Grafana | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
 | GraphQL | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Greenhouse | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Groq | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | gRPC | 🟥 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Gusto | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
+| Heap | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
+| Help Scout | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ |
+| Heroku | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
+| HiBob | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Hightouch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Honeycomb | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | HTTP | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | HubSpot | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Hugging Face | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | IBM | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| ID.me | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ |
 | Informatica | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Instana | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Intercom | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Ironclad | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Iterable | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
+| Jamf | 🟩 | ⬜ | ⬜ | ⬜ | 🟩 |
 | JSON Web Token | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| JumpCloud | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
+| Keap | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| Kentik | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Keycloak | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Kibana | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Kit | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Klarna | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Klaviyo | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | LangChain | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | LangGraph | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | LangSmith | 🟩 | 🟩 | 🟥 | ⬜ | 🟩 |
+| LaunchDarkly | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Lever | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Linear | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | LiteLLM | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Lithic | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
+| LiveChat | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | LlamaIndex | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
+| Lob | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Local Storage | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| LogRocket | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
 | Logs | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Logz.io | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Lokalise | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
+| M-Files | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ |
+| Mailchimp | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Mailgun | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Marketo | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
+| Marqeta | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Matomo | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Matrix | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
+| Meilisearch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Mercury | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Merge | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Microsoft | 🟨 | 🟩 | 🟨 | 🟨 | 🟨 |
 | Microsoft Teams | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Milvus | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
+| Miro | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Mistral AI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Mixmax | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Mixpanel | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Modal | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Modern Treasury | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
+| monday.com | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | MongoDB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Moralis | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
+| MuleSoft | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| MURAL | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| MX Technologies | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | MySQL | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Neon | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | New Relic | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -554,47 +647,91 @@ Generated: 2026-03-26 18:26:38
 | Notion | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Nvidia | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Nvidia Dynamo-Triton | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Nylas | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
+| Okta | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Ollama | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | OneDrive | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
+| OneLogin | 🟩 | ⬜ | 🟩 | 🟩 | ⬜ |
 | OpenAI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | OpenRouter | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | OpenTelemetry | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Optimizely | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Oracle DB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Oracle NetSuite | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Ortto | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Outlook | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Outreach | ⬜ | 🟩 | ⬜ | 🟩 | ⬜ |
+| Paddle | 🟩 | 🟩 | 🟥 | 🟥 | 🟩 |
+| PagerDuty | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Palo Alto Networks | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
+| PandaDoc | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | PayPal | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Peewee | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Perplexity | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
+| Personio | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Pinecone | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Pipedrive | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Plaid | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| PlanetScale | ⬜ | 🟩 | ⬜ | ⬜ | 🟩 |
+| Plivo | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Pony ORM | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | PostgreSQL | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| PostHog | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Postmark | ⬜ | 🟩 | 🟩 | 🟩 | 🟩 |
 | Prometheus | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Protocol Buffers | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ |
+| PubNub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Pulumi | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Pure Storage | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Pusher | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Pydantic AI | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Qdrant | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Qualtrics | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | QuickBooks | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Qumulo | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
+| Ramp | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Range Labs | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Recombee | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Redis | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Regula | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| Replicate | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Replit | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
 | Resend | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Revolut | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Rippling | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| RocketReach | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Rollbar | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| RudderStack | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
+| Rutter | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Sage | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
 | Salesforce | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Sanity | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
 | SAP | 🟥 | 🟥 | 🟩 | 🟥 | 🟥 |
 | SAP HANA | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | SAP NetWeaver | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
+| SAP SuccessFactors | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ |
+| Satori Cyber | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Sauce Labs | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ |
 | Segment | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Semantic Kernel | 🟩 | ⬜ | 🟩 | 🟩 | ⬜ |
+| SendBird | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | SendGrid | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Sentry | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Session Storage | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| ShareFile | ⬜ | ⬜ | 🟩 | 🟩 | ⬜ |
 | Sharepoint | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Shippo | 🟩 | 🟩 | 🟩 | 🟩 | 🟥 |
+| Shopify | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Slack | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Smartsheet | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Smarty | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Snapchat | 🟩 | ⬜ | 🟩 | ⬜ | 🟩 |
 | Snowflake | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Snyk | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | SOAP | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
+| Split Software | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Splunk | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| SpotDraft | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Spotify | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | SQL Database | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | SQL Server | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -604,19 +741,52 @@ Generated: 2026-03-26 18:26:38
 | Square | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Standard Error | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Standard Output | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Stitch | 🟩 | ⬜ | 🟩 | ⬜ | ⬜ |
+| Strapi | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | Stripe | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Stytch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Supabase | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| SurveyMonkey | ⬜ | 🟩 | 🟩 | 🟩 | ⬜ |
+| Tableau | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Telegram | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| TeleSign | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| Tenable | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Terraform | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Terrific | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | TestMu AI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | ThoughtSpot | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | Thrift | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ |
+| TiDB | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Tink | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ |
 | Todoist | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
+| Together AI | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Tortoise ORM | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Totango | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Trello | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| TrueLayer | ⬜ | 🟩 | 🟩 | 🟩 | ⬜ |
 | Twilio | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Typeform | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| UiPath | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Unit | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | Valkey | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Veryfi | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Vimeo | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
 | vLLM | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Vonage | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| Voyage AI | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Weaviate | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
+| Webflow | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Websocket | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Weights & Biases | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| WooCommerce | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
+| Wootric | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
+| WordPress | ⬜ | 🟩 | 🟩 | 🟩 | ⬜ |
+| Workday | 🟩 | ⬜ | 🟩 | 🟩 | ⬜ |
+| WorkOS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | xAI | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
+| Xero | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Yandex | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Zendesk | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Zendesk Sell | 🟩 | ⬜ | 🟩 | ⬜ | ⬜ |
+| Zoho | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| Zoom | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
