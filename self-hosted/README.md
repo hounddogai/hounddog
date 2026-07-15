@@ -1,88 +1,103 @@
 # HoundDog.ai Self-Hosted
 
-Run the [HoundDog.ai](https://hounddog.ai) Cloud Platform on your own infrastructure with Docker Compose. All services
-run from the public `hounddogai/hounddog-self-hosted` image plus Postgres; no external dependencies.
-
 ## Requirements
 
 - Docker with Compose v2
-- 4 GB RAM and 80 GB disk recommended
+- At least 8 GB RAM and 80 GB disk
 
-## Quick start
-
-```shell
-./setup.sh    # interactive wizard: generates .env (secret key + database settings)
-./start.sh    # starts the stack
-```
-
-Then open http://localhost:3300 and create your organization and admin account.
-
-> **Do this right away.** Until the first account exists, the setup page is open to anyone who
-> can reach the instance. Do not expose the configured UI and API ports (`3300` and `8800` by
-> default) to an untrusted network before completing setup.
-
-## Services
-
-| Service    | Role                                                                                                 |
-|------------|------------------------------------------------------------------------------------------------------|
-| `caddy`    | Web UI and REST API reverse proxy on the configured ports (the only service with published ports)    |
-| `api`      | REST API (uvicorn), horizontally scalable                                                            |
-| `worker`   | Background task worker (SAQ), horizontally scalable                                                  |
-| `init`     | One-shot database migrations and scanner rules bootstrap                                             |
-| `postgres` | Bundled database, enabled by the `postgres` compose profile                                          |
-
-## Scaling
+## Setup
 
 ```shell
-./start.sh --scale api=3 --scale worker=2
+git clone https://github.com/hounddogai/hounddog.git
+cd hounddog/self-hosted
+./setup.sh
+docker compose up -d --wait
 ```
 
-## Using your own Postgres
+`setup.sh` creates a private `.env` file and lets you choose the bundled database or your own Postgres server.
 
-Set `HOUNDDOG_POSTGRES_URL` in `.env` and remove the `COMPOSE_PROFILES=postgres` line so the
-bundled database does not start (the setup wizard can do this for you):
-
-```shell
-HOUNDDOG_POSTGRES_URL=postgres://user:password@host:5432/hounddog
-```
+Open http://localhost:3300. When asked for the setup key, use the `HOUNDDOG_SETUP_KEY` value from `.env`.
 
 ## Configuration
 
-See `.env.example` for the full commented reference. Required: `HOUNDDOG_SECRET_KEY` — a stable
-random string of 50+ characters that encrypts sensitive data at rest. Keep a copy somewhere
-safe; encrypted settings are unrecoverable without it, and it must never change once set.
+See [`.env.example`](.env.example) for all settings.
 
-Set `HOUNDDOG_APP_PORT` and `HOUNDDOG_API_PORT` to change the ports published by the starter Compose stack. For
-deployments not accessed via localhost, set `HOUNDDOG_APP_BASE_URL` and `HOUNDDOG_API_BASE_URL` to the URLs your
-users' browsers reach. When the base URLs are omitted, they are derived from the configured ports.
+The example uses `hounddog` as the bundled Postgres user, password, and database so local testing
+works with minimal setup. Change all three values before the first start of any non-local deployment,
+or use an external Postgres server. Existing Postgres volumes keep the credentials they were initialized with.
+Because these values are interpolated into the database URL, use only ASCII letters, numbers, hyphens, periods,
+underscores, and tildes. Other special characters such as `/`, `?`, and `%` are not supported in these fields.
 
-## Production checklist
+To use another local port, add this to `.env`:
 
-- Put a TLS-terminating reverse proxy (or your load balancer) in front of the configured UI and API ports, and set
-  the base URLs above to the HTTPS origins. Credentials transit in cleartext otherwise.
-- Keep `.env` private (it contains the secret key); it is created with owner-only permissions
-  and ignored by git.
-- Back up the `postgres_data` and `hounddog_data` volumes, and store the secret key separately
-  from database backups.
+```dotenv
+HOUNDDOG_PORT=4300
+```
 
-## CLI scanner
+The public URL will default to `http://localhost:4300`. When you use a domain or reverse proxy, set the public URL too:
 
-Point the [HoundDog.ai CLI scanner](https://docs.hounddog.ai) at your deployment:
+```dotenv
+HOUNDDOG_URL=https://hounddog.example.com
+```
+
+The web app is served at `HOUNDDOG_URL`. The API is served at `HOUNDDOG_URL/api`.
+The OpenAPI schema is available without authentication at `HOUNDDOG_URL/api/openapi.json`.
+
+HoundDog.ai-managed AI is not available in self-hosted deployments. Add your own provider under **Settings > AI**.
+
+## External Postgres
+
+Choose external Postgres when you run `./setup.sh`. To configure it by hand, set the URL in `.env` and remove
+`COMPOSE_PROFILES` and `POSTGRES_PASSWORD`:
+
+```dotenv
+HOUNDDOG_POSTGRES_URL=postgres://user:password@host:5432/hounddog
+```
+
+Percent-encode special characters in the username and password. URL options such as `?sslmode=require` are kept.
+Separate host, port, database, user, and password settings are not supported.
+
+## Operations
+
+```shell
+docker compose ps
+docker compose logs -f
+docker compose down
+```
+
+`docker compose down` stops the stack without deleting data. Scale the API and worker services when needed:
+
+```shell
+docker compose up -d --wait --scale api=3 --scale worker=2
+```
+
+The `caddy` and bundled `postgres` containers use fixed names, so only one stack can run on a Docker host. API and
+worker containers use numbered names and can be scaled.
+
+## Production
+
+- Put a TLS reverse proxy or load balancer in front of HoundDog.ai. Without TLS, passwords and API keys are not
+  encrypted in transit.
+- Set `HOUNDDOG_URL` to the public HTTPS URL.
+- Keep `.env` private. It contains secrets and is ignored by git.
+- Back up `hounddog_data`. If you use bundled Postgres, also back up `postgres_data`.
+- Store `HOUNDDOG_SECRET_KEY` separately from the database backup. Encrypted settings cannot be recovered without it.
+
+## CLI Scanner
+
+Create an API key in HoundDog.ai, then run the scanner with the same public URL:
 
 ```shell
 HOUNDDOG_ENV=self-hosted \
-HOUNDDOG_API_URL=http://localhost:8800 \
-HOUNDDOG_APP_URL=http://localhost:3300 \
-HOUNDDOG_API_KEY=<api key> \
+HOUNDDOG_URL=http://localhost:3300 \
+HOUNDDOG_API_KEY=YOUR_API_KEY \
 hounddog scan <path>
 ```
 
-Use the externally reachable API and app URLs when the deployment uses custom ports or hostnames. `HOUNDDOG_API_URL`
-controls scanner API requests; `HOUNDDOG_APP_URL` controls links emitted in scanner output.
-
-## Upgrading
+## Upgrade
 
 ```shell
+git pull
 docker compose pull
-./start.sh
+docker compose up -d --wait
 ```

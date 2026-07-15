@@ -1,16 +1,108 @@
 #!/usr/bin/env bash
 #
-# Interactive setup wizard for the HoundDog.ai self-hosted stack. Generates the .env file
+# Interactive setup wizard for HoundDog.ai Self-Hosted. Generates the .env file
 # consumed by compose.yaml. Press Enter at any prompt to accept the default shown in brackets.
 
 set -euo pipefail
 
 cd "$(dirname "$0")"
 
+color_heading=""
+color_success=""
+color_warning=""
+color_error=""
+color_prompt=""
+color_reset=""
+if { [ -t 1 ] || [ -t 2 ]; } && [ "${TERM:-dumb}" != "dumb" ] && [ -z "${NO_COLOR:-}" ]; then
+    color_heading=$'\033[1;36m'
+    color_success=$'\033[0;32m'
+    color_warning=$'\033[0;33m'
+    color_error=$'\033[0;31m'
+    color_prompt=$'\033[1;35m'
+    color_reset=$'\033[0m'
+fi
+
 say() { printf '%s\n' "$*"; }
+heading() { printf '\n%s%s%s\n' "$color_heading" "$*" "$color_reset"; }
 fail() {
-    printf 'ERROR: %s\n' "$*" >&2
+    printf '%sERROR:%s %s\n' "$color_error" "$color_reset" "$*" >&2
     exit 1
+}
+
+prompt() {
+    if [ "${3:-true}" = "true" ]; then
+        say ""
+    fi
+    if [ "${2:-false}" = "true" ]; then
+        read -r -s -p "${color_prompt}$1${color_reset} " REPLY
+        say ""
+    else
+        read -r -p "${color_prompt}$1${color_reset} " REPLY
+    fi
+}
+
+if [ -e .env ] || [ -L .env ]; then
+    printf '%sA .env file already exists at %s/.env.%s\n' \
+        "$color_warning" "$(pwd)" "$color_reset" >&2
+    say ""
+    say "  1) Delete it and start over"
+    say "  2) Back it up and start over"
+    say "  3) Quit"
+    while :; do
+        prompt "Choose 1, 2, or 3 [default: 3]:"
+        env_action="${REPLY:-3}"
+        case "$env_action" in
+            1)
+                rm .env
+                break
+                ;;
+            2)
+                backup_path=".env.backup.$(date +%Y%m%d-%H%M%S).$$"
+                umask 077
+                cp .env "$backup_path"
+                chmod 600 "$backup_path"
+                rm .env
+                say "Backed up .env to $(pwd)/$backup_path."
+                break
+                ;;
+            3)
+                say "Setup cancelled. .env was not changed."
+                exit 0
+                ;;
+            *) say "Please enter 1, 2, or 3." ;;
+        esac
+    done
+fi
+
+generate_secret() {
+    # $1 = number of random bytes; prints them base64url-encoded without padding or newlines.
+    if command -v openssl > /dev/null 2>&1; then
+        openssl rand -base64 "$1" | tr -d '\n=' | tr '+/' '-_'
+    else
+        head -c "$1" /dev/urandom | base64 | tr -d '\n=' | tr '+/' '-_'
+    fi
+}
+
+prompt_postgres_value() {
+    local label="$1"
+    local result_var="$2"
+    local read_silently="${3:-false}"
+    local value
+
+    while :; do
+        prompt "$label [default: hounddog]:" "$read_silently" false
+        value="$REPLY"
+        value="${value:-hounddog}"
+        case "$value" in
+            *[!A-Za-z0-9._~-]*)
+                say "Use only ASCII letters, numbers, hyphens, periods, underscores, and tildes."
+                ;;
+            *)
+                printf -v "$result_var" '%s' "$value"
+                return
+                ;;
+        esac
+    done
 }
 
 command -v docker > /dev/null 2>&1 \
@@ -18,42 +110,19 @@ command -v docker > /dev/null 2>&1 \
 docker compose version > /dev/null 2>&1 \
     || fail "Docker Compose v2 is required but was not found. Update Docker or install the compose plugin."
 
-if [ -f .env ]; then
-    say "A .env file already exists in $(pwd)."
-    read -r -p "Overwrite it? Existing settings will be lost. [y/N] " answer
-    case "$answer" in
-        [Yy]*) ;;
-        *)
-            say "Keeping the existing .env; nothing to do."
-            exit 0
-            ;;
-    esac
-fi
-
-generate_secret() {
-    # $1 = number of random bytes; prints them base64-encoded without padding or newlines.
-    if command -v openssl > /dev/null 2>&1; then
-        openssl rand -base64 "$1" | tr -d '\n='
-    else
-        head -c "$1" /dev/urandom | base64 | tr -d '\n='
-    fi
-}
-
-say ""
-say "HoundDog.ai self-hosted setup"
-say "============================="
-say ""
-say "Generating a secret key (encrypts sensitive data at rest) ..."
 secret_key="$(generate_secret 48)"
-say "Done. It will be written to .env; keep a copy somewhere safe, because encrypted"
-say "settings are unrecoverable without it."
+setup_key="$(generate_secret 48)"
 
+heading "CHOOSE A DATABASE"
+say "  1) Bundled Postgres"
+say "     Best for a quick trial or testing on one server. Docker Compose runs"
+say "     Postgres alongside HoundDog.ai and stores its data in a Docker volume."
 say ""
-say "Database:"
-say "  1) Bundled Postgres managed by this compose stack (default)"
-say "  2) External Postgres that you provide"
+say "  2) External Postgres"
+say "     Recommended for production. Connect to a database you own."
 while :; do
-    read -r -p "Choose 1 or 2 [1]: " db_choice
+    prompt "Choose 1 or 2 [default: 1]:"
+    db_choice="$REPLY"
     db_choice="${db_choice:-1}"
     case "$db_choice" in
         1 | 2) break ;;
@@ -62,44 +131,27 @@ while :; do
 done
 
 postgres_url=""
+postgres_user=""
 postgres_password=""
+postgres_database=""
 if [ "$db_choice" = "1" ]; then
-    postgres_password="$(generate_secret 24)"
-    say "Generated a random password for the bundled Postgres."
+    heading "CONFIGURE BUNDLED POSTGRES"
+    prompt_postgres_value "Database" postgres_database
+    prompt_postgres_value "Username" postgres_user
+    prompt_postgres_value "Password" postgres_password true
+    # Compose expands these placeholders when it reads the generated .env file.
+    # shellcheck disable=SC2016
+    postgres_url='postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}'
 else
     say ""
     say "Enter the connection URL of your Postgres server, in the form:"
     say "  postgres://USER:PASSWORD@HOST:PORT/DATABASE"
-    say "Leave it empty to enter host, port, database, user, and password separately."
     while :; do
-        read -r -p "Postgres URL []: " postgres_url
-        if [ -z "$postgres_url" ]; then
-            read -r -p "Host [localhost]: " db_host
-            db_host="${db_host:-localhost}"
-            while :; do
-                read -r -p "Port [5432]: " db_port
-                db_port="${db_port:-5432}"
-                case "$db_port" in
-                    '' | *[!0-9]*) say "The port must be a number (e.g. 5432)." ;;
-                    *) break ;;
-                esac
-            done
-            read -r -p "Database [hounddog]: " db_name
-            db_name="${db_name:-hounddog}"
-            read -r -p "User [hounddog]: " db_user
-            db_user="${db_user:-hounddog}"
-            read -r -s -p "Password (input hidden): " db_password
-            say ""
-            [ -n "$db_password" ] || {
-                say "A password is required for the external database."
-                continue
-            }
-            postgres_url="postgres://${db_user}:${db_password}@${db_host}:${db_port}/${db_name}"
-            break
-        fi
+        prompt "Postgres URL:"
+        postgres_url="$REPLY"
         case "$postgres_url" in
             postgres://* | postgresql://*) break ;;
-            *) say "The URL must start with postgres:// or postgresql://." ;;
+            *) say "Enter a URL starting with postgres:// or postgresql://." ;;
         esac
     done
 fi
@@ -107,20 +159,28 @@ fi
 umask 077
 {
     printf '# Generated by setup.sh. Keep this file private: it contains secrets.\n\n'
-    printf 'HOUNDDOG_SECRET_KEY=%s\n\n' "$secret_key"
+    printf 'HOUNDDOG_SECRET_KEY=%s\n' "$secret_key"
+    printf 'HOUNDDOG_SETUP_KEY=%s\n\n' "$setup_key"
     if [ "$db_choice" = "1" ]; then
         printf 'COMPOSE_PROFILES=postgres\n'
-        printf 'HOUNDDOG_POSTGRES_PASSWORD=%s\n' "$postgres_password"
-    else
-        printf 'HOUNDDOG_POSTGRES_URL=%s\n' "$postgres_url"
+        printf 'POSTGRES_USER=%s\n' "$postgres_user"
+        printf 'POSTGRES_PASSWORD=%s\n' "$postgres_password"
+        printf 'POSTGRES_DB=%s\n' "$postgres_database"
     fi
+    printf 'HOUNDDOG_POSTGRES_URL=%s\n' "$postgres_url"
 } > .env
 
 say ""
-say "Wrote $(pwd)/.env (owner-only permissions)."
-say ""
-say "Next steps:"
-say "  1. Run ./start.sh"
-say "  2. Open http://localhost:3300 and create your organization and admin account."
-say "     Do this right away: until the first account exists, anyone who can reach the"
-say "     instance can claim it."
+say "${color_success}Created $(pwd)/.env (copy it somewhere safe).${color_reset}"
+if [ -t 1 ]; then
+    heading "ONE-TIME SETUP KEY"
+    say "$setup_key"
+fi
+heading "NEXT STEPS"
+say "  1. Run docker compose up -d --wait"
+say "  2. Open http://localhost:3300 and create your organization and owner account."
+if [ -t 1 ]; then
+    say "  3. Use the setup key shown above when prompted."
+else
+    say "  3. Open .env and use HOUNDDOG_SETUP_KEY when prompted."
+fi
