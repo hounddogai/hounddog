@@ -73,8 +73,8 @@ docker compose down
 docker compose up -d --wait --scale api=3 --scale worker=2
 ```
 
-The `caddy` and bundled `postgres` containers use fixed names, so only one stack can run on a Docker host. API and
-worker containers use numbered names and can be scaled.
+The bundled Postgres and Caddy containers use stable `hounddog-self-hosted-*` names. Only one self-hosted stack can run
+on a Docker host. API and worker containers use numbered names and can be scaled.
 
 ## Production
 

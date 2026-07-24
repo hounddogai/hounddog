@@ -35,7 +35,7 @@ x-hounddog-self-hosted: &hounddog-self-hosted
 
 services:
   postgres:
-    container_name: postgres
+    container_name: hounddog-self-hosted-postgres
     image: postgres:18.4-alpine
     profiles: ["postgres"]
     restart: unless-stopped
@@ -88,7 +88,7 @@ services:
   # The only service publishing a host port: serves the web UI and proxies /api across API replicas.
   caddy:
     <<: *hounddog-self-hosted
-    container_name: caddy
+    container_name: hounddog-self-hosted-caddy
     command: caddy
     depends_on:
       api:
