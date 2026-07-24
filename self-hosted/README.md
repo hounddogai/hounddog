@@ -14,9 +14,11 @@ cd hounddog/self-hosted
 docker compose up -d --wait
 ```
 
-`setup.sh` creates a private `.env` file and lets you choose the bundled database or your own Postgres server.
+`setup.sh` creates a private `.env` file at `hounddog/self-hosted/.env` by default, relative to the directory where you
+ran `git clone`. It also lets you choose the bundled database or your own Postgres server.
 
-Open http://localhost:3300. When asked for the setup key, use the `HOUNDDOG_SETUP_KEY` value from `.env`.
+When setup completes, the console displays the one-time setup key. It is also stored as `HOUNDDOG_SETUP_KEY` in
+`hounddog/self-hosted/.env`. Open http://localhost:3300 and enter this key when prompted.
 
 ## Configuration
 
@@ -85,14 +87,20 @@ worker containers use numbered names and can be scaled.
 
 ## CLI Scanner
 
-Create an API key in HoundDog.ai, then run the scanner with the same public URL:
+The self-hosted deployment does not include the CLI scanner. [Install the CLI scanner][scanner-install] on each machine
+where you want to run scans.
+
+Create an API key in HoundDog.ai, then export the self-hosted environment variables with the same public URL:
 
 ```shell
-HOUNDDOG_ENV=self-hosted \
-HOUNDDOG_URL=http://localhost:3300 \
-HOUNDDOG_API_KEY=YOUR_API_KEY \
+export HOUNDDOG_ENV=self-hosted
+export HOUNDDOG_URL=http://localhost:3300
+export HOUNDDOG_API_KEY=YOUR_API_KEY
+
 hounddog scan <path>
 ```
+
+[scanner-install]: https://github.com/hounddogai/hounddog#installation
 
 ## Upgrade
 
