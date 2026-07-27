@@ -179,12 +179,19 @@ try {
             throw 'The installed HoundDog CLI executable failed verification.'
         }
     } catch {
+        $InstallFailure = $_
         if ($BackupInstallPath -and (Test-Path -LiteralPath $BackupInstallPath -PathType Leaf)) {
-            Copy-Item -LiteralPath $BackupInstallPath -Destination $InstalledBinary -Force
+            try {
+                Copy-Item -LiteralPath $BackupInstallPath -Destination $InstalledBinary -Force
+            } catch {
+                throw "The installed executable failed verification and the previous installation could not be restored. The backup remains at '$BackupInstallPath': $($_.Exception.Message)"
+            }
+            Remove-Item -LiteralPath $BackupInstallPath -Force -ErrorAction SilentlyContinue
+            $BackupInstallPath = $null
         } else {
             Remove-Item -LiteralPath $InstalledBinary -Force -ErrorAction SilentlyContinue
         }
-        throw
+        throw $InstallFailure
     }
     if ($BackupInstallPath) {
         Remove-Item -LiteralPath $BackupInstallPath -Force
@@ -212,9 +219,6 @@ try {
 } finally {
     if ($PendingInstallPath -and (Test-Path -LiteralPath $PendingInstallPath)) {
         Remove-Item -LiteralPath $PendingInstallPath -Force -ErrorAction SilentlyContinue
-    }
-    if ($BackupInstallPath -and (Test-Path -LiteralPath $BackupInstallPath)) {
-        Remove-Item -LiteralPath $BackupInstallPath -Force -ErrorAction SilentlyContinue
     }
     # Clean up the temporary directory.
     if (Test-Path $TempDir) {
