@@ -164,20 +164,31 @@ try {
     if (Test-Path -LiteralPath $InstalledBinary -PathType Leaf) {
         $BackupInstallPath = Join-Path $InstallPath "hounddog-$([Guid]::NewGuid().ToString('N')).bak"
         [System.IO.File]::Replace($PendingInstallPath, $InstalledBinary, $BackupInstallPath)
-        Remove-Item -LiteralPath $BackupInstallPath -Force
-        $BackupInstallPath = $null
     } else {
         [System.IO.File]::Move($PendingInstallPath, $InstalledBinary)
     }
     $PendingInstallPath = $null
 
-    $InstalledVersionOutput = @(& $InstalledBinary --version)
-    if ($LASTEXITCODE -ne 0) {
-        throw 'The installed HoundDog CLI executable could not be run.'
+    try {
+        $InstalledVersionOutput = @(& $InstalledBinary --version)
+        if ($LASTEXITCODE -ne 0) {
+            throw 'The installed HoundDog CLI executable could not be run.'
+        }
+        $InstalledVersion = ($InstalledVersionOutput -join [Environment]::NewLine).Trim()
+        if ($InstalledVersion -ne $StagedVersion) {
+            throw 'The installed HoundDog CLI executable failed verification.'
+        }
+    } catch {
+        if ($BackupInstallPath -and (Test-Path -LiteralPath $BackupInstallPath -PathType Leaf)) {
+            Copy-Item -LiteralPath $BackupInstallPath -Destination $InstalledBinary -Force
+        } else {
+            Remove-Item -LiteralPath $InstalledBinary -Force -ErrorAction SilentlyContinue
+        }
+        throw
     }
-    $InstalledVersion = ($InstalledVersionOutput -join [Environment]::NewLine).Trim()
-    if ($InstalledVersion -ne $StagedVersion) {
-        throw 'The installed HoundDog CLI executable failed verification.'
+    if ($BackupInstallPath) {
+        Remove-Item -LiteralPath $BackupInstallPath -Force
+        $BackupInstallPath = $null
     }
 
     # Prepend the installation directory in both the persistent and current-session PATH values.
@@ -197,8 +208,7 @@ try {
     Write-Host "Installed version: $InstalledVersion"
     Write-Host "Run 'hounddog --help' to get started."
 } catch {
-    Write-Host "$($_.Exception.Message) Aborting installation." -ForegroundColor Red
-    exit 1
+    throw "$($_.Exception.Message) Aborting installation."
 } finally {
     if ($PendingInstallPath -and (Test-Path -LiteralPath $PendingInstallPath)) {
         Remove-Item -LiteralPath $PendingInstallPath -Force -ErrorAction SilentlyContinue

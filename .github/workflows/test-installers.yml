@@ -279,26 +279,22 @@ jobs:
           }
 
       - name: Reject nonexistent version
-        id: missing-version
-        continue-on-error: true
         shell: powershell
         env:
           HOUNDDOG_VERSION: 999999.999999.999999
         run: |
+          $ErrorActionPreference = 'Stop'
           $env:TEMP = $env:INSTALLER_TEMP
           $env:TMP = $env:INSTALLER_TEMP
-          Get-Content -LiteralPath $env:INSTALLER_PATH -Raw | Invoke-Expression
-
-      - name: Verify failed upgrade preservation and cleanup
-        if: ${{ always() && (steps.missing-version.outcome == 'failure' || steps.missing-version.outcome == 'success') }}
-        shell: powershell
-        env:
-          MISSING_VERSION_OUTCOME: ${{ steps.missing-version.outcome }}
-        run: |
-          $ErrorActionPreference = 'Stop'
-
-          if ($env:MISSING_VERSION_OUTCOME -ne 'failure') {
-              throw "Expected nonexistent version installation to fail, got $env:MISSING_VERSION_OUTCOME."
+          $FailureMessage = $null
+          try {
+              Get-Content -LiteralPath $env:INSTALLER_PATH -Raw | Invoke-Expression
+          } catch {
+              $FailureMessage = $_.Exception.Message
+              Write-Host $FailureMessage
+          }
+          if (-not $FailureMessage) {
+              throw 'Installing a nonexistent version unexpectedly succeeded.'
           }
           $ActualVersion = ((& $env:INSTALLED_BINARY --version) | Out-String).Trim()
           if ($ActualVersion -ne $env:INSTALLED_VERSION) {
