@@ -11,6 +11,9 @@ $ErrorActionPreference = 'Stop'
 # Disable progress bar for faster downloads.
 $ProgressPreference = 'SilentlyContinue'
 
+# GitHub requires TLS 1.2, which is not always enabled by default in Windows PowerShell 5.1.
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
 if ([string]::IsNullOrWhiteSpace($Version)) {
     $Version = 'latest'
 }
@@ -24,12 +27,42 @@ function Test-HoundDogVersionFormat {
     return $Candidate -match '^\d+\.\d+\.\d+(-(alpha|beta))?$'
 }
 
+function Get-PathWithEntryFirst {
+    param(
+        [Parameter(Mandatory = $false)]
+        [AllowNull()]
+        [AllowEmptyString()]
+        [string]$PathValue,
+
+        [Parameter(Mandatory = $true)]
+        [string]$Entry
+    )
+
+    $PathSeparators = [char[]]@('\', '/')
+    $NormalizedEntry = $Entry.Trim().TrimEnd($PathSeparators)
+    $RemainingEntries = @()
+    if (-not [string]::IsNullOrWhiteSpace($PathValue)) {
+        $RemainingEntries = @(
+            $PathValue.Split(';') | Where-Object {
+                -not [string]::IsNullOrWhiteSpace($_) -and
+                $_.Trim().TrimEnd($PathSeparators) -ine $NormalizedEntry
+            }
+        )
+    }
+
+    return (@($Entry) + $RemainingEntries) -join ';'
+}
+
 # Check CPU architecture.
-$Arch = switch ($env:PROCESSOR_ARCHITECTURE) {
+$ProcessorArchitecture = if ($env:PROCESSOR_ARCHITEW6432) {
+    $env:PROCESSOR_ARCHITEW6432
+} else {
+    $env:PROCESSOR_ARCHITECTURE
+}
+$Arch = switch ($ProcessorArchitecture.ToUpperInvariant()) {
     'AMD64' { 'amd64' }
     'ARM64' { 'arm64' }
-    'x86' { 'amd64' }
-    default { throw 'Unsupported CPU architecture. HoundDog CLI requires an AMD64, ARM64, or x86 processor.' }
+    default { throw 'Unsupported CPU architecture. HoundDog CLI requires an AMD64 or ARM64 processor.' }
 }
 $ReleaseRootUrl = "https://github.com/hounddogai/hounddog/releases"
 $Version = $Version.Trim()
@@ -43,29 +76,23 @@ $TagsToTry = if ($Version -eq 'latest') {
     @($Version, "v$Version")
 }
 $TempDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
+$PendingInstallPath = $null
 
 try {
-    # Determine if running with admin privileges
+    # Determine if running with admin privileges.
     $IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-    # Set installation path and PATH scope based on privileges
+    # Set installation path and PATH scope based on privileges.
     if ($IsAdmin) {
-        # Admin: Install to Program Files and update System PATH
+        # Admin: Install to Program Files and update System PATH.
         $InstallPath = Join-Path $env:ProgramFiles "hounddog\bin"
         $PathScope = "Machine"
         Write-Host "Installing HoundDog CLI for all users..."
     } else {
-        # Non-admin: Install to user's local app data and update User PATH
+        # Non-admin: Install to user's local app data and update User PATH.
         $InstallPath = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'hounddog\bin'
         $PathScope = "User"
         Write-Host "Installing HoundDog CLI for current user only..."
-    }
-
-    # Create the installation directory if it doesn't exist
-    if (Test-Path $InstallPath) {
-        Remove-Item -Path "$InstallPath\*" -Force -Recurse -ErrorAction SilentlyContinue
-    } else {
-        New-Item -ItemType Directory -Path $InstallPath -Force | Out-Null
     }
 
     # Create a temporary directory for downloading the ZIP archive.
@@ -82,6 +109,7 @@ try {
             $BaseDownloadUrl = "$ReleaseRootUrl/download/$Tag"
         }
 
+        Remove-Item -Path $ZipPath, $ChecksumPath -Force -ErrorAction SilentlyContinue
         $DownloadUrl = "$BaseDownloadUrl/hounddog-windows-$Arch.zip"
         Write-Host "Downloading ZIP from $DownloadUrl ..."
         try {
@@ -100,66 +128,77 @@ try {
 
     # Download the SHA256 checksum file and verify the integrity of the binary.
     Write-Host "Verifying checksum ..."
-    $ExpectedHash = (Get-Content -Path $ChecksumPath).Split(' ')[0] # Get only the hash, sometimes files include filename
+    $ChecksumContent = (Get-Content -Path $ChecksumPath -Raw).Trim()
+    if ($ChecksumContent -notmatch '^(?<Hash>[0-9a-fA-F]{64})(?:\s|$)') {
+        throw 'The downloaded checksum file is invalid.'
+    }
+    $ExpectedHash = $Matches.Hash
     $ActualHash = Get-FileHash -Path $ZipPath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-    if ($ActualHash -ne $ExpectedHash) {
-        throw "Checksum verification failed."
+    if ($ActualHash -ine $ExpectedHash) {
+        throw 'Checksum verification failed.'
     }
 
-    # Extract the ZIP archive to the installation directory.
-    Write-Host "Extracting ZIP to $InstallPath ..."
-    Expand-Archive -Path $ZipPath -DestinationPath $InstallPath -Force
-
-    # Verify the extracted file.
-    $ExtractedFiles = Get-ChildItem -Path $InstallPath -ErrorAction SilentlyContinue
-    if ($ExtractedFiles.Count -eq 0) {
-        throw "No files found in $InstallPath after extraction."
-    }
-    if (-not (Test-Path (Join-Path $InstallPath 'hounddog.exe'))) {
-        throw "hounddog.exe not found in $InstallPath after extraction."
+    # Extract and validate the new executable before replacing an existing installation.
+    $ExtractPath = Join-Path $TempDir 'extract'
+    Expand-Archive -Path $ZipPath -DestinationPath $ExtractPath -Force
+    $ExtractedBinary = Join-Path $ExtractPath 'hounddog.exe'
+    if (-not (Test-Path -LiteralPath $ExtractedBinary -PathType Leaf)) {
+        throw 'The release archive does not contain hounddog.exe.'
     }
 
-    # Update PATH based on admin status
+    $StagedVersionOutput = @(& $ExtractedBinary --version)
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The downloaded HoundDog CLI executable could not be run.'
+    }
+    $StagedVersion = ($StagedVersionOutput -join [Environment]::NewLine).Trim()
+    if ([string]::IsNullOrWhiteSpace($StagedVersion)) {
+        throw 'The downloaded HoundDog CLI executable did not report a version.'
+    }
+
+    # Replace only the CLI executable and leave any unrelated files in the directory intact.
+    New-Item -ItemType Directory -Path $InstallPath -Force | Out-Null
+    $InstalledBinary = Join-Path $InstallPath 'hounddog.exe'
+    $PendingInstallPath = Join-Path $InstallPath "hounddog-$([Guid]::NewGuid().ToString('N')).tmp"
+    Copy-Item -LiteralPath $ExtractedBinary -Destination $PendingInstallPath
+    if (Test-Path -LiteralPath $InstalledBinary -PathType Leaf) {
+        [System.IO.File]::Replace($PendingInstallPath, $InstalledBinary, $null)
+    } else {
+        [System.IO.File]::Move($PendingInstallPath, $InstalledBinary)
+    }
+    $PendingInstallPath = $null
+
+    $InstalledVersionOutput = @(& $InstalledBinary --version)
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The installed HoundDog CLI executable could not be run.'
+    }
+    $InstalledVersion = ($InstalledVersionOutput -join [Environment]::NewLine).Trim()
+    if ($InstalledVersion -ne $StagedVersion) {
+        throw 'The installed HoundDog CLI executable failed verification.'
+    }
+
+    # Prepend the installation directory in both the persistent and current-session PATH values.
     $CurrentPath = [System.Environment]::GetEnvironmentVariable('Path', $PathScope)
-
-    # Only add the HoundDog installation path if it's not already in the PATH
-    if ($CurrentPath -notlike "*$InstallPath*") {
-        # Ensure PATH ends with semicolon before appending
-        if ($CurrentPath -and -not $CurrentPath.EndsWith(';')) {
-            $CurrentPath = "$CurrentPath;"
-        }
-        
-        # Add the new path
-        $NewPath = "$CurrentPath$InstallPath"
-        
+    $NewPath = Get-PathWithEntryFirst -PathValue $CurrentPath -Entry $InstallPath
+    if ($NewPath -ne $CurrentPath) {
         try {
             [Environment]::SetEnvironmentVariable('Path', $NewPath, $PathScope)
-            Write-Host "Added HoundDog CLI to $PathScope PATH."
+            Write-Host "Added HoundDog CLI to the beginning of the $PathScope PATH."
         } catch {
-            Write-Host "Failed to update $PathScope PATH: $_" -ForegroundColor Red
-            exit 1
+            throw "Failed to update the $PathScope PATH: $($_.Exception.Message)"
         }
-    } else {
-        $NewPath = $CurrentPath
     }
+    $env:Path = Get-PathWithEntryFirst -PathValue $env:Path -Entry $InstallPath
 
-    # Update current session's PATH
-    $env:Path = $NewPath
-
-    # Test installation.
-    if (Get-Command hounddog -ErrorAction SilentlyContinue) {
-        Write-Host "`nHoundDog CLI installed successfully."
-        if ($Version -ne 'latest') {
-            Write-Host "Installed version: $Version"
-        }
-        Write-Host "Run 'hounddog --help' to get started."
-    } else {
-        throw "Cannot find 'hounddog' command in PATH."
-    }
+    Write-Host "`nHoundDog CLI installed successfully."
+    Write-Host "Installed version: $InstalledVersion"
+    Write-Host "Run 'hounddog --help' to get started."
 } catch {
-    Write-Host "$_ Aborting installation." -ForegroundColor Red
+    Write-Host "$($_.Exception.Message) Aborting installation." -ForegroundColor Red
     exit 1
 } finally {
+    if ($PendingInstallPath -and (Test-Path -LiteralPath $PendingInstallPath)) {
+        Remove-Item -LiteralPath $PendingInstallPath -Force -ErrorAction SilentlyContinue
+    }
     # Clean up the temporary directory.
     if (Test-Path $TempDir) {
         Remove-Item -Path $TempDir -Recurse -Force -ErrorAction SilentlyContinue

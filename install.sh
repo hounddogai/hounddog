@@ -4,15 +4,25 @@ set -u  # Exit on using unset variable
 
 echo "Installing HoundDog CLI ..."
 
+TEMP_DIR=""
+PENDING_INSTALL_PATH=""
+
 cleanup() {
-    rm -rf /tmp/hounddog.tar.gz /tmp/hounddog.sha256 > /dev/null 2>&1
+    if [ -n "$PENDING_INSTALL_PATH" ]; then
+        rm -f "$PENDING_INSTALL_PATH" > /dev/null 2>&1
+    fi
+    if [ -n "$TEMP_DIR" ]; then
+        rm -rf "$TEMP_DIR" > /dev/null 2>&1
+    fi
 }
 
 abort() {
-  cleanup
-  echo "$@" 1>&2
-  exit 1
+    echo "$@" 1>&2
+    exit 1
 }
+
+trap cleanup 0
+trap 'cleanup; exit 1' HUP INT TERM
 
 usage() {
     cat <<EOF
@@ -79,7 +89,12 @@ if [ "$VERSION" != "latest" ]; then
         || abort "Invalid version '${VERSION}'. Use x.y.z, x.y.z-alpha, or x.y.z-beta (without a leading 'v')."
 fi
 
-# Download the tarball and checksum files to a temporary directory.
+# Download the tarball and checksum files to a private temporary directory.
+TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/hounddog.XXXXXX") || abort "Failed to create a temporary directory."
+TARBALL_PATH="${TEMP_DIR}/hounddog.tar.gz"
+CHECKSUM_PATH="${TEMP_DIR}/hounddog.sha256"
+EXTRACT_DIR="${TEMP_DIR}/extract"
+
 download_release_assets() {
     RELEASES_URL="https://github.com/hounddogai/hounddog/releases"
     ARTIFACT="hounddog-${OS}-${ARCH}.tar.gz"
@@ -98,8 +113,8 @@ download_release_assets() {
             DL_URL="${RELEASES_URL}/download/${TAG}"
         fi
 
-        if curl -fsSL "${DL_URL}/${ARTIFACT}" -o /tmp/hounddog.tar.gz \
-            && curl -fsSL "${DL_URL}/${ARTIFACT}.sha256" -o /tmp/hounddog.sha256; then
+        if curl -fsSL "${DL_URL}/${ARTIFACT}" -o "$TARBALL_PATH" \
+            && curl -fsSL "${DL_URL}/${ARTIFACT}.sha256" -o "$CHECKSUM_PATH"; then
             return
         fi
     done
@@ -110,45 +125,67 @@ download_release_assets() {
 download_release_assets
 
 # Verify checksum.
-EXPECTED_CHECKSUM=$(awk '{print $1}' /tmp/hounddog.sha256)
+EXPECTED_CHECKSUM=$(awk '{print $1}' "$CHECKSUM_PATH")
 if [ "$OS" = "macos" ]; then
-    ACTUAL_CHECKSUM=$(shasum -a 256 /tmp/hounddog.tar.gz | awk '{print $1}')
+    ACTUAL_CHECKSUM=$(shasum -a 256 "$TARBALL_PATH" | awk '{print $1}')
 else
-    ACTUAL_CHECKSUM=$(sha256sum /tmp/hounddog.tar.gz | awk '{print $1}')
+    ACTUAL_CHECKSUM=$(sha256sum "$TARBALL_PATH" | awk '{print $1}')
 fi
 [ "$EXPECTED_CHECKSUM" = "$ACTUAL_CHECKSUM" ] || abort "Checksum mismatch. Aborting installation."
+
+mkdir "$EXTRACT_DIR"
+tar -x -f "$TARBALL_PATH" -C "$EXTRACT_DIR" hounddog
+STAGED_BINARY="${EXTRACT_DIR}/hounddog"
+[ -f "$STAGED_BINARY" ] || abort "The release archive does not contain the HoundDog CLI executable."
+chmod 755 "$STAGED_BINARY"
+STAGED_VERSION=$("$STAGED_BINARY" --version) || abort "The downloaded HoundDog CLI executable could not be run."
+[ -n "$STAGED_VERSION" ] || abort "The downloaded HoundDog CLI executable did not report a version."
+
+install_binary() {
+    INSTALL_DIR="$1"
+    INSTALL_PATH="${INSTALL_DIR}/hounddog"
+    PENDING_INSTALL_PATH=$(mktemp "${INSTALL_DIR}/.hounddog.XXXXXX") \
+        || abort "Failed to create a temporary installation file in ${INSTALL_DIR}."
+    cp "$STAGED_BINARY" "$PENDING_INSTALL_PATH"
+    chmod 755 "$PENDING_INSTALL_PATH"
+    mv -f "$PENDING_INSTALL_PATH" "$INSTALL_PATH"
+    PENDING_INSTALL_PATH=""
+
+    INSTALLED_VERSION=$("$INSTALL_PATH" --version) || abort "The installed HoundDog CLI executable could not be run."
+    [ "$INSTALLED_VERSION" = "$STAGED_VERSION" ] || abort "The installed HoundDog CLI executable failed verification."
+}
 
 # If the script is not running as root, install to ~/.hounddog/bin/hounddog.
 if [ "$(id -u)" -ne 0 ]; then
     # Detect shell configuration file.
     SHELL_NAME=$(basename "${SHELL:-}")
     case "$SHELL_NAME" in
-        bash) SHELL_RC="$HOME/.bashrc" ;;
-        zsh) SHELL_RC="$HOME/.zshrc" ;;
-        fish) SHELL_RC="$HOME/.config/fish/config.fish" ;;
+        bash)
+            SHELL_RC="$HOME/.bashrc"
+            PATH_LINE="export PATH=\"\$HOME/.hounddog/bin:\$PATH\""
+            ;;
+        zsh)
+            SHELL_RC="$HOME/.zshrc"
+            PATH_LINE="export PATH=\"\$HOME/.hounddog/bin:\$PATH\""
+            ;;
+        fish)
+            SHELL_RC="$HOME/.config/fish/config.fish"
+            PATH_LINE="set -gx PATH \"\$HOME/.hounddog/bin\" \$PATH"
+            ;;
         *) abort "HoundDog CLI only supports Bash, Zsh, and Fish shells." ;;
     esac
 
-    # Extract binary to ~/.hounddog/bin/hounddog
-    mkdir -p "${HOME}/.hounddog/bin"
-    tar -x -f /tmp/hounddog.tar.gz -C "${HOME}/.hounddog/bin" hounddog
-    chmod 755 "${HOME}/.hounddog/bin/hounddog"
+    INSTALL_DIR="${HOME}/.hounddog/bin"
+    mkdir -p "$INSTALL_DIR"
+    install_binary "$INSTALL_DIR"
 
-    # Add ~/.hounddog/bin to user's PATH in shell rc file.
-    if ! grep -q "export PATH=\$PATH:\$HOME/.hounddog/bin" "${SHELL_RC}"; then
+    # Prepend ~/.hounddog/bin so another hounddog executable cannot shadow the installed version.
+    if ! { [ -f "$SHELL_RC" ] && grep -Fqx "$PATH_LINE" "$SHELL_RC"; }; then
         echo "Adding ${HOME}/.hounddog/bin to PATH in ${SHELL_RC}..."
-        printf "\nexport PATH=\$PATH:\$HOME/.hounddog/bin\n" >> "${SHELL_RC}"
-        export PATH="${HOME}/.hounddog/bin:${PATH}"
+        mkdir -p "$(dirname "$SHELL_RC")"
+        printf "\n%s\n" "$PATH_LINE" >> "$SHELL_RC"
     fi
-
-    # Add ~/.hounddog/bin to PATH in current shell.
-    export PATH="${PATH}:${HOME}/.hounddog/bin"
-
-    cleanup
-    echo ""
-    echo "HoundDog CLI installed successfully."
-    [ "$VERSION" = "latest" ] || echo "Installed version: ${VERSION}"
-    echo "Please restart your shell and run 'hounddog --help' to get started."
+    NEXT_STEP="Open a new shell and run 'hounddog --help' to get started."
 
 # If the script is running as root, install to /usr/local/bin/hounddog.
 else
@@ -160,13 +197,11 @@ else
         *) abort "Directory '/usr/local/bin' is not in PATH. Aborting installation." ;;
     esac
 
-    # Extract tarball to /usr/local/bin/hounddog
-    tar -x -f /tmp/hounddog.tar.gz -C /usr/local/bin hounddog
-    chmod 755 /usr/local/bin/hounddog
-
-    cleanup
-    echo ""
-    echo "HoundDog CLI has been installed successfully."
-    [ "$VERSION" = "latest" ] || echo "Installed version: ${VERSION}"
-    echo "Run 'hounddog --help' to get started."
+    install_binary "/usr/local/bin"
+    NEXT_STEP="Run 'hounddog --help' to get started."
 fi
+
+echo ""
+echo "HoundDog CLI installed successfully."
+echo "Installed version: ${INSTALLED_VERSION}"
+echo "$NEXT_STEP"

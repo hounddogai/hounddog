@@ -1,0 +1,312 @@
+name: Test installers
+
+on:
+  pull_request:
+    paths:
+      - "install.sh"
+      - "install.ps1"
+      - ".github/workflows/test-installers.yml"
+  push:
+    branches: [main]
+    paths:
+      - "install.sh"
+      - "install.ps1"
+      - ".github/workflows/test-installers.yml"
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-installers-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-unix:
+    name: Test ${{ matrix.os }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: Linux
+            arch: AMD64
+            runner: ubuntu-24.04
+            runner-arch: X64
+            shell-path: /bin/bash
+            shell-rc: .bashrc
+          - os: Linux
+            arch: ARM64
+            runner: ubuntu-24.04-arm
+            runner-arch: ARM64
+            shell-path: /bin/bash
+            shell-rc: .bashrc
+          - os: macOS
+            arch: AMD64
+            runner: macos-15-intel
+            runner-arch: X64
+            shell-path: /bin/zsh
+            shell-rc: .zshrc
+          - os: macOS
+            arch: ARM64
+            runner: macos-15
+            runner-arch: ARM64
+            shell-path: /bin/zsh
+            shell-rc: .zshrc
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Test installer
+        shell: bash
+        env:
+          EXPECTED_RUNNER_ARCH: ${{ matrix.runner-arch }}
+          TEST_SHELL: ${{ matrix.shell-path }}
+          TEST_SHELL_RC: ${{ matrix.shell-rc }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$RUNNER_ARCH" != "$EXPECTED_RUNNER_ARCH" ]]; then
+            echo "Expected runner architecture $EXPECTED_RUNNER_ARCH, got $RUNNER_ARCH."
+            exit 1
+          fi
+
+          export HOME="$RUNNER_TEMP/hounddog-home"
+          export TMPDIR="$RUNNER_TEMP/hounddog-tmp"
+          export SHELL="$TEST_SHELL"
+          shadow_dir="$RUNNER_TEMP/hounddog-shadow"
+          mkdir -p "$HOME" "$TMPDIR" "$shadow_dir"
+
+          cat > "$shadow_dir/hounddog" <<'EOF'
+          #!/bin/sh
+          echo shadow
+          EOF
+          chmod 755 "$shadow_dir/hounddog"
+          export PATH="$shadow_dir:$PATH"
+
+          install_output=$(sh < ./install.sh)
+          printf '%s\n' "$install_output"
+
+          installed_binary="$HOME/.hounddog/bin/hounddog"
+          installed_version=$("$installed_binary" --version)
+          if [[ -z "$installed_version" ]]; then
+            echo "Installed binary did not report a version."
+            exit 1
+          fi
+          if ! grep -Fqx "Installed version: $installed_version" <<< "$install_output"; then
+            echo "Installer did not print the installed version."
+            exit 1
+          fi
+
+          file_output=$(file "$installed_binary")
+          case "$EXPECTED_RUNNER_ARCH" in
+            X64)
+              grep -Eiq 'x86[-_]64' <<< "$file_output"
+              ;;
+            ARM64)
+              grep -Eiq 'arm64|aarch64' <<< "$file_output"
+              ;;
+          esac
+
+          if [[ "$TEST_SHELL" == "/bin/zsh" ]]; then
+            resolved_binary=$(ZDOTDIR="$HOME" "$TEST_SHELL" -ic 'command -v hounddog')
+          else
+            resolved_binary=$("$TEST_SHELL" --noprofile -ic 'command -v hounddog')
+          fi
+          if [[ "$resolved_binary" != "$installed_binary" ]]; then
+            echo "Expected $installed_binary to take PATH precedence, got $resolved_binary."
+            exit 1
+          fi
+
+          reinstall_output=$(sh ./install.sh --version "$installed_version")
+          printf '%s\n' "$reinstall_output"
+          if ! grep -Fqx "Installed version: $installed_version" <<< "$reinstall_output"; then
+            echo "Version-specific reinstall did not print the installed version."
+            exit 1
+          fi
+
+          shell_rc="$HOME/$TEST_SHELL_RC"
+          path_line="export PATH=\"\$HOME/.hounddog/bin:\$PATH\""
+          if [[ "$(grep -Fxc "$path_line" "$shell_rc")" -ne 1 ]]; then
+            echo "Installer PATH configuration is not idempotent."
+            exit 1
+          fi
+
+          if HOUNDDOG_VERSION=999999.999999.999999 sh ./install.sh; then
+            echo "Installing a nonexistent version unexpectedly succeeded."
+            exit 1
+          fi
+          if [[ "$("$installed_binary" --version)" != "$installed_version" ]]; then
+            echo "Failed upgrade changed the working installation."
+            exit 1
+          fi
+
+          if find "$TMPDIR" -mindepth 1 -print -quit | grep -q .; then
+            echo "Installer left temporary files behind:"
+            find "$TMPDIR" -mindepth 1 -maxdepth 2 -print
+            exit 1
+          fi
+          if find "$(dirname "$installed_binary")" -name '.hounddog.*' -print -quit | grep -q .; then
+            echo "Installer left a pending installation file behind."
+            exit 1
+          fi
+
+  test-windows:
+    name: Test Windows ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: AMD64
+            runner: windows-2025
+          - arch: ARM64
+            runner: windows-11-arm
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Test installer
+        shell: powershell
+        env:
+          EXPECTED_RUNNER_ARCH: ${{ matrix.arch }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          $DetectedArchitecture = if ($env:PROCESSOR_ARCHITEW6432) {
+              $env:PROCESSOR_ARCHITEW6432
+          } else {
+              $env:PROCESSOR_ARCHITECTURE
+          }
+          if ($DetectedArchitecture -ne $env:EXPECTED_RUNNER_ARCH) {
+              throw "Expected runner architecture $env:EXPECTED_RUNNER_ARCH, got $DetectedArchitecture."
+          }
+
+          $TestRoot = Join-Path $env:RUNNER_TEMP 'hounddog-installer-test'
+          $TempRoot = Join-Path $TestRoot 'temp'
+          $ShadowPath = Join-Path $TestRoot 'shadow'
+          New-Item -ItemType Directory -Path $TempRoot, $ShadowPath -Force | Out-Null
+          $env:TEMP = $TempRoot
+          $env:TMP = $TempRoot
+
+          Set-Content -LiteralPath (Join-Path $ShadowPath 'hounddog.cmd') -Value "@echo off`necho shadow" -Encoding ascii
+          $env:Path = "$ShadowPath;$env:Path"
+
+          $InstallerPath = Join-Path $env:GITHUB_WORKSPACE 'install.ps1'
+          $InstallOutput = & {
+              Get-Content -LiteralPath $InstallerPath -Raw | Invoke-Expression
+          } *>&1
+          $InstallOutput | ForEach-Object { Write-Host "$_" }
+
+          $IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+              [Security.Principal.WindowsBuiltInRole]::Administrator
+          )
+          if ($IsAdmin) {
+              $InstallPath = Join-Path $env:ProgramFiles 'hounddog\bin'
+              $PathScope = 'Machine'
+          } else {
+              $InstallPath = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'hounddog\bin'
+              $PathScope = 'User'
+          }
+
+          $InstalledBinary = Join-Path $InstallPath 'hounddog.exe'
+          if (-not (Test-Path -LiteralPath $InstalledBinary -PathType Leaf)) {
+              throw "Installed binary was not found at $InstalledBinary."
+          }
+          $InstalledVersion = ((& $InstalledBinary --version) | Out-String).Trim()
+          if ([string]::IsNullOrWhiteSpace($InstalledVersion)) {
+              throw 'Installed binary did not report a version.'
+          }
+          if (@($InstallOutput | ForEach-Object { "$_" }) -notcontains "Installed version: $InstalledVersion") {
+              throw 'Installer did not print the installed version.'
+          }
+
+          $ResolvedBinary = (Get-Command hounddog -CommandType Application).Source
+          if ($ResolvedBinary -ne $InstalledBinary) {
+              throw "Expected $InstalledBinary to take PATH precedence, got $ResolvedBinary."
+          }
+
+          $CurrentPathFirstEntry = $env:Path.Split(';')[0].TrimEnd('\')
+          if ($CurrentPathFirstEntry -ine $InstallPath.TrimEnd('\')) {
+              throw 'Installer did not prepend its directory to the current PATH.'
+          }
+          $PersistentPath = [Environment]::GetEnvironmentVariable('Path', $PathScope)
+          $PersistentPathFirstEntry = $PersistentPath.Split(';')[0].TrimEnd('\')
+          if ($PersistentPathFirstEntry -ine $InstallPath.TrimEnd('\')) {
+              throw "Installer did not prepend its directory to the $PathScope PATH."
+          }
+
+          "INSTALLER_PATH=$InstallerPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "INSTALLER_TEMP=$TempRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "INSTALLED_BINARY=$InstalledBinary" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "INSTALLED_VERSION=$InstalledVersion" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "INSTALL_PATH=$InstallPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "PATH_SCOPE=$PathScope" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Test version-specific reinstall
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $env:TEMP = $env:INSTALLER_TEMP
+          $env:TMP = $env:INSTALLER_TEMP
+          $env:HOUNDDOG_VERSION = $env:INSTALLED_VERSION
+
+          $ReinstallOutput = & {
+              Get-Content -LiteralPath $env:INSTALLER_PATH -Raw | Invoke-Expression
+          } *>&1
+          $ReinstallOutput | ForEach-Object { Write-Host "$_" }
+
+          if (@($ReinstallOutput | ForEach-Object { "$_" }) -notcontains "Installed version: $env:INSTALLED_VERSION") {
+              throw 'Version-specific reinstall did not print the installed version.'
+          }
+          $ActualVersion = ((& $env:INSTALLED_BINARY --version) | Out-String).Trim()
+          if ($ActualVersion -ne $env:INSTALLED_VERSION) {
+              throw "Expected installed version $env:INSTALLED_VERSION, got $ActualVersion."
+          }
+
+          $PathSeparators = [char[]]@('\', '/')
+          $NormalizedInstallPath = $env:INSTALL_PATH.TrimEnd($PathSeparators)
+          $MatchingEntries = @(
+              [Environment]::GetEnvironmentVariable('Path', $env:PATH_SCOPE).Split(';') |
+                  Where-Object { $_.Trim().TrimEnd($PathSeparators) -ieq $NormalizedInstallPath }
+          )
+          if ($MatchingEntries.Count -ne 1) {
+              throw 'Installer PATH configuration is not idempotent.'
+          }
+
+      - name: Reject nonexistent version
+        id: missing-version
+        continue-on-error: true
+        shell: powershell
+        env:
+          HOUNDDOG_VERSION: 999999.999999.999999
+        run: |
+          $env:TEMP = $env:INSTALLER_TEMP
+          $env:TMP = $env:INSTALLER_TEMP
+          Get-Content -LiteralPath $env:INSTALLER_PATH -Raw | Invoke-Expression
+
+      - name: Verify failed upgrade preservation and cleanup
+        if: ${{ always() && (steps.missing-version.outcome == 'failure' || steps.missing-version.outcome == 'success') }}
+        shell: powershell
+        env:
+          MISSING_VERSION_OUTCOME: ${{ steps.missing-version.outcome }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          if ($env:MISSING_VERSION_OUTCOME -ne 'failure') {
+              throw "Expected nonexistent version installation to fail, got $env:MISSING_VERSION_OUTCOME."
+          }
+          $ActualVersion = ((& $env:INSTALLED_BINARY --version) | Out-String).Trim()
+          if ($ActualVersion -ne $env:INSTALLED_VERSION) {
+              throw 'Failed upgrade changed the working installation.'
+          }
+          if (@(Get-ChildItem -LiteralPath $env:INSTALLER_TEMP -Force).Count -ne 0) {
+              throw 'Installer left temporary files behind.'
+          }
+          if (@(Get-ChildItem -LiteralPath $env:INSTALL_PATH -Filter 'hounddog-*.tmp' -Force).Count -ne 0) {
+              throw 'Installer left a pending installation file behind.'
+          }
