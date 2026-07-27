@@ -225,7 +225,7 @@ jobs:
               throw 'Installer did not print the installed version.'
           }
 
-          $ResolvedBinary = (Get-Command hounddog -CommandType Application).Source
+          $ResolvedBinary = (Get-Command hounddog -CommandType Application | Select-Object -First 1).Source
           if ($ResolvedBinary -ne $InstalledBinary) {
               throw "Expected $InstalledBinary to take PATH precedence, got $ResolvedBinary."
           }
