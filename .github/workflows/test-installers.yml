@@ -307,6 +307,10 @@ jobs:
           if (@(Get-ChildItem -LiteralPath $env:INSTALLER_TEMP -Force).Count -ne 0) {
               throw 'Installer left temporary files behind.'
           }
-          if (@(Get-ChildItem -LiteralPath $env:INSTALL_PATH -Filter 'hounddog-*.tmp' -Force).Count -ne 0) {
-              throw 'Installer left a pending installation file behind.'
+          $PendingInstallFiles = @(
+              Get-ChildItem -LiteralPath $env:INSTALL_PATH -Force |
+                  Where-Object { $_.Name -like 'hounddog-*.tmp' -or $_.Name -like 'hounddog-*.bak' }
+          )
+          if ($PendingInstallFiles.Count -ne 0) {
+              throw 'Installer left a pending or backup installation file behind.'
           }

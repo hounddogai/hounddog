@@ -77,6 +77,7 @@ $TagsToTry = if ($Version -eq 'latest') {
 }
 $TempDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
 $PendingInstallPath = $null
+$BackupInstallPath = $null
 
 try {
     # Determine if running with admin privileges.
@@ -161,7 +162,10 @@ try {
     $PendingInstallPath = Join-Path $InstallPath "hounddog-$([Guid]::NewGuid().ToString('N')).tmp"
     Copy-Item -LiteralPath $ExtractedBinary -Destination $PendingInstallPath
     if (Test-Path -LiteralPath $InstalledBinary -PathType Leaf) {
-        [System.IO.File]::Replace($PendingInstallPath, $InstalledBinary, $null)
+        $BackupInstallPath = Join-Path $InstallPath "hounddog-$([Guid]::NewGuid().ToString('N')).bak"
+        [System.IO.File]::Replace($PendingInstallPath, $InstalledBinary, $BackupInstallPath)
+        Remove-Item -LiteralPath $BackupInstallPath -Force
+        $BackupInstallPath = $null
     } else {
         [System.IO.File]::Move($PendingInstallPath, $InstalledBinary)
     }
@@ -198,6 +202,9 @@ try {
 } finally {
     if ($PendingInstallPath -and (Test-Path -LiteralPath $PendingInstallPath)) {
         Remove-Item -LiteralPath $PendingInstallPath -Force -ErrorAction SilentlyContinue
+    }
+    if ($BackupInstallPath -and (Test-Path -LiteralPath $BackupInstallPath)) {
+        Remove-Item -LiteralPath $BackupInstallPath -Force -ErrorAction SilentlyContinue
     }
     # Clean up the temporary directory.
     if (Test-Path $TempDir) {
