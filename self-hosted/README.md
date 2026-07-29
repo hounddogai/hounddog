@@ -26,6 +26,9 @@ When the installation finishes:
 2. Enter the one-time setup key printed by the installer.
 3. Create your organization and owner account.
 
+The installer publishes port 3300 on all host interfaces by default so the app is reachable from another machine.
+Set `HOUNDDOG_BIND_ADDRESS=127.0.0.1` in `.env` and recreate the containers to restrict access to the Docker host.
+
 In Trial mode, the installer automatically sets up a CLI API key so you can scan a repository right away:
 
 ```shell

@@ -162,7 +162,6 @@ while :; do
 done
 
 hounddog_url="http://localhost:${hounddog_port}"
-hounddog_bind_address="0.0.0.0"
 postgres_url=""
 postgres_user="hounddog"
 postgres_database="hounddog"
@@ -178,7 +177,6 @@ secret_key="$(generate_secret 48)"
 setup_key="$(generate_secret 48)"
 if [ "$install_type" = "1" ]; then
     say "Generating a Postgres password and personal CLI API key..."
-    hounddog_bind_address="127.0.0.1"
     # Compose expands these placeholders when it reads the generated .env file.
     # shellcheck disable=SC2016
     postgres_url='postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}'
@@ -211,7 +209,6 @@ server_env_temp="$(mktemp "$(pwd)/.env.tmp.XXXXXX")"
     printf 'HOUNDDOG_SECRET_KEY=%s\n' "$secret_key"
     printf 'HOUNDDOG_SETUP_KEY=%s\n\n' "$setup_key"
     printf 'HOUNDDOG_PORT=%s\n' "$hounddog_port"
-    printf 'HOUNDDOG_BIND_ADDRESS=%s\n' "$hounddog_bind_address"
     printf 'HOUNDDOG_URL=%s\n\n' "$hounddog_url"
     if [ "$install_type" = "1" ]; then
         printf 'COMPOSE_PROFILES=postgres\n'

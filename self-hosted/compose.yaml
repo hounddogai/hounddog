@@ -86,7 +86,7 @@ services:
       api:
         condition: service_healthy
     ports:
-      - "${HOUNDDOG_BIND_ADDRESS:-0.0.0.0}:${HOUNDDOG_PORT:-3300}:3300"
+      - "${HOUNDDOG_BIND_ADDRESS:+${HOUNDDOG_BIND_ADDRESS}:}${HOUNDDOG_PORT:-3300}:3300"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:3300/ && curl -fsS http://127.0.0.1:3300/api/health"]
       interval: 10s
