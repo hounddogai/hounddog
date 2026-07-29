@@ -1,15 +1,14 @@
 # HoundDog.ai Self-Hosted.
 #
 # Quick start:
-#   1. ./setup.sh (generates a .env file with the required configuration values)
-#   2. docker compose up -d --wait
-#   3. Open http://localhost:3300 and use HOUNDDOG_SETUP_KEY from .env to create your
+#   1. ./install.sh (generates the configuration and starts Docker Compose)
+#   2. Open http://localhost:3300 and use HOUNDDOG_SETUP_KEY from .env to create your
 #      organization and owner account.
 #
 # Scale the API and worker horizontally with:
 #   docker compose up -d --scale api=3 --scale worker=2
 #
-# Point the CLI scanner at the same public URL as the web app:
+# Point the CLI at the same public URL as the web app:
 #   HOUNDDOG_ENV=self-hosted HOUNDDOG_URL=http://localhost:3300 HOUNDDOG_API_KEY=<api key> hounddog scan ...
 #
 # Set HOUNDDOG_PORT to change the published port. Set HOUNDDOG_URL to the public HTTPS origin when
@@ -24,12 +23,15 @@ x-hounddog-self-hosted: &hounddog-self-hosted
   image: hounddogai/hounddog-self-hosted:latest
   restart: unless-stopped
   environment:
-    HOUNDDOG_SECRET_KEY: ${HOUNDDOG_SECRET_KEY:?is required. Run ./setup.sh, or set a stable random string of 50+ characters. Encrypted data derives from it, so it must never change}
+    HOUNDDOG_SECRET_KEY: ${HOUNDDOG_SECRET_KEY:?is required. Run ./install.sh, or set a stable random string of 50+ characters. Encrypted data derives from it, so it must never change}
     # Required only until the first owner exists. Left optional here so upgraded, already-configured
     # installations continue to start; first-run setup fails closed when it is empty.
     HOUNDDOG_SETUP_KEY: ${HOUNDDOG_SETUP_KEY:-}
-    HOUNDDOG_POSTGRES_URL: ${HOUNDDOG_POSTGRES_URL:?is required. Run ./setup.sh or provide a postgres:// or postgresql:// URL}
+    HOUNDDOG_POSTGRES_URL: ${HOUNDDOG_POSTGRES_URL:?is required. Run ./install.sh or provide a postgres:// or postgresql:// URL}
     HOUNDDOG_URL: ${HOUNDDOG_URL:-http://localhost:${HOUNDDOG_PORT:-3300}}
+    HOUNDDOG_INITIAL_PERSONAL_API_KEY_ID: ${HOUNDDOG_INITIAL_PERSONAL_API_KEY_ID:-}
+    HOUNDDOG_INITIAL_PERSONAL_API_KEY_HASH: ${HOUNDDOG_INITIAL_PERSONAL_API_KEY_HASH:-}
+    HOUNDDOG_INITIAL_PERSONAL_API_KEY_PREFIX: ${HOUNDDOG_INITIAL_PERSONAL_API_KEY_PREFIX:-}
   security_opt:
     - no-new-privileges:true
 
@@ -54,19 +56,9 @@ services:
     security_opt:
       - no-new-privileges:true
 
-  # One-shot migrations and scanner rules bootstrap; api and worker wait for it to complete so
-  # scaled replicas never run migrations concurrently.
-  init:
-    <<: *hounddog-self-hosted
-    command: init
-    restart: "no"
-
   api:
     <<: *hounddog-self-hosted
     command: api
-    depends_on:
-      init:
-        condition: service_completed_successfully
     volumes:
       - hounddog_data:/data
     healthcheck:
@@ -80,8 +72,8 @@ services:
     <<: *hounddog-self-hosted
     command: worker
     depends_on:
-      init:
-        condition: service_completed_successfully
+      api:
+        condition: service_healthy
     volumes:
       - hounddog_data:/data
 
@@ -92,9 +84,9 @@ services:
     command: caddy
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
     ports:
-      - "${HOUNDDOG_PORT:-3300}:3300"
+      - "${HOUNDDOG_BIND_ADDRESS:-0.0.0.0}:${HOUNDDOG_PORT:-3300}:3300"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:3300/ && curl -fsS http://127.0.0.1:3300/api/health"]
       interval: 10s
