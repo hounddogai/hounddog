@@ -1326,7 +1326,7 @@ This section shows vulnerable dataflows where sensitive data reaches unsafe sink
 
 ---
 
-🟥 **CRITICAL:** Medical History exposed to OpenAI 
+🟥 **CRITICAL:** Medical History exposed to OpenAI
 in [pages/patient.py:321:36](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L321-L321):
 
 ```python
@@ -1381,7 +1381,7 @@ For auto-closing vulnerabilities, see [https://docs.hounddog.ai/scanner/remediat
 
 ---
 
-🟧 **MEDIUM:** Phone Number exposed to Sentry 
+🟧 **MEDIUM:** Phone Number exposed to Sentry
 in [pages/patient.py:98:21](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L98-L102):
 
 ```python
@@ -1430,7 +1430,7 @@ For auto-closing vulnerabilities, see [https://docs.hounddog.ai/scanner/remediat
 
 ---
 
-🟨 **LOW:** First Name and Last Name exposed to Logs 
+🟨 **LOW:** First Name and Last Name exposed to Logs
 in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L168-L168):
 
 ```python
@@ -1492,7 +1492,7 @@ This section shows dataflows where sensitive data reaches safe sinks or is prope
 
 ---
 
-🟩 **INFO:** First Name stored in SQL Database 
+🟩 **INFO:** First Name stored in SQL Database
 in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L26-L26):
 
 ```python
@@ -1524,7 +1524,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Medical Record Number stored in SQL Database 
+🟩 **INFO:** Medical Record Number stored in SQL Database
 in [utils/data_manager.py:387:58](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387):
 
 ```python
@@ -1556,7 +1556,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Date of Birth stored in SQL Database 
+🟩 **INFO:** Date of Birth stored in SQL Database
 in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L28-L28):
 
 ```python
@@ -1588,7 +1588,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Medical Record Number stored in SQL Database 
+🟩 **INFO:** Medical Record Number stored in SQL Database
 in [utils/data_manager.py:248:34](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L248-L248):
 
 ```python
@@ -1620,7 +1620,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Medical Record Number stored in SQL Database 
+🟩 **INFO:** Medical Record Number stored in SQL Database
 in [utils/data_manager.py:496:43](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L496-L496):
 
 ```python
@@ -1652,7 +1652,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Medical Condition stored in SQL Database 
+🟩 **INFO:** Medical Condition stored in SQL Database
 in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L34-L34):
 
 ```python
@@ -1684,7 +1684,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** First Name stored in SQL Database 
+🟩 **INFO:** First Name stored in SQL Database
 in [utils/data_manager.py:102:22](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L102-L102):
 
 ```python
@@ -1716,7 +1716,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Medical Record Number stored in SQL Database 
+🟩 **INFO:** Medical Record Number stored in SQL Database
 in [utils/data_manager.py:389:32](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L389-L389):
 
 ```python
@@ -1748,7 +1748,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Medical Record Number stored in SQL Database 
+🟩 **INFO:** Medical Record Number stored in SQL Database
 in [utils/data_manager.py:239:34](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L239-L239):
 
 ```python
@@ -1780,7 +1780,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Last Name stored in SQL Database 
+🟩 **INFO:** Last Name stored in SQL Database
 in [utils/data_manager.py:103:24](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L103-L103):
 
 ```python
@@ -1812,7 +1812,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Phone Number stored in SQL Database 
+🟩 **INFO:** Phone Number stored in SQL Database
 in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L30-L30):
 
 ```python
@@ -1844,7 +1844,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Medical History stored in SQL Database 
+🟩 **INFO:** Medical History stored in SQL Database
 in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L37-L37):
 
 ```python
@@ -1876,7 +1876,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Emergency Contact stored in SQL Database 
+🟩 **INFO:** Emergency Contact stored in SQL Database
 in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L36-L36):
 
 ```python
@@ -1908,7 +1908,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Blood Type stored in SQL Database 
+🟩 **INFO:** Blood Type stored in SQL Database
 in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L33-L33):
 
 ```python
@@ -1940,7 +1940,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Email stored in SQL Database 
+🟩 **INFO:** Email stored in SQL Database
 in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L31-L31):
 
 ```python
@@ -1972,7 +1972,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Medication stored in SQL Database 
+🟩 **INFO:** Medication stored in SQL Database
 in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L38-L38):
 
 ```python
@@ -2004,7 +2004,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Last Name stored in SQL Database 
+🟩 **INFO:** Last Name stored in SQL Database
 in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L27-L27):
 
 ```python
@@ -2036,7 +2036,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 
 ---
 
-🟩 **INFO:** Sexual Orientation stored in SQL Database 
+🟩 **INFO:** Sexual Orientation stored in SQL Database
 in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L29-L29):
 
 ```python

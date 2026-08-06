@@ -1,13 +1,13 @@
 # HoundDog.ai Data Elements
 
-Generated: 2026-07-10 11:22:52
+Generated: 2026-08-06 10:03:25
 
 | Sensitivity | Count |
 |---|---|
-| 🟥 Critical | 32 |
+| 🟥 Critical | 33 |
 | 🟧 Medium | 49 |
 | 🟨 Low | 20 |
-| **Total** | 101 |
+| **Total** | 102 |
 
 | Sensitivity | Data Element | Tags |
 |---|---|---|
@@ -19,6 +19,7 @@ Generated: 2026-07-10 11:22:52
 | 🟥 Critical | Credit History | PIFI |
 | 🟥 Critical | Criminal History | PII |
 | 🟥 Critical | Diagnostic Result | PHI |
+| 🟥 Critical | Doctor's Notes | PHI |
 | 🟥 Critical | Driver's License | PII |
 | 🟥 Critical | Encryption Key | SECRET |
 | 🟥 Critical | Fertility Treatment | PHI |

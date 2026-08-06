@@ -1,6 +1,6 @@
 # HoundDog.ai Data Sinks
 
-Generated: 2026-07-10 11:22:52
+Generated: 2026-08-06 10:03:25
 
 🟩 Supported  🟨 Partially Supported  🟥 Not Supported Yet  ⬜ Not Applicable
 
@@ -11,6 +11,7 @@ Generated: 2026-07-10 11:22:52
 | Ada | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Adobe Commerce | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | ADP | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| AdRoll | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Adyen | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AfterShip | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AgentMail | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
@@ -19,6 +20,26 @@ Generated: 2026-07-10 11:22:52
 | Airtable | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Akamai | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Algolia | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Aurora DSQL | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Braket | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Connect | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon DocumentDB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon DynamoDB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon ECR | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon ECS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon EFS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon EKS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon ElastiCache | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon EVS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon FSx | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Inspector | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Keyspaces | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Location Service | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Managed Streaming for Apache Kafka | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Mechanical Turk | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Neptune | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Q | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Amazon Quick Sight | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Amplitude | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Anthropic | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Apache Hive | ⬜ | 🟩 | 🟩 | ⬜ | 🟩 |
@@ -56,12 +77,11 @@ Generated: 2026-07-10 11:22:52
 | AWS Batch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Bedrock | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Billing and Cost Management | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Braket | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Certificate Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Chatbot | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Chime | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Clean Rooms | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Cloud Control | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| AWS Cloud Control API | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Cloud Directory | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Cloud Map | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Cloud9 | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -84,7 +104,6 @@ Generated: 2026-07-10 11:22:52
 | AWS Comprehend | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Compute Optimizer | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Config | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Connect | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Control Tower | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Data Exchange | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Data Firehose | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -99,20 +118,12 @@ Generated: 2026-07-10 11:22:52
 | AWS DevOps Guru | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Direct Connect | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Directory Service | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Disaster Recovery Service | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS DocumentDB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS DSQL | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS DynamoDB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS EBS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS EC2 | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS EC2 Image Builder | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS ECR | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS ECS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS EFS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS EKS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Elastic Beanstalk | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| AWS Elastic Disaster Recovery | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Elastic Load Balancing | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS ElastiCache | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Elemental MediaConnect | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Elemental MediaConvert | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Elemental MediaLive | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -123,7 +134,6 @@ Generated: 2026-07-10 11:22:52
 | AWS End User Messaging | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Entity Resolution | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS EventBridge | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS EVS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Fault Injection Service | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS FinSpace | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Firewall Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -131,7 +141,6 @@ Generated: 2026-07-10 11:22:52
 | AWS Forecast | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Fraud Detector | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Free Tier | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS FSx | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS GameLift | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Glacier | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Global Accelerator | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -142,12 +151,10 @@ Generated: 2026-07-10 11:22:52
 | AWS HealthLake | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS HealthOmics | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS IAM | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Inspector | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS IoT | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS IoT Greengrass | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS IVS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Kendra | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Keyspaces | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Kinesis | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS KMS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Lake Formation | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -156,41 +163,34 @@ Generated: 2026-07-10 11:22:52
 | AWS Lex | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS License Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Lightsail | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Location Service | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Lookout | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Machine Learning | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Macie | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Mainframe Modernization | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Managed Blockchain | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Managed Grafana | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Managed Streaming for Kafka | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Marketplace | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Mechanical Turk | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Media Services | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS MemoryDB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Migration Hub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS MQ | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Neptune | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Network Firewall | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Network Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Nimble Studio | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Notifications | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS OpenSearch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Organizations | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Outposts | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Panorama | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Parallel Computing Service | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Partner Network | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| AWS Partner Central | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Payment Cryptography | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Personalize | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Polly | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Pricing | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Private Certificate Authority | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Proton | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Q | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS Quick | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS RDS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| AWS re:Post | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| AWS re:Post Private | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Redshift | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Rekognition | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Resilience Hub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -229,6 +229,7 @@ Generated: 2026-07-10 11:22:52
 | AWS Transfer Family | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Translate | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Trusted Advisor | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| AWS User Notifications | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS Verified Permissions | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS VPC | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS WAF | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -239,94 +240,71 @@ Generated: 2026-07-10 11:22:52
 | AWS X-Ray | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
 | Azure Advisor | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure AI Services | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure AI Video Indexer | 🟥 | 🟥 | 🟥 | 🟥 | 🟩 |
-| Azure Analysis Services | 🟥 | 🟩 | 🟥 | 🟩 | 🟩 |
-| Azure API Management | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Azure Analysis Services | 🟥 | 🟩 | 🟥 | 🟥 | 🟩 |
+| Azure API Management | 🟩 | 🟨 | 🟨 | 🟨 | 🟩 |
 | Azure App Configuration | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure App Service | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure App Testing | 🟥 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Arc | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Attestation | 🟥 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Azure Attestation | ⬜ | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Automanage | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Automation | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Batch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Azure Batch | 🟩 | 🟩 | 🟨 | 🟨 | 🟩 |
 | Azure Blob Storage | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Blueprints | 🟥 | 🟥 | 🟥 | 🟥 | 🟩 |
-| Azure CDN | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Azure CDN | 🟩 | 🟩 | 🟨 | 🟨 | 🟩 |
 | Azure Chaos Studio | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure CM+B | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Comm Services | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Azure Communication Services | 🟨 | 🟩 | 🟨 | 🟩 | 🟨 |
 | Azure Compute | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Compute Fleet | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Confidential Ledger | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Containers | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Azure Containers | 🟩 | 🟩 | 🟨 | 🟨 | 🟨 |
 | Azure Cosmos DB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Data Box | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Data Catalog | 🟥 | 🟩 | 🟥 | 🟥 | 🟩 |
 | Azure Data Factory | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Data Share | 🟥 | 🟥 | 🟥 | 🟩 | 🟩 |
+| Azure Data Share | 🟥 | 🟥 | 🟥 | 🟨 | 🟨 |
 | Azure Database Migration | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Defender | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
 | Azure DevOps | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
 | Azure DevTest Labs | 🟥 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Digital Twins | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure DNS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Elastic SAN | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Entra Domain Services | 🟥 | 🟩 | 🟥 | 🟥 | 🟩 |
-| Azure Entra ID | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Event Grid | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Event Hubs | 🟥 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Files | 🟥 | 🟥 | 🟥 | 🟩 | 🟩 |
+| Azure Files | 🟥 | 🟥 | 🟥 | 🟥 | 🟩 |
 | Azure Fluid Relay | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Front Door | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Functions | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure HDInsight | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Health Bot | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Health Data Services | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Azure Health Data Services | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Azure HSM | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Identity | 🟩 | 🟥 | 🟥 | 🟩 | 🟩 |
-| Azure IoT | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Azure IoT | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Azure Key Vault | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Kubernetes | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Lab Services | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Local | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Azure Kubernetes Configuration | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Logic Apps | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Machine Learning | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Maps | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
+| Azure Maps | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Azure Marketplace | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Migrate | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
-| Azure Mixed Reality | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Monitor | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Azure Monitor | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Azure NetApp Files | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Networking | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Notification Hubs | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Operator Nexus | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
 | Azure Playwright | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Portalservices | 🟩 | 🟥 | 🟥 | 🟥 | 🟩 |
-| Azure Power BI | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
-| Azure Power Platform | 🟥 | 🟥 | 🟥 | 🟥 | 🟩 |
-| Azure Purview | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Quantum | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
+| Azure Quantum | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Azure Queue Storage | 🟥 | 🟥 | 🟥 | 🟩 | 🟩 |
 | Azure Resource Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Resource Mover | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Security | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Service Bus | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Service Fabric | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Site Recovery | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Sphere | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Spring Apps | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
+| Azure Spring Apps | 🟩 | ⬜ | 🟩 | ⬜ | ⬜ |
 | Azure SQL | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Stack Edge | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Storage | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Stream Analytics | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Synapse Analytics | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Tables | 🟩 | 🟥 | 🟥 | 🟩 | 🟩 |
-| Azure Traffic Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Trusted Signing | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
-| Azure Virtual Desktop | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Virtual Machines | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Virtual Network | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Visual Studio | 🟥 | 🟩 | 🟥 | 🟥 | 🟩 |
 | Azure Web PubSub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -336,10 +314,9 @@ Generated: 2026-07-10 11:22:52
 | Bird | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bitbucket | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bitly | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
-| Boomi | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Box | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Braintree | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Braze | ⬜ | 🟩 | 🟩 | 🟩 | 🟩 |
+| Braze | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
 | Bugsnag | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bullhorn | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
 | Calendly | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
@@ -348,8 +325,8 @@ Generated: 2026-07-10 11:22:52
 | Chameleon | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Chroma | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | CircleCI | 🟩 | ⬜ | ⬜ | ⬜ | 🟩 |
+| Cisco Catalyst Center | 🟩 | ⬜ | 🟥 | 🟩 | 🟥 |
 | Cisco Catalyst SD-WAN | 🟩 | ⬜ | 🟥 | 🟩 | 🟥 |
-| Cisco DNA | 🟩 | ⬜ | 🟥 | 🟩 | 🟥 |
 | Cisco IMC | 🟩 | ⬜ | 🟥 | ⬜ | 🟥 |
 | Cisco Intersight | 🟩 | ⬜ | 🟥 | ⬜ | 🟥 |
 | Cisco ISE | 🟩 | ⬜ | 🟥 | 🟩 | 🟩 |
@@ -414,6 +391,7 @@ Generated: 2026-07-10 11:22:52
 | Files | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Firebase | 🟩 | 🟥 | 🟩 | 🟥 | 🟥 |
 | Fivetran | 🟩 | ⬜ | ⬜ | ⬜ | 🟩 |
+| Foundry Tools | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | FreshBooks | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Freshdesk | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Freshworks | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
@@ -427,17 +405,16 @@ Generated: 2026-07-10 11:22:52
 | GitLab | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | GoDaddy | 🟩 | ⬜ | ⬜ | 🟩 | 🟩 |
 | Gong | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
-| Google | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google | 🟩 | 🟩 | 🟨 | 🟩 | 🟩 |
 | Google Ads | 🟩 | 🟩 | 🟩 | 🟩 | 🟥 |
 | Google Analytics | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Area 120 | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Bare Metal | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Binary Authorization | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Calendar | 🟩 | 🟩 | 🟩 | 🟥 | 🟥 |
 | Google Chat | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Access Approval | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Access Context Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Access Context Manager | 🟥 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Advisory Notifications | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud AI Hypercomputer | 🟩 | 🟩 | 🟩 | 🟩 | 🟥 |
 | Google Cloud AlloyDB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -447,23 +424,25 @@ Generated: 2026-07-10 11:22:52
 | Google Cloud Apigee | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud App Engine | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud App Hub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud App Lifecycle Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Artifact Analysis (Grafeas) | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Artifact Registry | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Asset Inventory | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Assured Workloads | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Backup and DR Service | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Bare Metal Solution | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Batch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud BeyondCorp | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud BigQuery | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Bigtable | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Billing | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Build | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Cert Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Certificate Authority | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Certificate Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Channel API | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Chronicle | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Composer | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Compute Engine | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Contact Center | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Contact Center AI Insights | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Data Fusion | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Data Lineage | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Database Center | 🟩 | 🟥 | 🟩 | 🟩 | 🟥 |
@@ -474,7 +453,7 @@ Generated: 2026-07-10 11:22:52
 | Google Cloud Dataproc | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Datastream | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Deploy | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Dev Connect | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Developer Connect | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Device Streaming | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Dialogflow | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Document AI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -487,20 +466,18 @@ Generated: 2026-07-10 11:22:52
 | Google Cloud Functions | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Gemini Data Analytics | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud GKE | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Grafeas | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Healthcare | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Identity and Access Management | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Identity Platform | 🟥 | 🟥 | 🟥 | 🟥 | 🟩 |
 | Google Cloud Identity-Aware Proxy | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud IDS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Infra Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud IoT Core | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
-| Google Cloud Kafka | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Infrastructure Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud IoT Core | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Google Cloud Key Management Service | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Livesteam | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Live Stream API | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Location Finder | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Logging | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Lustre | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Logging | 🟨 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Managed Lustre | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Managed Service for Apache Kafka | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Managed Service for Microsoft Active Directory | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Marketplace | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Memorystore | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -508,19 +485,17 @@ Generated: 2026-07-10 11:22:52
 | Google Cloud Model Armor | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Monitoring | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Natural Language API | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud NetApp | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud NetApp Volumes | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Network Management | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Networking | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud OracleDB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Parallelstore | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Personalized Service Health | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Profiler | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Pub/Sub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud reCAPTCHA | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud reCAPTCHA Enterprise | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Recommender | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Resource Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Retail API | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Run | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud SaaS Runtime | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Scheduler | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Secret Manager | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Secure Source Manager | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
@@ -528,21 +503,21 @@ Generated: 2026-07-10 11:22:52
 | Google Cloud Sensitive Data Protection | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Service Catalog | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
 | Google Cloud Service Directory | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Service Health | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Service Infrastructure | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Service Usage | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Shell | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Sovereign | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Spanner | 🟩 | 🟩 | 🟩 | 🟩 | 🟨 |
-| Google Cloud Speech-to-Text | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Sovereign Controls by Partners | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Spanner | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Speech-to-Text and Text-to-Speech | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Storage | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Talent Solution | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Tasks | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Telecom | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Telecom Network Automation | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud TPU | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Trace | 🟩 | 🟥 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Transcoder | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Translation AI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Vertex AI Search for commerce | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Vertex AI Vision | 🟩 | 🟥 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Video AI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Video Stitcher | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -560,6 +535,7 @@ Generated: 2026-07-10 11:22:52
 | Google Gmail | 🟩 | 🟩 | 🟥 | 🟥 | 🟥 |
 | Google Maps | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Meet | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Security Operations (Chronicle) | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Sheets | 🟩 | 🟩 | 🟩 | 🟥 | 🟥 |
 | Google Shopping | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Tag Manager | 🟥 | 🟩 | 🟩 | 🟥 | 🟥 |
@@ -567,7 +543,6 @@ Generated: 2026-07-10 11:22:52
 | Google Workspace | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google YouTube | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
 | Gorgias | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
-| Grafana | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
 | GraphQL | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Greenhouse | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Groq | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -597,10 +572,10 @@ Generated: 2026-07-10 11:22:52
 | Keycloak | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Kibana | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Kit | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
-| Klarna | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Klarna | 🟩 | 🟩 | 🟨 | 🟩 | 🟩 |
 | Klaviyo | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | LangChain | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| LangGraph | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
+| LangGraph | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | LangSmith | 🟩 | 🟩 | 🟥 | ⬜ | 🟩 |
 | LaunchDarkly | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Lever | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
@@ -621,11 +596,17 @@ Generated: 2026-07-10 11:22:52
 | Marketo | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | Marqeta | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Matomo | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Matrix | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
+| Matrix | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Meilisearch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Mercury | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Merge | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Microsoft | 🟨 | 🟩 | 🟨 | 🟨 | 🟨 |
+| Microsoft Cost Management and Billing | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Microsoft Defender for Cloud | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
+| Microsoft Defender for Cloud | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Microsoft Entra Domain Services | 🟥 | 🟩 | 🟥 | 🟥 | 🟩 |
+| Microsoft Entra ID | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Microsoft Purview | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Microsoft Teams | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Milvus | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Miro | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
@@ -638,15 +619,15 @@ Generated: 2026-07-10 11:22:52
 | MongoDB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Moralis | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
 | MuleSoft | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
-| MURAL | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Mural | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | MX Technologies | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
-| MySQL | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Neon | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| MySQL | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
+| Neon | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | New Relic | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Nginx | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| NGINX | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Notion | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Nvidia | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
-| Nvidia Dynamo-Triton | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| NVIDIA | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| NVIDIA Dynamo-Triton | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Nylas | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | Okta | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Ollama | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -656,6 +637,7 @@ Generated: 2026-07-10 11:22:52
 | OpenRouter | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | OpenTelemetry | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Optimizely | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Oracle Database@Google Cloud | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Oracle DB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Oracle NetSuite | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Ortto | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
@@ -678,17 +660,18 @@ Generated: 2026-07-10 11:22:52
 | PostgreSQL | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | PostHog | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Postmark | ⬜ | 🟩 | 🟩 | 🟩 | 🟩 |
+| Power BI Embedded | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
 | Prometheus | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Protocol Buffers | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ |
 | PubNub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Pulumi | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Pure Storage | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Pusher | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Pydantic AI | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Pydantic AI | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Qdrant | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Qualtrics | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | QuickBooks | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Qumulo | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
+| Qumulo | 🟩 | 🟨 | 🟥 | 🟩 | 🟩 |
 | Ramp | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Range Labs | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Recombee | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -706,7 +689,7 @@ Generated: 2026-07-10 11:22:52
 | Sage | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
 | Salesforce | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Sanity | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
-| SAP | 🟥 | 🟥 | 🟩 | 🟥 | 🟥 |
+| SAP | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ |
 | SAP HANA | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | SAP NetWeaver | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
 | SAP SuccessFactors | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ |
@@ -714,12 +697,12 @@ Generated: 2026-07-10 11:22:52
 | Sauce Labs | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ |
 | Segment | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Semantic Kernel | 🟩 | ⬜ | 🟩 | 🟩 | ⬜ |
-| SendBird | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| Sendbird | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | SendGrid | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Sentry | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Session Storage | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | ShareFile | ⬜ | ⬜ | 🟩 | 🟩 | ⬜ |
-| Sharepoint | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| SharePoint | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Shippo | 🟩 | 🟩 | 🟩 | 🟩 | 🟥 |
 | Shopify | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Slack | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -749,13 +732,13 @@ Generated: 2026-07-10 11:22:52
 | SurveyMonkey | ⬜ | 🟩 | 🟩 | 🟩 | ⬜ |
 | Tableau | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Telegram | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| TeleSign | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| Telesign | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Tenable | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Terraform | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Terrific | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | TestMu AI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | ThoughtSpot | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
-| Thrift | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ |
+| Thrift | 🟥 | 🟥 | 🟩 | 🟥 | 🟥 |
 | TiDB | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Tink | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ |
 | Todoist | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
@@ -776,16 +759,16 @@ Generated: 2026-07-10 11:22:52
 | Voyage AI | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Weaviate | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Webflow | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
-| Websocket | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| WebSocket | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Weights & Biases | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | WooCommerce | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Wootric | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
-| WordPress | ⬜ | 🟩 | 🟩 | 🟩 | ⬜ |
-| Workday | 🟩 | ⬜ | 🟩 | 🟩 | ⬜ |
+| WordPress | ⬜ | 🟩 | 🟨 | 🟩 | ⬜ |
+| Workday | 🟩 | ⬜ | 🟨 | 🟩 | ⬜ |
 | WorkOS | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | xAI | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Xero | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
-| Yandex | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Yandex Cloud | 🟨 | 🟩 | 🟨 | 🟩 | 🟩 |
 | Zendesk | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Zendesk Sell | 🟩 | ⬜ | 🟩 | ⬜ | ⬜ |
 | Zoho | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |

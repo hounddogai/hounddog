@@ -1,6 +1,6 @@
 # HoundDog.ai - Privacy Code Scanner and Dataflow Context Engine
 
-[HoundDog.ai](https://hounddog.ai) is an ultra-fast, deterministic context engine that scans source code and provides 
+[HoundDog.ai](https://hounddog.ai) is an ultra-fast, deterministic context engine that scans source code and provides
 your AI agents where sensitive data flows, and how your APIs and services connect.
 
 ## Two capabilities, one scan
