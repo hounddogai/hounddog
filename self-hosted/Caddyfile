@@ -1,0 +1,35 @@
+# Serves the React single-page application and reverse-proxies /api to the "api" compose service.
+# Docker DNS spreads requests across scaled API replicas.
+{
+	admin off
+	auto_https off
+	persist_config off
+}
+
+:3300 {
+	root * /srv/frontend
+	encode zstd gzip
+
+	header {
+		Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+	}
+
+	@notAssets not path /assets/*
+	header @notAssets Cache-Control "no-cache"
+	header /assets/* Cache-Control "public, max-age=31536000, immutable"
+
+	# API requests stay on the app origin. This includes the public schema at /api/openapi.json.
+	# handle_path strips the /api prefix before proxying.
+	handle_path /api/* {
+		reverse_proxy api:8800
+	}
+
+	# Serve index.html for client-side routes that were not handled above.
+	handle {
+		try_files {path} /index.html
+		file_server
+	}
+}
