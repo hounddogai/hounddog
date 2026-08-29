@@ -1,13 +1,13 @@
 # HoundDog.ai Data Elements
 
-Generated: 2026-08-06 10:03:25
+Generated: 2026-08-29 00:56:33
 
 | Sensitivity | Count |
 |---|---|
 | 🟥 Critical | 33 |
-| 🟧 Medium | 49 |
+| 🟧 Medium | 50 |
 | 🟨 Low | 20 |
-| **Total** | 102 |
+| **Total** | 103 |
 
 | Sensitivity | Data Element | Tags |
 |---|---|---|
@@ -79,6 +79,7 @@ Generated: 2026-08-06 10:03:25
 | 🟧 Medium | Pain Level | PHI |
 | 🟧 Medium | Payment Method | PIFI |
 | 🟧 Medium | Payroll | PIFI |
+| 🟧 Medium | Personal Number | PII |
 | 🟧 Medium | Phone Call History | PII |
 | 🟧 Medium | Phone Number | PII |
 | 🟧 Medium | Photograph | PII |
