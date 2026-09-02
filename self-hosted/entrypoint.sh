@@ -11,7 +11,7 @@ case "$role" in
 api)
     python manage.py wait_for_db
     echo "Applying database migrations ..."
-    python manage.py migrate --noinput
+    PGOPTIONS="${PGOPTIONS:--c lock_timeout=5s}" python manage.py migrate --noinput
     echo "Updating scan rules ..."
     python manage.py update_rules
     echo "Starting API (port 8800) ..."

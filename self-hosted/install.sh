@@ -121,13 +121,53 @@ if [ -e .env ] || [ -L .env ]; then
     heading "UPGRADE DOCKER COMPOSE"
     say "Pulling the latest images..."
     docker compose pull
-    say "Recreating containers while keeping Docker volumes..."
-    if ! docker compose up -d --wait --force-recreate --remove-orphans; then
+    api_scale="$(docker compose ps --all --format '{{.Service}}' | awk '$1 == "api" { count++ } END { print count + 0 }')"
+    worker_scale="$(docker compose ps --all --format '{{.Service}}' | awk '$1 == "worker" { count++ } END { print count + 0 }')"
+    if [ "${api_scale}" -eq 0 ]; then
+        api_scale=1
+    fi
+    scale_args=(--scale "api=${api_scale}" --scale "worker=${worker_scale}")
+    if ! management_commands="$(docker compose run --rm --no-deps api python manage.py help --commands)"; then
+        fail "Could not inspect the management commands in the pulled API image. The existing application is still running."
+    fi
+    has_ropa_preflight=false
+    if grep -Fxq preflight_ropa_normalization <<< "${management_commands}"; then
+        has_ropa_preflight=true
+        say "Checking whether existing RoPA reports can be migrated..."
+        if ! docker compose run --rm --no-deps api python manage.py preflight_ropa_normalization; then
+            fail "RoPA migration preflight failed. The existing application is still running; correct the reported reports before retrying."
+        fi
+    else
+        say "The pulled image predates the RoPA storage cutover; continuing with its normal migration path."
+    fi
+    say "Stopping the web and API containers before database migration..."
+    docker compose stop caddy api
+    if [ "${has_ropa_preflight}" = "true" ]; then
+        docker compose run --rm --no-deps api python manage.py preflight_ropa_normalization \
+            || fail "RoPA migration preflight changed while the API was stopping. The old worker remains available to finish a raced import. If the error names an active review, run 'docker compose start api caddy', resolve or delete that review, and retry the upgrade."
+    fi
+    say "Stopping worker containers before database migration..."
+    docker compose stop worker
+    if [ "${has_ropa_preflight}" = "true" ]; then
+        docker compose run --rm --no-deps api python manage.py preflight_ropa_normalization \
+            || fail "RoPA migration preflight changed while workers were stopping. Containers remain stopped; correct the reported reports before retrying."
+    fi
+    say "Applying database migrations with the new image..."
+    if ! docker compose run --rm --no-deps \
+        -e PGOPTIONS="-c lock_timeout=5s" \
+        api python manage.py migrate --noinput; then
+        fail "Database migration failed. API and worker containers remain stopped. Fix the migration forward or restore your pre-upgrade database backup before restarting the previous release."
+    fi
+    say "Updating scan rules with the new image..."
+    if ! docker compose run --rm --no-deps api python manage.py update_rules; then
+        fail "Scan rule update failed after database migration. Containers remain stopped; rerun the upgrade after correcting the failure."
+    fi
+    say "Starting the upgraded containers while keeping Docker volumes..."
+    if ! docker compose up -d --wait --force-recreate --remove-orphans "${scale_args[@]}"; then
         docker compose ps || true
         fail "HoundDog.ai did not start successfully. Run 'docker compose logs' for details."
     fi
 
-    ensure_database
     install_cli
 
     heading "UPGRADE COMPLETE"

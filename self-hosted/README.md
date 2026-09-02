@@ -37,11 +37,44 @@ hounddog scan /path/to/repository
 
 ## Upgrade
 
-Upgrading keeps your configuration and data. Database migrations run automatically during startup:
+Upgrading keeps your configuration and data. Take a database backup first. The installer pulls the new image, stops
+the web/API/worker containers, runs migrations once with the new image, and starts the new stack only after migration
+succeeds:
 
 ```shell
 git pull && ./install.sh
 ```
+
+The application is unavailable during this maintenance window. If a migration fails, the installer deliberately
+leaves application containers stopped. Fix forward with the new release, or restore the pre-upgrade database backup
+before restarting an older release; do not run an older release against a partially migrated database.
+
+The installer preserves API and worker replica counts set with `docker compose up --scale` when it restarts an
+existing installation, including a worker scale of zero. The public web application requires an API, so an upgrade
+restores a missing API service at scale one.
+
+### Recovering RoPA migrations 0126 and 0127
+
+Migration 0126 applies the normalized RoPA schema atomically. If it fails, correct the reported lock or schema problem
+and rerun `./install.sh`; PostgreSQL rolled its schema transaction back. Do not start an older API or worker against a
+database where either migration has completed.
+
+The installer checks legacy reports before stopping writers, after stopping the API, and after stopping workers. If an
+import raced the first check, the old worker remains running so it can finish before you retry. Migration 0127 copies
+each report's current table into normalized storage in its own transaction. If it fails after all writers stop, keep
+`caddy`, `api`, and `worker` stopped, correct the reported report, and rerun the installer:
+
+```shell
+./install.sh
+```
+
+If the API-closed preflight instead names an active review that raced the first check, migrations have not started. Run
+`docker compose start api caddy`, resolve or delete that review in the previous application, and rerun `./install.sh`.
+Do not restart the previous application after migration 0127 has started.
+
+The normal migration retry skips completed reports and rolls back the report that failed. The installer restores the
+API and worker replica counts it observed before the upgrade after migration succeeds. Migration 0127 is irreversible;
+do not fake either migration or invoke its Python helper manually. Take another database backup after recovery succeeds.
 
 ## Reset
 
