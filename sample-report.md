@@ -45,8 +45,7 @@ If you face any issues, please reach out to us at support@hounddog.ai.
 - **Safe Dataflows**: Dataflows in which the transmission or storage of sensitive data elements are either:
     1. Sent to destinations that are generally known to be safe (e.g., encrypted databases, internal gRPC endpoints).
     2. Sent to destinations that are generally considered unsafe (e.g., logs, third-party APIs), but the data element is explicitly allowlisted.
-    3. Sanitized before reaching the sink (e.g., hashed, masked, encrypted, redacted).
-- **Risky Dataflows**: Vulnerable dataflows where sensitive data reaches unsafe sinks without adequate sanitization, potentially exposing it to misuse or leakage.
+- **Risky Dataflows**: Vulnerable dataflows where sensitive data reaches unsafe sinks without an applicable data-element allowance, potentially exposing it to misuse or leakage.
 - **Severity**: Dataflows are assigned one of the following severity levels:
   - 🟥 **Critical**
   - 🟧 **Medium**
@@ -1322,7 +1321,7 @@ This section lists the data sinks detected and the data elements exposed to them
 
 # Risky Dataflows
 
-This section shows vulnerable dataflows where sensitive data reaches unsafe sinks without adequate sanitization.
+This section shows vulnerable dataflows where sensitive data reaches unsafe sinks without an applicable data-element allowance.
 
 ---
 
@@ -1488,7 +1487,7 @@ For auto-closing vulnerabilities, see [https://docs.hounddog.ai/scanner/remediat
 
 # Safe Dataflows
 
-This section shows dataflows where sensitive data reaches safe sinks or is properly sanitized.
+This section shows dataflows where sensitive data reaches safe sinks or is explicitly allowlisted.
 
 ---
 
