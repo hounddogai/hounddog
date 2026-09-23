@@ -26,8 +26,8 @@ When the installation finishes:
 2. Enter the one-time setup key printed by the installer.
 3. Create your organization and owner account.
 
-The installer publishes port 3300 on all host interfaces by default so the app is reachable from another machine.
-Set `HOUNDDOG_BIND_ADDRESS=127.0.0.1` in `.env` and recreate the containers to restrict access to the Docker host.
+By default, HoundDog.ai is reachable from other machines on your network. To allow access only from this machine, set
+`HOUNDDOG_BIND_ADDRESS=127.0.0.1` in `.env` and run `docker compose up -d`.
 
 In Trial mode, the installer automatically sets up a CLI API key so you can scan a repository right away:
 
@@ -37,48 +37,20 @@ hounddog scan /path/to/repository
 
 ## Upgrade
 
-Upgrading keeps your configuration and data. Take a database backup first. The installer pulls the new image, stops
-the web/API/worker containers, runs migrations once with the new image, and starts the new stack only after migration
-succeeds:
+Upgrading keeps your configuration and data, and also upgrades the CLI. Back up your database first, because
+HoundDog.ai is briefly unavailable while the upgrade runs.
 
 ```shell
-git pull && ./install.sh
+git pull && ./upgrade.sh
 ```
 
-The application is unavailable during this maintenance window. If a migration fails, the installer deliberately
-leaves application containers stopped. Fix forward with the new release, or restore the pre-upgrade database backup
-before restarting an older release; do not run an older release against a partially migrated database.
-
-The installer preserves API and worker replica counts set with `docker compose up --scale` when it restarts an
-existing installation, including a worker scale of zero. The public web application requires an API, so an upgrade
-restores a missing API service at scale one.
-
-### Recovering RoPA migrations 0126 and 0127
-
-Migration 0126 applies the normalized RoPA schema atomically. If it fails, correct the reported lock or schema problem
-and rerun `./install.sh`; PostgreSQL rolled its schema transaction back. Do not start an older API or worker against a
-database where either migration has completed.
-
-The installer checks legacy reports before stopping writers, after stopping the API, and after stopping workers. If an
-import raced the first check, the old worker remains running so it can finish before you retry. Migration 0127 copies
-each report's current table into normalized storage in its own transaction. If it fails after all writers stop, keep
-`caddy`, `api`, and `worker` stopped, correct the reported report, and rerun the installer:
-
-```shell
-./install.sh
-```
-
-If the API-closed preflight instead names an active review that raced the first check, migrations have not started. Run
-`docker compose start api caddy`, resolve or delete that review in the previous application, and rerun `./install.sh`.
-Do not restart the previous application after migration 0127 has started.
-
-The normal migration retry skips completed reports and rolls back the report that failed. The installer restores the
-API and worker replica counts it observed before the upgrade after migration succeeds. Migration 0127 is irreversible;
-do not fake either migration or invoke its Python helper manually. Take another database backup after recovery succeeds.
+If the upgrade fails, HoundDog.ai stays stopped. Fix the reported error and run `./upgrade.sh` again, or restore your
+database backup before going back to the previous version.
 
 ## Reset
 
-Reset deletes your local configuration and data, then starts a fresh installation. It does not delete external Postgres.
+Reset deletes your local configuration and data, then starts a fresh installation. It does not delete data in your own
+Postgres database.
 
 ```shell
 ./reset.sh
@@ -86,8 +58,8 @@ Reset deletes your local configuration and data, then starts a fresh installatio
 
 ## Uninstall
 
-Uninstall removes HoundDog.ai and its local data. It keeps the CLI, configuration backups, repository files, and any
-external Postgres database.
+Uninstall removes HoundDog.ai and its local data. It keeps the CLI, configuration backups, this directory, and your own
+Postgres database.
 
 ```shell
 ./uninstall.sh
