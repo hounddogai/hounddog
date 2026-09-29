@@ -1,6 +1,6 @@
 # HoundDog.ai Data Sinks
 
-Generated: 2026-08-29 00:56:33
+Generated: 2026-09-29 08:54:41
 
 🟩 Supported  🟨 Partially Supported  🟥 Not Supported Yet  ⬜ Not Applicable
 
@@ -254,7 +254,7 @@ Generated: 2026-08-29 00:56:33
 | Azure Blueprints | 🟥 | 🟥 | 🟥 | 🟥 | 🟩 |
 | Azure CDN | 🟩 | 🟩 | 🟨 | 🟨 | 🟩 |
 | Azure Chaos Studio | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Azure Communication Services | 🟨 | 🟩 | 🟨 | 🟩 | 🟨 |
+| Azure Communication Services | 🟨 | 🟩 | 🟩 | 🟩 | 🟨 |
 | Azure Compute | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Compute Fleet | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Confidential Ledger | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -475,7 +475,7 @@ Generated: 2026-08-29 00:56:33
 | Google Cloud Key Management Service | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Live Stream API | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Location Finder | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Google Cloud Logging | 🟨 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Google Cloud Logging | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Managed Lustre | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Managed Service for Apache Kafka | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Cloud Managed Service for Microsoft Active Directory | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -531,7 +531,7 @@ Generated: 2026-08-29 00:56:33
 | Google Distributed Cloud | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Docs | 🟩 | 🟩 | 🟥 | 🟥 | 🟥 |
 | Google Drive | 🟩 | 🟩 | 🟩 | 🟥 | 🟥 |
-| Google GenAI | 🟩 | 🟩 | 🟩 | 🟨 | 🟩 |
+| Google GenAI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Gmail | 🟩 | 🟩 | 🟥 | 🟥 | 🟥 |
 | Google Maps | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Google Meet | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
