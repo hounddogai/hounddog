@@ -58,6 +58,12 @@ esac
 heading "UPGRADE DOCKER COMPOSE"
 say "Pulling the latest images..."
 docker compose pull
+say "Checking database migrations before stopping containers..."
+migration_status=0
+docker compose run --rm --no-deps api migrate --check || migration_status=$?
+if [[ "$migration_status" != 0 && "$migration_status" != 2 ]]; then
+    fail "Database migration check failed. Existing containers remain running. Check database connectivity and migration status before retrying."
+fi
 api_scale="$(docker compose ps --all --format '{{.Service}}' | awk '$1 == "api" { count++ } END { print count + 0 }')"
 worker_scale="$(docker compose ps --all --format '{{.Service}}' | awk '$1 == "worker" { count++ } END { print count + 0 }')"
 if [ "${api_scale}" -eq 0 ]; then
@@ -65,15 +71,13 @@ if [ "${api_scale}" -eq 0 ]; then
 fi
 scale_args=(--scale "api=${api_scale}" --scale "worker=${worker_scale}")
 say "Stopping the web, API, and worker containers before database migration..."
-docker compose stop caddy api worker
+docker compose stop --timeout 900 caddy api worker
 say "Applying database migrations with the new image..."
-if ! docker compose run --rm --no-deps \
-    -e PGOPTIONS="-c lock_timeout=5s" \
-    api python manage.py migrate --noinput; then
+if ! docker compose run --rm --no-deps api migrate; then
     fail "Database migration failed. API and worker containers remain stopped. Fix the migration forward or restore your pre-upgrade database backup before restarting the previous release."
 fi
 say "Updating scan rules with the new image..."
-if ! docker compose run --rm --no-deps api python manage.py update_rules; then
+if ! docker compose run --rm --no-deps api update-rules; then
     fail "Scan rule update failed after database migration. Containers remain stopped; rerun the upgrade after correcting the failure."
 fi
 say "Starting the upgraded containers while keeping Docker volumes..."

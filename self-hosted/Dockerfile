@@ -1,69 +1,53 @@
-# Public self-hosted image (hounddogai/hounddog-self-hosted) bundling the React UI, the REST API,
-# and the SAQ background worker. Build from the private monorepo root:
-#   docker build -f public/self-hosted/Dockerfile -t hounddogai/hounddog-self-hosted .
+# Build from the private monorepo root with -f public/self-hosted/Dockerfile.
+FROM rust:1.99-slim-bookworm AS backend-build
+ARG TARGETARCH
+ARG CARGO_BUILD_JOBS=2
+ENV CARGO_BUILD_JOBS=$CARGO_BUILD_JOBS
+WORKDIR /build/backend
+RUN apt-get update && apt-get install --no-install-recommends -y build-essential cmake libssl-dev pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+COPY backend/Cargo.toml backend/Cargo.lock ./
+COPY backend/crates ./crates
+COPY prompts /build/prompts
+RUN --mount=type=cache,id=backend-cargo-registry,target=/usr/local/cargo/registry \
+    --mount=type=cache,id=backend-cargo-git,target=/usr/local/cargo/git \
+    --mount=type=cache,id=backend-cargo-target-${TARGETARCH},target=/build/backend/target \
+    cargo install --locked --path crates/app --root /out --target-dir /build/backend/target --bins
 
 FROM node:24-alpine AS frontend-build
-ENV PNPM_HOME=/root/.local/share/pnpm
-ENV PATH="${PNPM_HOME}:${PATH}"
-WORKDIR /app
+WORKDIR /frontend
 RUN npm install -g pnpm@11.6.0
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-COPY frontend/ .
-ARG HOUNDDOG_VERSION=dev
-ENV VITE_HOUNDDOG_VERSION=$HOUNDDOG_VERSION
+COPY frontend/ ./
 RUN pnpm run build --mode self-hosted
 
-FROM python:3.14-slim-bookworm
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
-COPY --from=caddy:2 /usr/bin/caddy /usr/local/bin/caddy
+FROM caddy:2 AS caddy
+
+FROM debian:bookworm-slim AS runtime
 ARG HOUNDDOG_VERSION=dev
 ENV HOUNDDOG_ENV=self-hosted \
     HOUNDDOG_VERSION=$HOUNDDOG_VERSION \
+    HOUNDDOG_LISTEN=0.0.0.0:8800 \
     HOUNDDOG_DATA_DIR=/data \
-    DJANGO_SETTINGS_MODULE=hounddog.settings \
-    DEBIAN_FRONTEND=noninteractive \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PYTHONUNBUFFERED=1 \
-    PYTHONIOENCODING=UTF-8 \
-    UV_PROJECT_ENVIRONMENT=/app/venv \
-    VIRTUAL_ENV=/app/venv \
-    PATH=/app/venv/bin:$PATH
-
+    HOUNDDOG_RULES_DIR=/rules \
+    HOUNDDOG_PROMPTS_DIR=/prompts \
+    RUST_LOG=info
 WORKDIR /app
-
-# Create the non-root user, install system dependencies, and create the virtualenv. Caddy serves the UI.
-RUN groupadd -r hounddog && \
-    useradd -m -r -g hounddog -s /bin/bash hounddog && \
-    apt-get update && \
-    apt-get install --no-install-recommends -y build-essential libpq-dev curl git && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    uv venv /app/venv
-
-COPY backend/pyproject.toml ./pyproject.toml
-COPY backend/uv.lock ./uv.lock
-RUN uv sync --no-dev --no-install-project
-
-COPY backend/manage.py ./manage.py
-COPY backend/hounddog ./hounddog
+RUN groupadd -r hounddog && useradd -m -r -g hounddog -s /bin/bash hounddog \
+    && apt-get update && apt-get install --no-install-recommends -y ca-certificates curl git libssl3 openssh-client \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir /data && chown hounddog:hounddog /data
+COPY --from=backend-build /out/bin/ /usr/local/bin/
+COPY --from=caddy /usr/bin/caddy /usr/local/bin/caddy
+COPY --from=frontend-build /frontend/build/client /srv/frontend
+COPY public/self-hosted/Caddyfile ./Caddyfile
+COPY backend/migrations ./migrations
 COPY rules /rules
 COPY prompts /prompts
-COPY --from=frontend-build /app/build/client /srv/frontend
-COPY public/self-hosted/entrypoint.sh ./entrypoint.sh
-COPY public/self-hosted/Caddyfile ./Caddyfile
-
-RUN mkdir -p /data && \
-    chown -R hounddog:hounddog /app /data /srv/frontend && \
-    chmod +x /app/entrypoint.sh
-
-EXPOSE 3300 8800
-
-# Health checks are defined per service in public/self-hosted/compose.yaml because the image runs
-# in different roles (api, worker, caddy).
-
+COPY public/self-hosted/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 USER hounddog
-
-ENTRYPOINT ["/app/entrypoint.sh"]
+EXPOSE 3300 8800
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["api"]

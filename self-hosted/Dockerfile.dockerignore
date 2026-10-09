@@ -2,11 +2,12 @@
 # <Dockerfile>.dockerignore next to the Dockerfile). The build context is the private monorepo
 # root; keep this whitelist in sync with the COPY statements in the Dockerfile.
 *
-!backend/pyproject.toml
-!backend/uv.lock
-!backend/manage.py
-!backend/hounddog/
-!backend/hounddog/**
+!backend/Cargo.toml
+!backend/Cargo.lock
+!backend/crates/
+!backend/crates/**
+!backend/migrations/
+!backend/migrations/**
 !frontend/
 !frontend/**
 !public/self-hosted/Caddyfile
@@ -15,7 +16,6 @@
 !rules/**
 !prompts/
 !prompts/**
-backend/hounddog/**/__pycache__/
 frontend/node_modules/
 frontend/node_modules/**
 frontend/.pnpm-store/

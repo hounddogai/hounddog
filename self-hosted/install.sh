@@ -80,15 +80,15 @@ install_cli() {
 }
 
 ensure_database() {
-    if docker compose exec -T api python manage.py migrate --check > /dev/null 2>&1; then
+    if docker compose exec -T api migrate --check > /dev/null 2>&1; then
         return
     fi
 
     heading "UPDATE DATABASE"
     say "Applying database migrations..."
-    docker compose exec -T api python manage.py migrate --noinput
+    docker compose exec -T api migrate
     say "Updating scan rules..."
-    docker compose exec -T api python manage.py update_rules
+    docker compose exec -T api update-rules
 }
 
 cli_config_dir() {

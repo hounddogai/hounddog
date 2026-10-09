@@ -2,25 +2,23 @@
 
 set -e
 
-# The container role is the first argument: "api" (REST API, the image default), "worker" (SAQ
-# background worker), "caddy" (React UI and API reverse proxy), or any other command to exec as-is
-# (e.g. manage.py shell).
+# The first argument selects the API, pgqueue worker, Caddy, or an administrative binary.
 role="${1:-api}"
 
 case "$role" in
 api)
-    python manage.py wait_for_db
+    wait-for-db
     echo "Applying database migrations ..."
-    PGOPTIONS="${PGOPTIONS:--c lock_timeout=5s}" python manage.py migrate --noinput
+    migrate
     echo "Updating scan rules ..."
-    python manage.py update_rules
+    update-rules
     echo "Starting API (port 8800) ..."
-    exec uvicorn hounddog.asgi:application --host 0.0.0.0 --port 8800 --no-access-log --lifespan off
+    exec api
     ;;
 worker)
-    python manage.py wait_for_db
-    echo "Starting SAQ worker ..."
-    exec python manage.py start_saq_worker
+    wait-for-db
+    echo "Starting pgqueue worker ..."
+    exec worker
     ;;
 caddy)
     echo "Starting Caddy (app and /api proxy on port 3300) ..."

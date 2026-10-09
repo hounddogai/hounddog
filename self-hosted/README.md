@@ -5,6 +5,7 @@ Run HoundDog.ai in your own environment.
 ## Requirements
 
 - Docker with Compose v2
+- PostgreSQL 18 or newer for an external database; Trial mode includes PostgreSQL 18
 - At least 4 GB of RAM and 40 GB of disk space
 
 ## Installation
@@ -44,7 +45,8 @@ HoundDog.ai is briefly unavailable while the upgrade runs.
 git pull && ./upgrade.sh
 ```
 
-If the upgrade fails, HoundDog.ai stays stopped. Fix the reported error and run `./upgrade.sh` again, or restore your
+If a prerequisite check fails, existing containers keep running. If migration or startup fails after the drain,
+HoundDog.ai stays stopped. Fix the reported error and run `./upgrade.sh` again, or restore your
 database backup before going back to the previous version.
 
 ## Reset

@@ -21,7 +21,7 @@
 	header @notAssets Cache-Control "no-cache"
 	header /assets/* Cache-Control "public, max-age=31536000, immutable"
 
-	# API requests stay on the app origin. This includes the public schema at /api/openapi.json.
+	# API requests stay on the app origin.
 	# handle_path strips the /api prefix before proxying.
 	handle_path /api/* {
 		reverse_proxy api:8800
