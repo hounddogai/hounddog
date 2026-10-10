@@ -113,32 +113,32 @@ A single scan produces both the privacy dataflow map and the API/service context
 
 ### Privacy Code Scanner
 
-For a quick demonstration, scan our [Python test repository](https://github.com/hounddogai/hounddog-test-python-app):
+For a quick demonstration, scan our [Python test repository](https://github.com/hounddogai/hounddog-test-python):
 
 ```
 # Clone the test repository
-git clone https://github.com/hounddogai/hounddog-test-python-app
+git clone https://github.com/hounddogai/hounddog-test-python
 
 # Scan the test repository
-hounddog scan hounddog-test-python-app
+hounddog scan hounddog-test-python
 ```
 
 By default, only *risky* dataflows are shown to minimize noise. Use `--severity=all` to see everything:
 
 ```
-hounddog scan hounddog-test-python-app --severity=all
+hounddog scan hounddog-test-python --severity=all
 ```
 
 Use `--trace` to see detailed dataflow traces (one of our coolest features and useful for debugging):
 
 ```
-hounddog scan hounddog-test-python-app --trace
+hounddog scan hounddog-test-python --trace
 ```
 
 Use `--output-format=markdown` to generate a Markdown report:
 
 ```
-hounddog scan hounddog-test-python-app --output-format=markdown --output-path=report.md
+hounddog scan hounddog-test-python --output-format=markdown --output-path=report.md
 ```
 
 We recommend

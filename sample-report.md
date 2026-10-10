@@ -63,10 +63,10 @@ The table below shows the configuration parameters used for this scan.
 |Scanner Version|dev|
 |Scanner Build|dev|
 |Was `HOUNDDOG_API_KEY` provided?|No|
-|Scan Target Directory|<span style="color:rgba(51, 113, 212, 1);">/Users/joohwan/hounddog-workspace/hounddog-test-python-app</span>|
+|Scan Target Directory|<span style="color:rgba(51, 113, 212, 1);">/Users/joohwan/hounddog-workspace/hounddog-test-python</span>|
 |Git Source Code Manager Type|GitHub (Cloud)|
-|Git Repository|[hounddogai/hounddog\-test\-python\-app](<https://github.com/hounddogai/hounddog-test-python-app>)|
-|Git Branch|[main](<https://github.com/hounddogai/hounddog-test-python-app/tree/main>)|
+|Git Repository|[hounddogai/hounddog\-test\-python\-app](<https://github.com/hounddogai/hounddog-test-python>)|
+|Git Branch|[main](<https://github.com/hounddogai/hounddog-test-python/tree/main>)|
 |Git Commit SHA|781c916790f5f99150244ab4e9942c13a563d2c3|
 |Ignored File Patterns|0|
 |Ignored Data Elements|0|
@@ -122,13 +122,13 @@ The table below shows the sensitive data elements discovered in the codebase and
 <details>
 <summary>SQL Database</summary>
 
-1. First detected here in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L34-L34)
+1. First detected here in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L34-L34)
 
     ```python
     allergies = Column(Text)
     ```
 
-2. Stored in SQL Database in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L34-L34)
+2. Stored in SQL Database in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L34-L34)
 
     ```python
     allergies = Column(Text)
@@ -143,10 +143,10 @@ The table below shows the sensitive data elements discovered in the codebase and
 flowchart LR
 de_43("<a href='#data-element-43'>Medical Condition</a>")
 style de_43 fill:none,stroke:#808080,stroke-width:1px
-file_43_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_43_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_43_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_43 --> file_43_a5d31205d55c70dbb753118aeba456b0
-file_43_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L34-L34'>L34</a>| sink_sql_db
+file_43_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L34-L34'>L34</a>| sink_sql_db
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
 style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 
@@ -161,13 +161,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>OpenAI</summary>
 
-1. First detected here in [pages/patient.py:59:9](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L59-L59)
+1. First detected here in [pages/patient.py:59:9](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L59-L59)
 
     ```python
     medical_history
     ```
 
-2. Placed inside a string and assigned to 'patient_context' in [pages/patient.py:284:17](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L284-L286)
+2. Placed inside a string and assigned to 'patient_context' in [pages/patient.py:284:17](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L284-L286)
 
     ```python
     patient_context = f"""
@@ -175,13 +175,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
     """
     ```
 
-3. Wrapped in langchain_core.messages.SystemMessage and assigned to 'messages' in [pages/patient.py:308:25](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L308-L308)
+3. Wrapped in langchain_core.messages.SystemMessage and assigned to 'messages' in [pages/patient.py:308:25](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L308-L308)
 
     ```python
     messages = [SystemMessage(content=patient_context)]
     ```
 
-4. Exposed to OpenAI in [pages/patient.py:321:36](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L321-L321)
+4. Exposed to OpenAI in [pages/patient.py:321:36](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L321-L321)
 
     ```python
     llm.invoke(messages)
@@ -193,13 +193,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>SQL Database</summary>
 
-1. First detected here in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L37-L37)
+1. First detected here in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L37-L37)
 
     ```python
     medical_history = Column(Text)
     ```
 
-2. Stored in SQL Database in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L37-L37)
+2. Stored in SQL Database in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L37-L37)
 
     ```python
     medical_history = Column(Text)
@@ -214,14 +214,14 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 flowchart LR
 de_45("<a href='#data-element-45'>Medical History</a>")
 style de_45 fill:none,stroke:#808080,stroke-width:1px
-file_45_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_45_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_45_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_45 --> file_45_a5d31205d55c70dbb753118aeba456b0
-file_45_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L37-L37'>L37</a>| sink_sql_db
-file_45_0a6344e795897f52ee7ed6e95daf4674("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py'>pages/patient.py</a>")
+file_45_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L37-L37'>L37</a>| sink_sql_db
+file_45_0a6344e795897f52ee7ed6e95daf4674("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py'>pages/patient.py</a>")
 style file_45_0a6344e795897f52ee7ed6e95daf4674 fill:none,stroke:#808080,stroke-width:1px
 de_45 --> file_45_0a6344e795897f52ee7ed6e95daf4674
-file_45_0a6344e795897f52ee7ed6e95daf4674 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L321-L321'>L321</a>| sink_openai
+file_45_0a6344e795897f52ee7ed6e95daf4674 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L321-L321'>L321</a>| sink_openai
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
 style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 sink_openai("<a href='#data-sink-openai'>OpenAI</a>")
@@ -244,65 +244,65 @@ style sink_openai fill:#FF000026,stroke:#C80000,color:#C80000
 
 </br>**Occurrence #1**
 
-1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387)
+1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L387-L387)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:387:58](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387)
+2. Stored in SQL Database in [utils/data_manager.py:387:58](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L387-L387)
 
     ```python
     func.count(MedicalRecord.id)
     ```
 </br>**Occurrence #2**
 
-1. First detected here in [utils/data_manager.py:248:45](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L248-L248)
+1. First detected here in [utils/data_manager.py:248:45](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L248-L248)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:248:34](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L248-L248)
+2. Stored in SQL Database in [utils/data_manager.py:248:34](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L248-L248)
 
     ```python
     func.count(MedicalRecord.id)
     ```
 </br>**Occurrence #3**
 
-1. First detected here in [utils/data_manager.py:496:54](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L496-L496)
+1. First detected here in [utils/data_manager.py:496:54](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L496-L496)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:496:43](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L496-L496)
+2. Stored in SQL Database in [utils/data_manager.py:496:43](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L496-L496)
 
     ```python
     func.count(MedicalRecord.id)
     ```
 </br>**Occurrence #4**
 
-1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387)
+1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L387-L387)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:389:32](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L389-L389)
+2. Stored in SQL Database in [utils/data_manager.py:389:32](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L389-L389)
 
     ```python
     func.count(MedicalRecord.id)
     ```
 </br>**Occurrence #5**
 
-1. First detected here in [utils/data_manager.py:239:45](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L239-L239)
+1. First detected here in [utils/data_manager.py:239:45](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L239-L239)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:239:34](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L239-L239)
+2. Stored in SQL Database in [utils/data_manager.py:239:34](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L239-L239)
 
     ```python
     func.count(MedicalRecord.id)
@@ -317,10 +317,10 @@ style sink_openai fill:#FF000026,stroke:#C80000,color:#C80000
 flowchart LR
 de_47("<a href='#data-element-47'>Medical Record Number</a>")
 style de_47 fill:none,stroke:#808080,stroke-width:1px
-file_47_f3b82eca6148dc549059de4f35e70529("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py'>utils/data_manager.py</a>")
+file_47_f3b82eca6148dc549059de4f35e70529("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py'>utils/data_manager.py</a>")
 style file_47_f3b82eca6148dc549059de4f35e70529 fill:none,stroke:#808080,stroke-width:1px
 de_47 --> file_47_f3b82eca6148dc549059de4f35e70529
-file_47_f3b82eca6148dc549059de4f35e70529 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L248-L248'>L248</a>| sink_sql_db
+file_47_f3b82eca6148dc549059de4f35e70529 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L248-L248'>L248</a>| sink_sql_db
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
 style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 
@@ -365,13 +365,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>SQL Database</summary>
 
-1. First detected here in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L33-L33)
+1. First detected here in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L33-L33)
 
     ```python
     blood_type = Column(String(10))
     ```
 
-2. Stored in SQL Database in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L33-L33)
+2. Stored in SQL Database in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L33-L33)
 
     ```python
     blood_type = Column(String(10))
@@ -386,10 +386,10 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 flowchart LR
 de_10("<a href='#data-element-10'>Blood Type</a>")
 style de_10 fill:none,stroke:#808080,stroke-width:1px
-file_10_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_10_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_10_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_10 --> file_10_a5d31205d55c70dbb753118aeba456b0
-file_10_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L33-L33'>L33</a>| sink_sql_db
+file_10_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L33-L33'>L33</a>| sink_sql_db
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
 style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 
@@ -408,13 +408,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>SQL Database</summary>
 
-1. First detected here in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L38-L38)
+1. First detected here in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L38-L38)
 
     ```python
     current_medications = Column(Text)
     ```
 
-2. Stored in SQL Database in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L38-L38)
+2. Stored in SQL Database in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L38-L38)
 
     ```python
     current_medications = Column(Text)
@@ -429,10 +429,10 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 flowchart LR
 de_49("<a href='#data-element-49'>Medication</a>")
 style de_49 fill:none,stroke:#808080,stroke-width:1px
-file_49_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_49_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_49_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_49 --> file_49_a5d31205d55c70dbb753118aeba456b0
-file_49_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L38-L38'>L38</a>| sink_sql_db
+file_49_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L38-L38'>L38</a>| sink_sql_db
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
 style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 
@@ -447,13 +447,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>Sentry</summary>
 
-1. First detected here in [pages/patient.py:101:33](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L101-L101)
+1. First detected here in [pages/patient.py:101:33](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L101-L101)
 
     ```python
     "phone": phone
     ```
 
-2. Placed inside a dictionary and exposed to Sentry in [pages/patient.py:98:21](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L98-L102)
+2. Placed inside a dictionary and exposed to Sentry in [pages/patient.py:98:21](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L98-L102)
 
     ```python
     sentry_sdk.capture_message(
@@ -469,13 +469,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>SQL Database</summary>
 
-1. First detected here in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L30-L30)
+1. First detected here in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L30-L30)
 
     ```python
     phone = Column(String(50))
     ```
 
-2. Stored in SQL Database in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L30-L30)
+2. Stored in SQL Database in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L30-L30)
 
     ```python
     phone = Column(String(50))
@@ -490,14 +490,14 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 flowchart LR
 de_60("<a href='#data-element-60'>Phone Number</a>")
 style de_60 fill:none,stroke:#808080,stroke-width:1px
-file_60_0a6344e795897f52ee7ed6e95daf4674("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py'>pages/patient.py</a>")
+file_60_0a6344e795897f52ee7ed6e95daf4674("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py'>pages/patient.py</a>")
 style file_60_0a6344e795897f52ee7ed6e95daf4674 fill:none,stroke:#808080,stroke-width:1px
 de_60 --> file_60_0a6344e795897f52ee7ed6e95daf4674
-file_60_0a6344e795897f52ee7ed6e95daf4674 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L98-L102'>L98</a>| sink_sentry
-file_60_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_60_0a6344e795897f52ee7ed6e95daf4674 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L98-L102'>L98</a>| sink_sentry
+file_60_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_60_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_60 --> file_60_a5d31205d55c70dbb753118aeba456b0
-file_60_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L30-L30'>L30</a>| sink_sql_db
+file_60_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L30-L30'>L30</a>| sink_sql_db
 sink_sentry("<a href='#data-sink-sentry'>Sentry</a>")
 style sink_sentry fill:#FF000026,stroke:#C80000,color:#C80000
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
@@ -518,13 +518,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>SQL Database</summary>
 
-1. First detected here in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L29-L29)
+1. First detected here in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L29-L29)
 
     ```python
     gender = Column(String(50), nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L29-L29)
+2. Stored in SQL Database in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L29-L29)
 
     ```python
     gender = Column(String(50), nullable=False)
@@ -539,10 +539,10 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 flowchart LR
 de_73("<a href='#data-element-73'>Sexual Orientation</a>")
 style de_73 fill:none,stroke:#808080,stroke-width:1px
-file_73_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_73_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_73_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_73 --> file_73_a5d31205d55c70dbb753118aeba456b0
-file_73_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L29-L29'>L29</a>| sink_sql_db
+file_73_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L29-L29'>L29</a>| sink_sql_db
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
 style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 
@@ -574,13 +574,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>SQL Database</summary>
 
-1. First detected here in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L28-L28)
+1. First detected here in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L28-L28)
 
     ```python
     date_of_birth = Column(Date, nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L28-L28)
+2. Stored in SQL Database in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L28-L28)
 
     ```python
     date_of_birth = Column(Date, nullable=False)
@@ -595,10 +595,10 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 flowchart LR
 de_16("<a href='#data-element-16'>Date of Birth</a>")
 style de_16 fill:none,stroke:#808080,stroke-width:1px
-file_16_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_16_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_16_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_16 --> file_16_a5d31205d55c70dbb753118aeba456b0
-file_16_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L28-L28'>L28</a>| sink_sql_db
+file_16_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L28-L28'>L28</a>| sink_sql_db
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
 style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 
@@ -617,13 +617,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>SQL Database</summary>
 
-1. First detected here in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L31-L31)
+1. First detected here in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L31-L31)
 
     ```python
     email = Column(String(100))
     ```
 
-2. Stored in SQL Database in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L31-L31)
+2. Stored in SQL Database in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L31-L31)
 
     ```python
     email = Column(String(100))
@@ -638,10 +638,10 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 flowchart LR
 de_20("<a href='#data-element-20'>Email</a>")
 style de_20 fill:none,stroke:#808080,stroke-width:1px
-file_20_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_20_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_20_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_20 --> file_20_a5d31205d55c70dbb753118aeba456b0
-file_20_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L31-L31'>L31</a>| sink_sql_db
+file_20_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L31-L31'>L31</a>| sink_sql_db
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
 style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 
@@ -660,13 +660,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>SQL Database</summary>
 
-1. First detected here in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L36-L36)
+1. First detected here in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L36-L36)
 
     ```python
     emergency_contact_phone = Column(String(50))
     ```
 
-2. Stored in SQL Database in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L36-L36)
+2. Stored in SQL Database in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L36-L36)
 
     ```python
     emergency_contact_phone = Column(String(50))
@@ -681,10 +681,10 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 flowchart LR
 de_21("<a href='#data-element-21'>Emergency Contact</a>")
 style de_21 fill:none,stroke:#808080,stroke-width:1px
-file_21_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_21_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_21_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_21 --> file_21_a5d31205d55c70dbb753118aeba456b0
-file_21_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L36-L36'>L36</a>| sink_sql_db
+file_21_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L36-L36'>L36</a>| sink_sql_db
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
 style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 
@@ -699,13 +699,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>Logs</summary>
 
-1. First detected here in [scripts/seed_db.py:143:9](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L143-L143)
+1. First detected here in [scripts/seed_db.py:143:9](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L143-L143)
 
     ```python
     first_name
     ```
 
-2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L168-L168)
+2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L168-L168)
 
     ```python
     logger.debug(f"Added patient: {first_name} {last_name}")
@@ -719,26 +719,26 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 
 </br>**Occurrence #1**
 
-1. First detected here in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L26-L26)
+1. First detected here in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L26-L26)
 
     ```python
     first_name = Column(String(100), nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L26-L26)
+2. Stored in SQL Database in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L26-L26)
 
     ```python
     first_name = Column(String(100), nullable=False)
     ```
 </br>**Occurrence #2**
 
-1. First detected here in [utils/data_manager.py:102:33](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L102-L102)
+1. First detected here in [utils/data_manager.py:102:33](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L102-L102)
 
     ```python
     Patient.first_name
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:102:22](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L102-L102)
+2. Stored in SQL Database in [utils/data_manager.py:102:22](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L102-L102)
 
     ```python
     func.lower(Patient.first_name)
@@ -753,18 +753,18 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 flowchart LR
 de_27("<a href='#data-element-27'>First Name</a>")
 style de_27 fill:none,stroke:#808080,stroke-width:1px
-file_27_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_27_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_27_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_27 --> file_27_a5d31205d55c70dbb753118aeba456b0
-file_27_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L26-L26'>L26</a>| sink_sql_db
-file_27_f3b82eca6148dc549059de4f35e70529("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py'>utils/data_manager.py</a>")
+file_27_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L26-L26'>L26</a>| sink_sql_db
+file_27_f3b82eca6148dc549059de4f35e70529("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py'>utils/data_manager.py</a>")
 style file_27_f3b82eca6148dc549059de4f35e70529 fill:none,stroke:#808080,stroke-width:1px
 de_27 --> file_27_f3b82eca6148dc549059de4f35e70529
-file_27_f3b82eca6148dc549059de4f35e70529 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L102-L102'>L102</a>| sink_sql_db
-file_27_1494986c7747c28afab49b7804e0927c("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py'>scripts/seed_db.py</a>")
+file_27_f3b82eca6148dc549059de4f35e70529 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L102-L102'>L102</a>| sink_sql_db
+file_27_1494986c7747c28afab49b7804e0927c("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py'>scripts/seed_db.py</a>")
 style file_27_1494986c7747c28afab49b7804e0927c fill:none,stroke:#808080,stroke-width:1px
 de_27 --> file_27_1494986c7747c28afab49b7804e0927c
-file_27_1494986c7747c28afab49b7804e0927c --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L168-L168'>L168</a>| sink_logs
+file_27_1494986c7747c28afab49b7804e0927c --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L168-L168'>L168</a>| sink_logs
 sink_logs("<a href='#data-sink-logs'>Logs</a>")
 style sink_logs fill:#FF000026,stroke:#C80000,color:#C80000
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
@@ -781,13 +781,13 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <details>
 <summary>Logs</summary>
 
-1. First detected here in [scripts/seed_db.py:144:9](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L144-L144)
+1. First detected here in [scripts/seed_db.py:144:9](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L144-L144)
 
     ```python
     last_name
     ```
 
-2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L168-L168)
+2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L168-L168)
 
     ```python
     logger.debug(f"Added patient: {first_name} {last_name}")
@@ -801,26 +801,26 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 
 </br>**Occurrence #1**
 
-1. First detected here in [utils/data_manager.py:103:35](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L103-L103)
+1. First detected here in [utils/data_manager.py:103:35](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L103-L103)
 
     ```python
     Patient.last_name
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:103:24](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L103-L103)
+2. Stored in SQL Database in [utils/data_manager.py:103:24](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L103-L103)
 
     ```python
     func.lower(Patient.last_name)
     ```
 </br>**Occurrence #2**
 
-1. First detected here in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L27-L27)
+1. First detected here in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L27-L27)
 
     ```python
     last_name = Column(String(100), nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L27-L27)
+2. Stored in SQL Database in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L27-L27)
 
     ```python
     last_name = Column(String(100), nullable=False)
@@ -835,18 +835,18 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 flowchart LR
 de_37("<a href='#data-element-37'>Last Name</a>")
 style de_37 fill:none,stroke:#808080,stroke-width:1px
-file_37_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
+file_37_a5d31205d55c70dbb753118aeba456b0("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py'>utils/database.py</a>")
 style file_37_a5d31205d55c70dbb753118aeba456b0 fill:none,stroke:#808080,stroke-width:1px
 de_37 --> file_37_a5d31205d55c70dbb753118aeba456b0
-file_37_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L27-L27'>L27</a>| sink_sql_db
-file_37_f3b82eca6148dc549059de4f35e70529("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py'>utils/data_manager.py</a>")
+file_37_a5d31205d55c70dbb753118aeba456b0 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L27-L27'>L27</a>| sink_sql_db
+file_37_f3b82eca6148dc549059de4f35e70529("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py'>utils/data_manager.py</a>")
 style file_37_f3b82eca6148dc549059de4f35e70529 fill:none,stroke:#808080,stroke-width:1px
 de_37 --> file_37_f3b82eca6148dc549059de4f35e70529
-file_37_f3b82eca6148dc549059de4f35e70529 --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L103-L103'>L103</a>| sink_sql_db
-file_37_1494986c7747c28afab49b7804e0927c("<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py'>scripts/seed_db.py</a>")
+file_37_f3b82eca6148dc549059de4f35e70529 --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L103-L103'>L103</a>| sink_sql_db
+file_37_1494986c7747c28afab49b7804e0927c("<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py'>scripts/seed_db.py</a>")
 style file_37_1494986c7747c28afab49b7804e0927c fill:none,stroke:#808080,stroke-width:1px
 de_37 --> file_37_1494986c7747c28afab49b7804e0927c
-file_37_1494986c7747c28afab49b7804e0927c --> |<a href='https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L168-L168'>L168</a>| sink_logs
+file_37_1494986c7747c28afab49b7804e0927c --> |<a href='https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L168-L168'>L168</a>| sink_logs
 sink_logs("<a href='#data-sink-logs'>Logs</a>")
 style sink_logs fill:#FF000026,stroke:#C80000,color:#C80000
 sink_sql_db("<a href='#data-sink-sql-db'>SQL Database</a>")
@@ -910,13 +910,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🟡 First Name</summary>
 
-1. First detected here in [scripts/seed_db.py:143:9](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L143-L143)
+1. First detected here in [scripts/seed_db.py:143:9](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L143-L143)
 
     ```python
     first_name
     ```
 
-2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L168-L168)
+2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L168-L168)
 
     ```python
     logger.debug(f"Added patient: {first_name} {last_name}")
@@ -926,13 +926,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🟡 Last Name</summary>
 
-1. First detected here in [scripts/seed_db.py:144:9](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L144-L144)
+1. First detected here in [scripts/seed_db.py:144:9](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L144-L144)
 
     ```python
     last_name
     ```
 
-2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L168-L168)
+2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L168-L168)
 
     ```python
     logger.debug(f"Added patient: {first_name} {last_name}")
@@ -951,13 +951,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🔴 Medical History</summary>
 
-1. First detected here in [pages/patient.py:59:9](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L59-L59)
+1. First detected here in [pages/patient.py:59:9](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L59-L59)
 
     ```python
     medical_history
     ```
 
-2. Placed inside a string and assigned to 'patient_context' in [pages/patient.py:284:17](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L284-L286)
+2. Placed inside a string and assigned to 'patient_context' in [pages/patient.py:284:17](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L284-L286)
 
     ```python
     patient_context = f"""
@@ -965,13 +965,13 @@ This section lists the data sinks detected and the data elements exposed to them
     """
     ```
 
-3. Wrapped in langchain_core.messages.SystemMessage and assigned to 'messages' in [pages/patient.py:308:25](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L308-L308)
+3. Wrapped in langchain_core.messages.SystemMessage and assigned to 'messages' in [pages/patient.py:308:25](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L308-L308)
 
     ```python
     messages = [SystemMessage(content=patient_context)]
     ```
 
-4. Exposed to OpenAI in [pages/patient.py:321:36](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L321-L321)
+4. Exposed to OpenAI in [pages/patient.py:321:36](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L321-L321)
 
     ```python
     llm.invoke(messages)
@@ -994,13 +994,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🔴 Medical Condition</summary>
 
-1. First detected here in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L34-L34)
+1. First detected here in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L34-L34)
 
     ```python
     allergies = Column(Text)
     ```
 
-2. Stored in SQL Database in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L34-L34)
+2. Stored in SQL Database in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L34-L34)
 
     ```python
     allergies = Column(Text)
@@ -1010,13 +1010,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🔴 Medical History</summary>
 
-1. First detected here in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L37-L37)
+1. First detected here in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L37-L37)
 
     ```python
     medical_history = Column(Text)
     ```
 
-2. Stored in SQL Database in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L37-L37)
+2. Stored in SQL Database in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L37-L37)
 
     ```python
     medical_history = Column(Text)
@@ -1028,65 +1028,65 @@ This section lists the data sinks detected and the data elements exposed to them
 
 </br>**Occurrence #1**
 
-1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387)
+1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L387-L387)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:387:58](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387)
+2. Stored in SQL Database in [utils/data_manager.py:387:58](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L387-L387)
 
     ```python
     func.count(MedicalRecord.id)
     ```
 </br>**Occurrence #2**
 
-1. First detected here in [utils/data_manager.py:248:45](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L248-L248)
+1. First detected here in [utils/data_manager.py:248:45](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L248-L248)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:248:34](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L248-L248)
+2. Stored in SQL Database in [utils/data_manager.py:248:34](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L248-L248)
 
     ```python
     func.count(MedicalRecord.id)
     ```
 </br>**Occurrence #3**
 
-1. First detected here in [utils/data_manager.py:496:54](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L496-L496)
+1. First detected here in [utils/data_manager.py:496:54](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L496-L496)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:496:43](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L496-L496)
+2. Stored in SQL Database in [utils/data_manager.py:496:43](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L496-L496)
 
     ```python
     func.count(MedicalRecord.id)
     ```
 </br>**Occurrence #4**
 
-1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387)
+1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L387-L387)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:389:32](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L389-L389)
+2. Stored in SQL Database in [utils/data_manager.py:389:32](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L389-L389)
 
     ```python
     func.count(MedicalRecord.id)
     ```
 </br>**Occurrence #5**
 
-1. First detected here in [utils/data_manager.py:239:45](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L239-L239)
+1. First detected here in [utils/data_manager.py:239:45](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L239-L239)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:239:34](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L239-L239)
+2. Stored in SQL Database in [utils/data_manager.py:239:34](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L239-L239)
 
     ```python
     func.count(MedicalRecord.id)
@@ -1096,13 +1096,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🟠 Blood Type</summary>
 
-1. First detected here in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L33-L33)
+1. First detected here in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L33-L33)
 
     ```python
     blood_type = Column(String(10))
     ```
 
-2. Stored in SQL Database in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L33-L33)
+2. Stored in SQL Database in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L33-L33)
 
     ```python
     blood_type = Column(String(10))
@@ -1112,13 +1112,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🟠 Medication</summary>
 
-1. First detected here in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L38-L38)
+1. First detected here in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L38-L38)
 
     ```python
     current_medications = Column(Text)
     ```
 
-2. Stored in SQL Database in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L38-L38)
+2. Stored in SQL Database in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L38-L38)
 
     ```python
     current_medications = Column(Text)
@@ -1128,13 +1128,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🟠 Phone Number</summary>
 
-1. First detected here in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L30-L30)
+1. First detected here in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L30-L30)
 
     ```python
     phone = Column(String(50))
     ```
 
-2. Stored in SQL Database in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L30-L30)
+2. Stored in SQL Database in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L30-L30)
 
     ```python
     phone = Column(String(50))
@@ -1144,13 +1144,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🟠 Sexual Orientation</summary>
 
-1. First detected here in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L29-L29)
+1. First detected here in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L29-L29)
 
     ```python
     gender = Column(String(50), nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L29-L29)
+2. Stored in SQL Database in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L29-L29)
 
     ```python
     gender = Column(String(50), nullable=False)
@@ -1160,13 +1160,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🟡 Date of Birth</summary>
 
-1. First detected here in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L28-L28)
+1. First detected here in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L28-L28)
 
     ```python
     date_of_birth = Column(Date, nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L28-L28)
+2. Stored in SQL Database in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L28-L28)
 
     ```python
     date_of_birth = Column(Date, nullable=False)
@@ -1176,13 +1176,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🟡 Email</summary>
 
-1. First detected here in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L31-L31)
+1. First detected here in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L31-L31)
 
     ```python
     email = Column(String(100))
     ```
 
-2. Stored in SQL Database in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L31-L31)
+2. Stored in SQL Database in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L31-L31)
 
     ```python
     email = Column(String(100))
@@ -1192,13 +1192,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🟡 Emergency Contact</summary>
 
-1. First detected here in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L36-L36)
+1. First detected here in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L36-L36)
 
     ```python
     emergency_contact_phone = Column(String(50))
     ```
 
-2. Stored in SQL Database in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L36-L36)
+2. Stored in SQL Database in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L36-L36)
 
     ```python
     emergency_contact_phone = Column(String(50))
@@ -1210,26 +1210,26 @@ This section lists the data sinks detected and the data elements exposed to them
 
 </br>**Occurrence #1**
 
-1. First detected here in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L26-L26)
+1. First detected here in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L26-L26)
 
     ```python
     first_name = Column(String(100), nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L26-L26)
+2. Stored in SQL Database in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L26-L26)
 
     ```python
     first_name = Column(String(100), nullable=False)
     ```
 </br>**Occurrence #2**
 
-1. First detected here in [utils/data_manager.py:102:33](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L102-L102)
+1. First detected here in [utils/data_manager.py:102:33](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L102-L102)
 
     ```python
     Patient.first_name
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:102:22](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L102-L102)
+2. Stored in SQL Database in [utils/data_manager.py:102:22](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L102-L102)
 
     ```python
     func.lower(Patient.first_name)
@@ -1241,26 +1241,26 @@ This section lists the data sinks detected and the data elements exposed to them
 
 </br>**Occurrence #1**
 
-1. First detected here in [utils/data_manager.py:103:35](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L103-L103)
+1. First detected here in [utils/data_manager.py:103:35](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L103-L103)
 
     ```python
     Patient.last_name
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:103:24](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L103-L103)
+2. Stored in SQL Database in [utils/data_manager.py:103:24](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L103-L103)
 
     ```python
     func.lower(Patient.last_name)
     ```
 </br>**Occurrence #2**
 
-1. First detected here in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L27-L27)
+1. First detected here in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L27-L27)
 
     ```python
     last_name = Column(String(100), nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L27-L27)
+2. Stored in SQL Database in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L27-L27)
 
     ```python
     last_name = Column(String(100), nullable=False)
@@ -1286,13 +1286,13 @@ This section lists the data sinks detected and the data elements exposed to them
 <details>
 <summary>🟠 Phone Number</summary>
 
-1. First detected here in [pages/patient.py:101:33](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L101-L101)
+1. First detected here in [pages/patient.py:101:33](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L101-L101)
 
     ```python
     "phone": phone
     ```
 
-2. Placed inside a dictionary and exposed to Sentry in [pages/patient.py:98:21](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L98-L102)
+2. Placed inside a dictionary and exposed to Sentry in [pages/patient.py:98:21](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L98-L102)
 
     ```python
     sentry_sdk.capture_message(
@@ -1326,7 +1326,7 @@ This section shows vulnerable dataflows where sensitive data reaches unsafe sink
 ---
 
 🟥 **CRITICAL:** Medical History exposed to OpenAI
-in [pages/patient.py:321:36](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L321-L321):
+in [pages/patient.py:321:36](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L321-L321):
 
 ```python
 llm.invoke(messages)
@@ -1340,13 +1340,13 @@ This issue was rated as 🟥 **CRITICAL** for exposing the following data elemen
 <details>
 <summary>🔴 Medical History</summary>
 
-1. First detected here in [pages/patient.py:59:9](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L59-L59)
+1. First detected here in [pages/patient.py:59:9](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L59-L59)
 
     ```python
     medical_history
     ```
 
-2. Placed inside a string and assigned to 'patient_context' in [pages/patient.py:284:17](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L284-L286)
+2. Placed inside a string and assigned to 'patient_context' in [pages/patient.py:284:17](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L284-L286)
 
     ```python
     patient_context = f"""
@@ -1354,13 +1354,13 @@ This issue was rated as 🟥 **CRITICAL** for exposing the following data elemen
     """
     ```
 
-3. Wrapped in langchain_core.messages.SystemMessage and assigned to 'messages' in [pages/patient.py:308:25](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L308-L308)
+3. Wrapped in langchain_core.messages.SystemMessage and assigned to 'messages' in [pages/patient.py:308:25](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L308-L308)
 
     ```python
     messages = [SystemMessage(content=patient_context)]
     ```
 
-4. Exposed to OpenAI in [pages/patient.py:321:36](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L321-L321)
+4. Exposed to OpenAI in [pages/patient.py:321:36](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L321-L321)
 
     ```python
     llm.invoke(messages)
@@ -1381,7 +1381,7 @@ For auto-closing vulnerabilities, see [https://docs.hounddog.ai/scanner/remediat
 ---
 
 🟧 **MEDIUM:** Phone Number exposed to Sentry
-in [pages/patient.py:98:21](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L98-L102):
+in [pages/patient.py:98:21](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L98-L102):
 
 ```python
 sentry_sdk.capture_message(
@@ -1399,13 +1399,13 @@ This issue was rated as 🟧 **MEDIUM** for exposing the following data element(
 <details>
 <summary>🟠 Phone Number</summary>
 
-1. First detected here in [pages/patient.py:101:33](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L101-L101)
+1. First detected here in [pages/patient.py:101:33](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L101-L101)
 
     ```python
     "phone": phone
     ```
 
-2. Placed inside a dictionary and exposed to Sentry in [pages/patient.py:98:21](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/pages/patient.py#L98-L102)
+2. Placed inside a dictionary and exposed to Sentry in [pages/patient.py:98:21](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L98-L102)
 
     ```python
     sentry_sdk.capture_message(
@@ -1430,7 +1430,7 @@ For auto-closing vulnerabilities, see [https://docs.hounddog.ai/scanner/remediat
 ---
 
 🟨 **LOW:** First Name and Last Name exposed to Logs
-in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L168-L168):
+in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L168-L168):
 
 ```python
 logger.debug(f"Added patient: {first_name} {last_name}")
@@ -1444,13 +1444,13 @@ This issue was rated as 🟨 **LOW** for exposing the following data element(s) 
 <details>
 <summary>🟡 First Name</summary>
 
-1. First detected here in [scripts/seed_db.py:143:9](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L143-L143)
+1. First detected here in [scripts/seed_db.py:143:9](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L143-L143)
 
     ```python
     first_name
     ```
 
-2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L168-L168)
+2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L168-L168)
 
     ```python
     logger.debug(f"Added patient: {first_name} {last_name}")
@@ -1460,13 +1460,13 @@ This issue was rated as 🟨 **LOW** for exposing the following data element(s) 
 <details>
 <summary>🟡 Last Name</summary>
 
-1. First detected here in [scripts/seed_db.py:144:9](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L144-L144)
+1. First detected here in [scripts/seed_db.py:144:9](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L144-L144)
 
     ```python
     last_name
     ```
 
-2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/scripts/seed_db.py#L168-L168)
+2. Placed inside a string and exposed to Logs in [scripts/seed_db.py:168:13](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/scripts/seed_db.py#L168-L168)
 
     ```python
     logger.debug(f"Added patient: {first_name} {last_name}")
@@ -1492,7 +1492,7 @@ This section shows dataflows where sensitive data reaches safe sinks or is expli
 ---
 
 🟩 **INFO:** First Name stored in SQL Database
-in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L26-L26):
+in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L26-L26):
 
 ```python
 first_name = Column(String(100), nullable=False)
@@ -1506,13 +1506,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟡 First Name</summary>
 
-1. First detected here in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L26-L26)
+1. First detected here in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L26-L26)
 
     ```python
     first_name = Column(String(100), nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L26-L26)
+2. Stored in SQL Database in [utils/database.py:26:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L26-L26)
 
     ```python
     first_name = Column(String(100), nullable=False)
@@ -1524,7 +1524,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Medical Record Number stored in SQL Database
-in [utils/data_manager.py:387:58](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387):
+in [utils/data_manager.py:387:58](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L387-L387):
 
 ```python
 func.count(MedicalRecord.id)
@@ -1538,13 +1538,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🔴 Medical Record Number</summary>
 
-1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387)
+1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L387-L387)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:387:58](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387)
+2. Stored in SQL Database in [utils/data_manager.py:387:58](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L387-L387)
 
     ```python
     func.count(MedicalRecord.id)
@@ -1556,7 +1556,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Date of Birth stored in SQL Database
-in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L28-L28):
+in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L28-L28):
 
 ```python
 date_of_birth = Column(Date, nullable=False)
@@ -1570,13 +1570,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟡 Date of Birth</summary>
 
-1. First detected here in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L28-L28)
+1. First detected here in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L28-L28)
 
     ```python
     date_of_birth = Column(Date, nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L28-L28)
+2. Stored in SQL Database in [utils/database.py:28:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L28-L28)
 
     ```python
     date_of_birth = Column(Date, nullable=False)
@@ -1588,7 +1588,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Medical Record Number stored in SQL Database
-in [utils/data_manager.py:248:34](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L248-L248):
+in [utils/data_manager.py:248:34](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L248-L248):
 
 ```python
 func.count(MedicalRecord.id)
@@ -1602,13 +1602,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🔴 Medical Record Number</summary>
 
-1. First detected here in [utils/data_manager.py:248:45](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L248-L248)
+1. First detected here in [utils/data_manager.py:248:45](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L248-L248)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:248:34](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L248-L248)
+2. Stored in SQL Database in [utils/data_manager.py:248:34](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L248-L248)
 
     ```python
     func.count(MedicalRecord.id)
@@ -1620,7 +1620,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Medical Record Number stored in SQL Database
-in [utils/data_manager.py:496:43](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L496-L496):
+in [utils/data_manager.py:496:43](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L496-L496):
 
 ```python
 func.count(MedicalRecord.id)
@@ -1634,13 +1634,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🔴 Medical Record Number</summary>
 
-1. First detected here in [utils/data_manager.py:496:54](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L496-L496)
+1. First detected here in [utils/data_manager.py:496:54](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L496-L496)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:496:43](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L496-L496)
+2. Stored in SQL Database in [utils/data_manager.py:496:43](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L496-L496)
 
     ```python
     func.count(MedicalRecord.id)
@@ -1652,7 +1652,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Medical Condition stored in SQL Database
-in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L34-L34):
+in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L34-L34):
 
 ```python
 allergies = Column(Text)
@@ -1666,13 +1666,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🔴 Medical Condition</summary>
 
-1. First detected here in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L34-L34)
+1. First detected here in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L34-L34)
 
     ```python
     allergies = Column(Text)
     ```
 
-2. Stored in SQL Database in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L34-L34)
+2. Stored in SQL Database in [utils/database.py:34:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L34-L34)
 
     ```python
     allergies = Column(Text)
@@ -1684,7 +1684,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** First Name stored in SQL Database
-in [utils/data_manager.py:102:22](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L102-L102):
+in [utils/data_manager.py:102:22](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L102-L102):
 
 ```python
 func.lower(Patient.first_name)
@@ -1698,13 +1698,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟡 First Name</summary>
 
-1. First detected here in [utils/data_manager.py:102:33](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L102-L102)
+1. First detected here in [utils/data_manager.py:102:33](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L102-L102)
 
     ```python
     Patient.first_name
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:102:22](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L102-L102)
+2. Stored in SQL Database in [utils/data_manager.py:102:22](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L102-L102)
 
     ```python
     func.lower(Patient.first_name)
@@ -1716,7 +1716,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Medical Record Number stored in SQL Database
-in [utils/data_manager.py:389:32](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L389-L389):
+in [utils/data_manager.py:389:32](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L389-L389):
 
 ```python
 func.count(MedicalRecord.id)
@@ -1730,13 +1730,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🔴 Medical Record Number</summary>
 
-1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L387-L387)
+1. First detected here in [utils/data_manager.py:387:69](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L387-L387)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:389:32](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L389-L389)
+2. Stored in SQL Database in [utils/data_manager.py:389:32](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L389-L389)
 
     ```python
     func.count(MedicalRecord.id)
@@ -1748,7 +1748,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Medical Record Number stored in SQL Database
-in [utils/data_manager.py:239:34](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L239-L239):
+in [utils/data_manager.py:239:34](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L239-L239):
 
 ```python
 func.count(MedicalRecord.id)
@@ -1762,13 +1762,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🔴 Medical Record Number</summary>
 
-1. First detected here in [utils/data_manager.py:239:45](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L239-L239)
+1. First detected here in [utils/data_manager.py:239:45](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L239-L239)
 
     ```python
     MedicalRecord.id
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:239:34](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L239-L239)
+2. Stored in SQL Database in [utils/data_manager.py:239:34](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L239-L239)
 
     ```python
     func.count(MedicalRecord.id)
@@ -1780,7 +1780,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Last Name stored in SQL Database
-in [utils/data_manager.py:103:24](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L103-L103):
+in [utils/data_manager.py:103:24](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L103-L103):
 
 ```python
 func.lower(Patient.last_name)
@@ -1794,13 +1794,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟡 Last Name</summary>
 
-1. First detected here in [utils/data_manager.py:103:35](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L103-L103)
+1. First detected here in [utils/data_manager.py:103:35](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L103-L103)
 
     ```python
     Patient.last_name
     ```
 
-2. Stored in SQL Database in [utils/data_manager.py:103:24](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/data_manager.py#L103-L103)
+2. Stored in SQL Database in [utils/data_manager.py:103:24](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/data_manager.py#L103-L103)
 
     ```python
     func.lower(Patient.last_name)
@@ -1812,7 +1812,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Phone Number stored in SQL Database
-in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L30-L30):
+in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L30-L30):
 
 ```python
 phone = Column(String(50))
@@ -1826,13 +1826,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟠 Phone Number</summary>
 
-1. First detected here in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L30-L30)
+1. First detected here in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L30-L30)
 
     ```python
     phone = Column(String(50))
     ```
 
-2. Stored in SQL Database in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L30-L30)
+2. Stored in SQL Database in [utils/database.py:30:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L30-L30)
 
     ```python
     phone = Column(String(50))
@@ -1844,7 +1844,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Medical History stored in SQL Database
-in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L37-L37):
+in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L37-L37):
 
 ```python
 medical_history = Column(Text)
@@ -1858,13 +1858,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🔴 Medical History</summary>
 
-1. First detected here in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L37-L37)
+1. First detected here in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L37-L37)
 
     ```python
     medical_history = Column(Text)
     ```
 
-2. Stored in SQL Database in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L37-L37)
+2. Stored in SQL Database in [utils/database.py:37:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L37-L37)
 
     ```python
     medical_history = Column(Text)
@@ -1876,7 +1876,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Emergency Contact stored in SQL Database
-in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L36-L36):
+in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L36-L36):
 
 ```python
 emergency_contact_phone = Column(String(50))
@@ -1890,13 +1890,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟡 Emergency Contact</summary>
 
-1. First detected here in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L36-L36)
+1. First detected here in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L36-L36)
 
     ```python
     emergency_contact_phone = Column(String(50))
     ```
 
-2. Stored in SQL Database in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L36-L36)
+2. Stored in SQL Database in [utils/database.py:36:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L36-L36)
 
     ```python
     emergency_contact_phone = Column(String(50))
@@ -1908,7 +1908,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Blood Type stored in SQL Database
-in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L33-L33):
+in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L33-L33):
 
 ```python
 blood_type = Column(String(10))
@@ -1922,13 +1922,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟠 Blood Type</summary>
 
-1. First detected here in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L33-L33)
+1. First detected here in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L33-L33)
 
     ```python
     blood_type = Column(String(10))
     ```
 
-2. Stored in SQL Database in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L33-L33)
+2. Stored in SQL Database in [utils/database.py:33:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L33-L33)
 
     ```python
     blood_type = Column(String(10))
@@ -1940,7 +1940,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Email stored in SQL Database
-in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L31-L31):
+in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L31-L31):
 
 ```python
 email = Column(String(100))
@@ -1954,13 +1954,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟡 Email</summary>
 
-1. First detected here in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L31-L31)
+1. First detected here in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L31-L31)
 
     ```python
     email = Column(String(100))
     ```
 
-2. Stored in SQL Database in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L31-L31)
+2. Stored in SQL Database in [utils/database.py:31:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L31-L31)
 
     ```python
     email = Column(String(100))
@@ -1972,7 +1972,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Medication stored in SQL Database
-in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L38-L38):
+in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L38-L38):
 
 ```python
 current_medications = Column(Text)
@@ -1986,13 +1986,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟠 Medication</summary>
 
-1. First detected here in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L38-L38)
+1. First detected here in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L38-L38)
 
     ```python
     current_medications = Column(Text)
     ```
 
-2. Stored in SQL Database in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L38-L38)
+2. Stored in SQL Database in [utils/database.py:38:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L38-L38)
 
     ```python
     current_medications = Column(Text)
@@ -2004,7 +2004,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Last Name stored in SQL Database
-in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L27-L27):
+in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L27-L27):
 
 ```python
 last_name = Column(String(100), nullable=False)
@@ -2018,13 +2018,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟡 Last Name</summary>
 
-1. First detected here in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L27-L27)
+1. First detected here in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L27-L27)
 
     ```python
     last_name = Column(String(100), nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L27-L27)
+2. Stored in SQL Database in [utils/database.py:27:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L27-L27)
 
     ```python
     last_name = Column(String(100), nullable=False)
@@ -2036,7 +2036,7 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 ---
 
 🟩 **INFO:** Sexual Orientation stored in SQL Database
-in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L29-L29):
+in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L29-L29):
 
 ```python
 gender = Column(String(50), nullable=False)
@@ -2050,13 +2050,13 @@ This issue was rated as 🟩 **INFO** for exposing the following data element(s)
 <details>
 <summary>🟠 Sexual Orientation</summary>
 
-1. First detected here in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L29-L29)
+1. First detected here in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L29-L29)
 
     ```python
     gender = Column(String(50), nullable=False)
     ```
 
-2. Stored in SQL Database in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python-app/blob/781c916790f5/utils/database.py#L29-L29)
+2. Stored in SQL Database in [utils/database.py:29:5](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/utils/database.py#L29-L29)
 
     ```python
     gender = Column(String(50), nullable=False)
