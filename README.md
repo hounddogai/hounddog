@@ -31,11 +31,11 @@ With the self-hosted or cloud platform, your organization's data map becomes que
 - A privacy engineer asks which third-party integrations receive PII.
 - An AI governance team asks which AI integrations exist and what sensitive data reaches them.
 
-![HoundDog.ai data map showing data elements, dataflows, and data sinks across scanned repositories](interactive-org-wide-data-map.png)
+![HoundDog.ai data map showing data elements, dataflows, and data sinks across scanned repositories](images/interactive-org-wide-data-map.png)
 
 For example, *"Which third-party and AI integrations have confirmed sensitive data flows?"* queries the underlying dataflow graph and returns the relevant integrations, sensitive data elements, repositories, code locations, and risk status.
 
-![HoundDog.ai assistant answering a plain-English question with a filtered view of risky third-party and AI dataflows](assistant-dataflow-query.png)
+![HoundDog.ai assistant answering a plain-English question with a filtered view of risky third-party and AI dataflows](images/assistant-dataflow-query.png)
 
 The data map becomes more than documentation. It becomes an interface to sensitive data flow evidence across your codebases, refreshed on every commit, across every repo.
 
