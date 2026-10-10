@@ -1,101 +1,81 @@
-# HoundDog.ai - Privacy Code Scanner and Dataflow Context Engine
+# HoundDog.ai
 
-[HoundDog.ai](https://hounddog.ai) is an ultra-fast, deterministic context engine that scans source code and provides
-your AI agents where sensitive data flows, and how your APIs and services connect.
+**Deterministic Privacy Code Scanner for GDPR Data Mapping Evidence and Proactive AI Governance**
 
-## Two capabilities, one scan
+HoundDog.ai builds lightweight, Rust-based code scanners that give you a living, code-derived view of the services, APIs, data flows, and external integrations across the software you build. Deterministic analysis, refreshed on every commit, across every repo.
 
-### Privacy Code Scanner
+> Need org-wide gRPC service mapping for your AI coding agents, covering every service, API, and field across monorepos and microservices? See [ProtoMap](https://github.com/hounddogai/protomap).
 
-Detects sensitive data flows and leaks in your code, mapping 100+ sensitive data elements across 800+ data sinks.
+## Privacy Code Scanner
 
-**It answers questions such as:**
+The [Privacy Code Scanner](https://hounddog.ai/privacy-code-scanning/) provides deterministic, code-level evidence of sensitive data flows across logs, storage, APIs, third parties, and AI integrations.
 
-- What data is processed? (e.g., personal data, financial data, health data)
-- Where is data stored? (e.g., logs, files, databases)
-- Who is data shared with? (e.g., AWS, Stripe, internal microservices)
+Surveys go stale. Privacy platforms infer flows after deployment. AI-only approaches produce inconsistent evidence and waste tokens on discovery. Our engine continuously maps what developers actually implement, including shadow AI and SDKs, with accurate, reproducible results as code changes.
 
-**It is useful for:**
+A fast, deterministic engine handles discovery, and AI is used selectively for reasoning and context. That means predictable performance and minimal latency, so the scanner runs directly in CI on standard CPU infrastructure.
 
-- Early prevention of data leaks during development.
-- Automated and evidence-based data mapping for privacy compliance (e.g., GDPR, HIPAA).
-- Reducing engineering fatigue, stale data inventories, and regulatory fines.
+It powers Replit's Security Agent at massive scale (100k daily scans) and is used by Fortune 1000 companies across technology, finance, and healthcare.
 
-### Dataflow Context Engine
+## Use Cases
 
-Builds a live, cross-repo catalog of every gRPC and Apache Thrift connections, so AI coding agents have reliable context
-instead of rediscovering it on every prompt.
+- **[Prevent sensitive data leaks](https://hounddog.ai/data-minimization-and-pii-leak-prevention/).** Catch leaks into application logs and other risky mediums before they reach production.
+- **[Enable proactive AI governance](https://hounddog.ai/ai-governance-and-shadow-ai-discovery/).** Discover AI integrations and see exactly what types of data are shared with them.
+- **[Ground GDPR data mapping in code evidence](https://hounddog.ai/gdpr-data-mapping-ropa-privacy-assessments/).** Give privacy teams deterministic evidence of actual data flows so they can prevent risks instead of documenting them after the fact.
+- **[Keep RoPA updated at development speed](https://hounddog.ai/records-of-processing-activities-ropa/).** Reflect new categories of personal data and subprocessors as developers introduce them, instead of lagging one or two quarters behind the code.
 
-**It answers questions such as:**
+## HoundDog.ai in Action
 
-- What gRPC/Thrift services exist, and which methods do they expose?
-- Where is each service defined, and who calls it? (file, line, branch, commit)
-- What breaks across repositories if I change or remove a field or an RPC?
+With the self-hosted or cloud platform, your organization's data map becomes queryable in plain English:
 
-**It is useful for:**
+- An AppSec engineer asks where auth tokens are leaking in plaintext into application logs.
+- A privacy engineer asks which third-party integrations receive PII.
+- An AI governance team asks which AI integrations exist and what sensitive data reaches them.
 
-- Giving AI coding agents deterministic, up-to-date context to reason about API and service changes.
-- Reducing wasted tokens and time spent re-analyzing the codebase on every prompt.
-- Keeping a service catalog accurate at the speed of development, with no manual upkeep.
+![HoundDog.ai data map showing data elements, dataflows, and data sinks across scanned repositories](interactive-org-wide-data-map.png)
 
-**HoundDog.ai in action:**
+For example, *"Which third-party and AI integrations have confirmed sensitive data flows?"* queries the underlying dataflow graph and returns the relevant integrations, sensitive data elements, repositories, code locations, and risk status.
 
-[![Demo GIF](https://raw.githubusercontent.com/hounddogai/hounddog/main/demo.gif)](https://raw.githubusercontent.com/hounddogai/hounddog/main/demo.gif)
+![HoundDog.ai assistant answering a plain-English question with a filtered view of risky third-party and AI dataflows](assistant-dataflow-query.png)
 
-**Technical highlights:**
+The data map becomes more than documentation. It becomes an interface to sensitive data flow evidence across your codebases, refreshed on every commit, across every repo.
 
-- Runs as a standalone binary on your machine. Your code never leaves your environment by default. For
-  organization-wide, in-network deployment,
-  see [self-hosted installation](https://github.com/hounddogai/hounddog/tree/main/self-hosted).
-- Fast and ready for large codebases. It can scan 1 million+ lines of code in seconds on modern laptops.
-- Deterministic static analysis. The same commit produces the same result, every time.
-- Supports 100s of [data elements](https://github.com/hounddogai/hounddog/blob/main/data-elements.md)
-  and [sinks](https://github.com/hounddogai/hounddog/blob/main/data-sinks.md) out of the box.
+## Technical Highlights
 
-Check out the [sample Markdown report](https://github.com/hounddogai/hounddog/blob/main/sample-report.md)
-and [FAQ](#faq) for more information.
+- **Deterministic static analysis.** The same commit produces the same result, every time. No prompt sensitivity, and your AI tokens are saved for higher-value work like reasoning over detected flows.
+- **Deep dataflow tracing.** Tracks sensitive data such as PII, PHI, CHD, and auth tokens through transformations across files, functions, and procedures, regardless of nesting depth. Flows are flagged when they reach a sink, whether controlled (a database) or high-risk (an LLM prompt or application logs).
+- **Broad coverage, fully customizable.** [100+ sensitive data types](https://github.com/hounddogai/hounddog/blob/main/data-elements.md) and [800+ data sinks](https://github.com/hounddogai/hounddog/blob/main/data-sinks.md) supported out of the box. You can also [create your own data element and data sink rules](https://docs.hounddog.ai/platform/scanner-rules/).
+- **Built for large codebases.** Scans 1M+ lines of code in seconds on modern laptops.
+- **Optional AI integration (highly recommended).** Uses your organization's own AI provider and API key (see [FAQ](#does-your-scanner-use-ai)). AI reduces false positives, adds context, and lets you query the data map in plain English. It never receives your full source code, only dataflow traces and relevant transformation snippets.
 
 ## Installation
 
-Install HoundDog.ai on a developer machine using the commands below. To run it across your organization inside your own
-network, see the [self-hosted installation guide](https://github.com/hounddogai/hounddog/tree/main/self-hosted).
+### Self-Hosted Platform + CLI Scanner (recommended)
 
-### Linux and macOS
+Follow the [self-hosted platform installation instructions](https://github.com/hounddogai/hounddog/tree/main/self-hosted). The platform runs in lightweight Docker containers on a developer's machine (ideal for POCs) and includes the CLI scanner.
 
-```
+[Enable the AI integration](https://docs.hounddog.ai/platform/ai-settings/) with your organization's API key for the full experience: the scanner discovers, AI reasons over the detected flows, and you query the results in plain English.
+
+### CLI Scanner Only
+
+For use with the cloud platform, or if you prefer results in the console or as Markdown reports.
+
+**Linux and macOS**
+
+```sh
 curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh
 ```
 
-To install a specific version:
+**Windows**
 
-```
-curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh -s -- --version 1.2.3
-```
-
-### Windows
-
-```
+```powershell
 irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
 ```
 
-To install a specific version:
-
-```
-$env:HOUNDDOG_VERSION = '1.2.3'; irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
-```
-
-Alternatively, you can download the binary directly from the [releases](https://github.com/hounddogai/hounddog/releases)
-page.
-
-### Self-Hosted (Organization-Wide)
-
-To deploy HoundDog.ai across your organization inside your own network, with SCM integration, automated scans, and a
-centralized dataflow and API context catalog, follow the
-[self-hosted installation guide](https://github.com/hounddogai/hounddog/tree/main/self-hosted).
+You can also download the binary from the [releases page](https://github.com/hounddogai/hounddog/releases).
 
 ### Uninstallation
 
-```
+```sh
 # Linux and macOS
 rm -rf ~/.hounddog
 
@@ -105,194 +85,75 @@ Remove-Item -Recurse -Force "$env:LocalAppData\hounddog"
 
 ## Usage
 
-```
+```sh
 hounddog scan [OPTIONS] [PATH]
 ```
 
-A single scan produces both the privacy dataflow map and the API/service context for the target codebase.
+- **Self-hosted platform:** results appear automatically at http://localhost:3300 on the same machine.
+- **CLI only:** results are displayed in the console.
 
-### Privacy Code Scanner
+For a quick demo, scan our Python test repository:
 
-For a quick demonstration, scan our [Python test repository](https://github.com/hounddogai/hounddog-test-python):
-
-```
-# Clone the test repository
+```sh
 git clone https://github.com/hounddogai/hounddog-test-python
-
-# Scan the test repository
 hounddog scan hounddog-test-python
 ```
 
-By default, only *risky* dataflows are shown to minimize noise. Use `--severity=all` to see everything:
+Generate a Markdown report with `--output-format=markdown`:
 
-```
-hounddog scan hounddog-test-python --severity=all
-```
-
-Use `--trace` to see detailed dataflow traces (one of our coolest features and useful for debugging):
-
-```
-hounddog scan hounddog-test-python --trace
-```
-
-Use `--output-format=markdown` to generate a Markdown report:
-
-```
+```sh
 hounddog scan hounddog-test-python --output-format=markdown --output-path=report.md
 ```
 
-We recommend
-the [Markdown Viewer](https://chromewebstore.google.com/detail/markdown-viewer/ckkdlimhmcjmikdlpkmbgfkaikojcbjk) Chrome
-extension for viewing it (see [setup](https://docs.hounddog.ai/scanner/markdown-report)
-and [sample report](https://github.com/hounddogai/hounddog/blob/main/sample-report.md)).
-
-### Dataflow Context Engine
-
-To see the API and service context across a polyglot codebase, scan our
-[monorepo test repository](https://github.com/hounddogai/hounddog-test-monorepo), which spans gRPC and Thrift services
-in Python, TypeScript, C#, Java, Go, and Rust:
-
-```
-# Clone the test repository
-git clone https://github.com/hounddogai/hounddog-test-monorepo
-
-# Scan the test repository
-hounddog scan hounddog-test-monorepo
-```
-
-Alongside the dataflow map, the scan prints a service catalog for each protocol. It resolves every service, its method
-definitions, and the servers and clients that implement and consume it, down to the file, line, branch, and commit.
-Across a whole organization, the
-[self-hosted deployment](https://github.com/hounddogai/hounddog/tree/main/self-hosted) unifies these per-repo catalogs
-into a single cross-repo catalog and refreshes it in CI on every pull request. A HoundDog.ai MCP server that will expose
-this context directly to AI coding agents is coming soon.
+We recommend the Markdown Viewer Chrome extension for viewing reports (see [setup and sample report](https://github.com/hounddogai/hounddog/blob/main/sample-report.md)).
 
 ### More Options
 
-To see the up-to-date list of supported data elements in HTML format:
-
-```
-hounddog data-elements
-```
-
-To see the up-to-date list of supported data sinks in HTML format:
-
-```
-hounddog data-sinks
+```sh
+hounddog data-elements           # Supported data elements (HTML)
+hounddog data-sinks              # Supported data sinks (HTML)
+hounddog [SUBCOMMAND] --help     # All subcommands and options
 ```
 
-Use `--help` to see all subcommands and options:
+## Pricing
 
-```
-hounddog [SUBCOMMAND] --help
-```
-
-## Features
-
-HoundDog.ai has two capability pillars. Both run from the same `hounddog scan` and are available in a free tier on a
-developer machine or across your organization via
-[self-hosted installation](https://github.com/hounddogai/hounddog/tree/main/self-hosted).
-
-### Privacy Code Scanner
-
-|                     | Free                                                                                                                                                                                                                              | Enterprise                                                                                                                                                                                                                        |
-|---------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Supported Languages | Python, JavaScript, TypeScript                                                                                                                                                                                                    | Languages in Free + C#, Go, Java, SQL, OpenAPI                                                                                                                                                                                    |
-| Usage Options       | CLI, IDE                                                                                                                                                                                                                          | CLI, IDE, GitHub Integration (Automated Scans, PR Reviews)                                                                                                                                                                        |
-| IDE Plugins         | [VS Code](https://marketplace.visualstudio.com/items?itemName=hounddog.hounddog-scanner), [JetBrains](https://plugins.jetbrains.com/plugin/25684-hounddog-ai), [Cursor](https://open-vsx.org/extension/hounddog/hounddog-scanner) | [VS Code](https://marketplace.visualstudio.com/items?itemName=hounddog.hounddog-scanner), [JetBrains](https://plugins.jetbrains.com/plugin/25684-hounddog-ai), [Cursor](https://open-vsx.org/extension/hounddog/hounddog-scanner) |
-| Dataflow Detection  | Limited Coverage                                                                                                                                                                                                                  | Full Coverage                                                                                                                                                                                                                     |
-| Rule Customization  | No                                                                                                                                                                                                                                | Custom Data Element and Data Sink Rules                                                                                                                                                                                           |
-| Privacy Reports     | No                                                                                                                                                                                                                                | RoPA                                                                                                                                                                                                                   |
-| Platform            | No                                                                                                                                                                                                                                | Issue Tracking, Alerts, SSO, RBAC, Audit Logs                                                                                                                                                                                     |
-| On-Prem Deployment  | No                                                                                                                                                                                                                                | [Included](https://github.com/hounddogai/hounddog/tree/main/self-hosted)                                                                                                                                                          |
-| Support             | GitHub Issues + Email                                                                                                                                                                                                             | Priority Support with SLA + Dedicated Slack Channel                                                                                                                                                                               |
-
-### Dataflow Context Engine
-
-|                     | Local (Free)                                                                                                            | Centralized (Enterprise)                                                                                          |
-|---------------------|-------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| Supported Protocols | gRPC, Thrift (REST on the roadmap)                                                                                      | gRPC, Thrift (REST on the roadmap)                                                                                |
-| Supported Languages | Python, JavaScript, TypeScript, C#, Go, Java, Rust                                                                      | Python, JavaScript, TypeScript, C#, Go, Java, Rust                                                                |
-| Scope               | Whatever code is checked out locally                                                                                    | Every selected repository across the organization, no local checkout required                                     |
-| Catalog Contents    | Per-scan service catalog: services, method definitions, servers, and clients resolved to file, line, branch, and commit | Same, unified into one cross-repo catalog across the entire estate                                                |
-| Refresh             | On demand, per scan                                                                                                     | Automatically in CI on every pull request                                                                         |
-| Agent Access        | Structured JSON output today; local MCP server coming soon                                                              | API and web UI today; centralized MCP server coming soon                                                          |
-| SCM Integration     | No                                                                                                                      | GitHub, GitLab, Bitbucket                                                                                         |
-| Deployment          | Runs on the developer's machine                                                                                         | Cloud or [on-prem, self-hosted in your own network](https://github.com/hounddogai/hounddog/tree/main/self-hosted) |
-| Access Controls     | No                                                                                                                      | SSO, RBAC, Audit Logs                                                                                             |
-| Support             | GitHub Issues + Email                                                                                                   | Priority Support with SLA + Dedicated Slack Channel                                                               |
+See the [HoundDog.ai Pricing Page](https://hounddog.ai/pricing/).
 
 ## FAQ
 
 ### How can I trust your scanner?
 
-Visit our [Trust Center](https://security.hounddog.ai/) to view our latest SOC2 report, penetration testing results, and
-SBOM details.
+Visit our [Trust Center](https://security.hounddog.ai/) for our latest SOC 2 report, penetration testing results, and SBOM details.
 
 ### Does your scanner send my code to external servers?
 
-Not by default. Scans run locally, and your code never leaves your machine. For organization-wide use, the
-[self-hosted deployment](https://github.com/hounddogai/hounddog/tree/main/self-hosted) runs entirely inside your own
-network, so code and the resulting catalog stay within your infrastructure. If your organization explicitly enables the
-optional Enterprise AI review, HoundDog.ai sends the relevant finding, trace, and source context directly to the AI
-provider your organization configured.
+Not by default. Scans run locally and your code never leaves your machine. For organization-wide use, the self-hosted deployment runs entirely inside your network, so code and the resulting catalog stay within your infrastructure. If your organization enables the optional AI integration, HoundDog.ai sends only the relevant finding, trace, and source context directly to the AI provider you configured.
 
 ### Does your scanner use AI?
 
-Scans themselves run on a deterministic static analysis engine. Nothing from your scan is sent to an AI provider unless
-your organization explicitly enables the optional Enterprise AI review. This keeps scans fast, cheap, and free of
-hallucinations. It applies to both pillars: the privacy data map and the API/service context are both produced
-deterministically.
+Scans run on a deterministic static analysis engine, which keeps them fast, cheap, and free of hallucinations. Nothing from a scan is sent to an AI provider unless your organization enables the optional AI integration.
 
-HoundDog.ai uses AI internally to help generate and update data detection rules before those rules are shipped with the
-scanner. Customer code and scan results are not used for this process.
+**Optional AI integration (Enterprise, cloud and self-hosted).** Your organization chooses its own provider (AWS Bedrock, Anthropic, OpenAI, Google Gemini, or Microsoft Foundry) and API key. When enabled, findings, traces, and source context go directly to that provider under the DPA and terms your organization holds with it. The AI layer auto-closes false positives, adjusts severities, and adds context to findings the scanner already produced. The deterministic scan still runs in your CI on inexpensive CPU with negligible impact on CI time.
 
-Separately, the [Enterprise](#features) offering (both cloud
-and [on-prem, self-hosted](https://github.com/hounddogai/hounddog/tree/main/self-hosted))
-includes an optional AI integration layered on top of the static findings. Your organization chooses and configures its
-own AI provider, AWS Bedrock, Anthropic, OpenAI, Google Gemini, or Microsoft Foundry, using its own API key. When
-enabled, HoundDog.ai sends the relevant finding, trace, and source context directly to that provider under the DPA and
-other terms your organization holds with the provider. HoundDog.ai does not use customer code, findings, prompts, or
-responses to train AI models. This optional layer auto-closes false positives, adjusts severities, and adds context to
-the findings the scanner already produced. The deterministic scan continues to run within your CI environment on
-inexpensive CPU with negligible impact on CI time.
+**Rule development.** HoundDog.ai uses AI internally to help generate and update detection rules before they ship with the scanner. Customer code and scan results are never used for this, and HoundDog.ai does not use customer code, findings, prompts, or responses to train AI models.
 
-### What is the Dataflow Context Engine, and how does it help AI coding agents?
+### Why not just use an LLM?
 
-Standards like OpenAPI, protobuf, and Thrift IDLs describe what an API is, but not which services consume it, which
-fields are actually used, or what breaks when something changes. Without that context, an AI coding agent rediscovers it
-on every prompt by grepping repositories and generating throwaway scripts, which is slow, expensive, and often
-incomplete.
+We recommend using both. HoundDog.ai is built to make your AI more effective, not to replace it.
 
-HoundDog.ai builds this context deterministically from your code: every service, method, and client call site, resolved
-to a file, line, branch, and commit. The catalog is available today through structured JSON output and the Enterprise
-API Catalog. A HoundDog.ai MCP server that will expose this context directly to agents is coming soon. This matters most
-for smaller or self-hosted models, which are weaker at cross-repo dependency discovery and benefit most from being
-handed accurate context. For organization-wide, cross-repo context refreshed in CI, see the
-[self-hosted installation guide](https://github.com/hounddogai/hounddog/tree/main/self-hosted).
+- **Spend tokens on reasoning, not discovery.** The scanner finds and traces sensitive data flows, so your AI tokens go to higher-value work like assessing risk, reviewing flows, and answering questions about your data map.
+- **Evidence you can stand behind.** The same commit always produces the same result. That reproducibility makes findings usable as evidence for GDPR data mapping, RoPA, and audits, where AI-generated output that varies with the prompt may not yet be accepted.
+- **Easy to roll out org-wide.** The Rust scanner runs in CI on standard CPU infrastructure, across every repo and every commit, with negligible impact on build times.
 
-### Why should I use your scanner instead of a large-language model?
+### How is this different from secrets scanners like GitLeaks or TruffleHog?
 
-LLMs can discover issues that traditional SAST tools miss, but they are slow, expensive, and non-deterministic. SAST
-tools are faster, cheaper, and predictable, but require high-effort rule maintenance and suffer from high false positive
-rates.
-
-HoundDog.ai’s vision is to combine the strengths of both approaches. Our scanning engine is fully rule-based and
-deterministic, with a rule specification expressive enough to model real-world code at compiler-level accuracy. AI is
-used selectively to scale coverage across thousands of code patterns without sacrificing performance, reliability, and
-trust.
-
-### How is your scanner different from secrets scanning tools like GitLeaks or TruffleHog?
-
-Secrets scanning tools look for credentials that are hardcoded directly in code, such as API keys, passwords, or tokens.
-For example:
+Secrets scanners find credentials hardcoded in code, such as API keys, passwords, or tokens:
 
 ```python
 exposed_api_key = "sk-proj-1234567890-abcdefghijklmnopqrstuvwxyz"
 ```
 
-HoundDog.ai, on the other hand, focuses on how sensitive data actually flows through code. It tracks values across
-various code paths such as assignment statements and transformations. For example:
+HoundDog.ai tracks how sensitive data actually *flows* through code, across assignments and transformations:
 
 ```python
 import logging
@@ -310,25 +171,24 @@ bar = {"message": f"api_key={foo}".strip()}
 logger.info("data=%s", bar)
 ```
 
-### How is your scanner different from Semgrep or CodeQL?
+### How is this different from Semgrep or CodeQL?
 
-DIY SAST tools like Semgrep and CodeQL are powerful and highly customizable, but their rules need significant upfront
-investment to learn and maintain.
+Semgrep and CodeQL are powerful and highly customizable, but their rules take significant upfront investment to learn and maintain.
 
-HoundDog.ai is a turnkey solution that provides broad, high-quality coverage of data elements and sinks out of the box,
-greatly reducing the rule authoring burden. It is designed specifically for dataflow analysis, scaling efficiently to
-large codebases, and detecting complex data flows that general-purpose solutions miss.
+HoundDog.ai works out of the box: broad, high-quality coverage of data elements and sinks from day one, with [custom rules](https://docs.hounddog.ai/platform/scanner-rules/) when you need them. It is purpose-built for dataflow analysis, scales efficiently to large codebases, and detects complex flows that general-purpose tools miss.
 
 ### Your scanner missed a dataflow!
 
-Our rules are constantly evolving, and we are working hard on improving them. Please let us know any false positives or
-negatives, and we will be happy to address them.
+Our rules are constantly evolving. Please report any false positives or negatives and we will address them.
+
+## Documentation
+
+See the [HoundDog.ai documentation](https://docs.hounddog.ai/).
 
 ## License
 
-View [license information](https://hounddog.ai/terms-of-service/) for HoundDog.ai's software.
+See [license information](https://hounddog.ai/terms-of-service/) for HoundDog.ai's software.
 
 ## Contact
 
-If you have any questions or feedback, please create a [GitHub issue](https://github.com/hounddogai/hounddog/issues) or
-email us at <support@hounddog.ai>.
+Questions or feedback? Open a GitHub issue or email support@hounddog.ai.
