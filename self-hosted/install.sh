@@ -111,7 +111,7 @@ if [ -e .env ] || [ -L .env ]; then
 fi
 
 heading "CHOOSE INSTALLATION"
-say "1) Trial: Uses the bundled Postgres and creates a CLI API key."
+say "1) Trial: Uses the bundled Postgres and creates an API key for the CLI to scan with."
 say "2) Production: Uses your Postgres server."
 while :; do
     prompt "Choose 1 or 2 [default: 1]:"
@@ -141,24 +141,25 @@ postgres_url=""
 postgres_user="hounddog"
 postgres_database="hounddog"
 postgres_password="$(generate_secret 32)"
-personal_api_key=""
-personal_api_key_id=""
-personal_api_key_hash=""
-personal_api_key_prefix=""
+cli_api_key=""
+cli_api_key_id=""
+cli_api_key_hash=""
+cli_api_key_prefix=""
 
 heading "GENERATE SECRETS"
 say "Generating the encryption key and one-time setup key..."
 secret_key="$(generate_secret 48)"
 setup_key="$(generate_secret 48)"
 if [ "$install_type" = "1" ]; then
-    say "Generating a Postgres password and personal CLI API key..."
+    say "Generating a Postgres password and an organization API key for the CLI..."
     # Compose expands these placeholders when it reads the generated .env file.
     # shellcheck disable=SC2016
     postgres_url='postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}'
-    personal_api_key="hd_pk_$(generate_secret 32)"
-    personal_api_key_id="$(generate_secret 24)"
-    personal_api_key_hash="$(hash_secret "$personal_api_key")"
-    personal_api_key_prefix="${personal_api_key:0:16}"
+    # First-run setup stores the key as an organization API key, which can only scan and expires after a year.
+    cli_api_key="hd_ok_$(generate_secret 32)"
+    cli_api_key_id="$(generate_secret 24)"
+    cli_api_key_hash="$(hash_secret "$cli_api_key")"
+    cli_api_key_prefix="${cli_api_key:0:16}"
 else
     say "Production installs create their CLI API key in the web app after setup."
     say ""
@@ -191,9 +192,9 @@ server_env_temp="$(mktemp "$(pwd)/.env.tmp.XXXXXX")"
         printf 'POSTGRES_PASSWORD=%s\n' "$postgres_password"
         printf 'POSTGRES_DB=%s\n' "$postgres_database"
         printf 'HOUNDDOG_POSTGRES_URL=%s\n\n' "$postgres_url"
-        printf 'HOUNDDOG_INITIAL_PERSONAL_API_KEY_ID=%s\n' "$personal_api_key_id"
-        printf 'HOUNDDOG_INITIAL_PERSONAL_API_KEY_HASH=%s\n' "$personal_api_key_hash"
-        printf 'HOUNDDOG_INITIAL_PERSONAL_API_KEY_PREFIX=%s\n' "$personal_api_key_prefix"
+        printf 'HOUNDDOG_INITIAL_API_KEY_ID=%s\n' "$cli_api_key_id"
+        printf 'HOUNDDOG_INITIAL_API_KEY_HASH=%s\n' "$cli_api_key_hash"
+        printf 'HOUNDDOG_INITIAL_API_KEY_PREFIX=%s\n' "$cli_api_key_prefix"
     else
         printf "HOUNDDOG_POSTGRES_URL='%s'\n" "$postgres_url"
     fi
@@ -217,7 +218,7 @@ cli_config_temp="$(mktemp "${config_dir}/.env.tmp.XXXXXX")"
 {
     printf "export HOUNDDOG_ENV='self-hosted'\n"
     printf "export HOUNDDOG_URL='%s'\n" "$hounddog_url"
-    printf "export HOUNDDOG_API_KEY='%s'\n" "$personal_api_key"
+    printf "export HOUNDDOG_API_KEY='%s'\n" "$cli_api_key"
 } > "$cli_config_temp"
 chmod 600 "$cli_config_temp"
 mv "$cli_config_temp" "$config_env"
@@ -236,6 +237,9 @@ heading "INSTALLATION COMPLETE"
 say "HoundDog.ai is running at ${hounddog_url}."
 say "Server configuration: $(pwd)/.env"
 say "CLI configuration: ${config_env}"
+say ""
+say "Keep a private backup of HOUNDDOG_SECRET_KEY from $(pwd)/.env. It encrypts the credentials stored in the database,"
+say "which cannot be decrypted without it."
 
 install_cli
 
@@ -248,7 +252,8 @@ else
 fi
 if [ "$install_type" = "1" ]; then
     say "3. Open a new terminal after setup and run: hounddog scan /path/to/repository"
+    say "   The CLI's organization API key expires a year after setup. Create a new one under API Keys before then."
 else
-    say "3. Create a personal API key in HoundDog.ai and add it to ${config_env}."
+    say "3. Create an organization API key in HoundDog.ai and add it to ${config_env}."
     say "4. Open a new terminal and run: hounddog scan /path/to/repository"
 fi

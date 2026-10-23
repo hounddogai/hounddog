@@ -27,6 +27,26 @@ function Test-HoundDogVersionFormat {
     return $Candidate -match '^\d+\.\d+\.\d+(-(alpha|beta))?$'
 }
 
+# Tell running programs, such as Explorer, that the environment changed, so the programs they start see the new PATH.
+# The Environment API does this for its own writes; the installer writes the registry directly.
+function Send-EnvironmentChange {
+    try {
+        if (-not ('HoundDogInstaller.NativeMethods' -as [type])) {
+            Add-Type -Namespace HoundDogInstaller -Name NativeMethods -MemberDefinition @'
+[DllImport("user32.dll", CharSet = CharSet.Unicode)]
+public static extern IntPtr SendMessageTimeout(
+    IntPtr hWnd, uint msg, UIntPtr wParam, string lParam, uint flags, uint timeout, out UIntPtr result);
+'@
+        }
+        $Result = [UIntPtr]::Zero
+        # HWND_BROADCAST and WM_SETTINGCHANGE, giving up on a hung window (SMTO_ABORTIFHUNG) after 5 seconds.
+        [void][HoundDogInstaller.NativeMethods]::SendMessageTimeout(
+            [IntPtr]0xffff, 0x1A, [UIntPtr]::Zero, 'Environment', 2, 5000, [ref]$Result)
+    } catch {
+        Write-Warning "Open a new terminal, or sign in again, to use the updated PATH: $($_.Exception.Message)"
+    }
+}
+
 function Get-PathWithEntryFirst {
     param(
         [Parameter(Mandatory = $false)]
@@ -198,16 +218,33 @@ try {
         $BackupInstallPath = $null
     }
 
-    # Prepend the installation directory in both the persistent and current-session PATH values.
-    $CurrentPath = [System.Environment]::GetEnvironmentVariable('Path', $PathScope)
-    $NewPath = Get-PathWithEntryFirst -PathValue $CurrentPath -Entry $InstallPath
-    if ($NewPath -ne $CurrentPath) {
-        try {
-            [Environment]::SetEnvironmentVariable('Path', $NewPath, $PathScope)
+    # Prepend the installation directory in both the persistent and current-session PATH values. The persistent value is
+    # read and written in the registry as stored: the Environment API expands entries such as %SystemRoot% and saves the
+    # whole value as a plain string, which would freeze those entries for every program started afterwards.
+    $EnvironmentKey = if ($PathScope -eq 'Machine') {
+        [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(
+            'SYSTEM\CurrentControlSet\Control\Session Manager\Environment', $true)
+    } else {
+        [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
+    }
+    if (-not $EnvironmentKey) {
+        throw "Failed to open the $PathScope environment in the registry."
+    }
+    try {
+        $CurrentPath = [string]$EnvironmentKey.GetValue(
+            'Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
+        $NewPath = Get-PathWithEntryFirst -PathValue $CurrentPath -Entry $InstallPath
+        if ($NewPath -ne $CurrentPath) {
+            try {
+                $EnvironmentKey.SetValue('Path', $NewPath, [Microsoft.Win32.RegistryValueKind]::ExpandString)
+            } catch {
+                throw "Failed to update the $PathScope PATH: $($_.Exception.Message)"
+            }
+            Send-EnvironmentChange
             Write-Host "Added HoundDog CLI to the beginning of the $PathScope PATH."
-        } catch {
-            throw "Failed to update the $PathScope PATH: $($_.Exception.Message)"
         }
+    } finally {
+        $EnvironmentKey.Close()
     }
     $env:Path = Get-PathWithEntryFirst -PathValue $env:Path -Entry $InstallPath
 

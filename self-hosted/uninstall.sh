@@ -27,6 +27,14 @@ prompt() {
     say ""
     read -r -p "${color_prompt}$1${color_reset} " REPLY
 }
+# Copies a configuration file to a timestamped backup next to it, readable only by you, then deletes the file.
+back_up_and_delete() {
+    local backup
+    backup="$(mktemp "$1.backup.$(date +%Y%m%d-%H%M%S).XXXXXX")"
+    cp "$1" "$backup"
+    rm -f "$1"
+    say "Backed up $1 to ${backup} and deleted it."
+}
 
 cli_config_env="${HOME}/.config/hounddog/.env"
 
@@ -46,11 +54,12 @@ heading "UNINSTALL HOUNDDOG.AI"
 say "Uninstalling will:"
 say "- Stop and remove containers"
 say "- Delete local Docker volumes"
-say "- Delete active server and CLI configuration"
-say "- Keep configuration backups, the CLI, and Docker images"
+say "- Back up and delete the server and CLI configuration"
+say "- Keep the configuration backups, the CLI, and Docker images"
 if ! grep -Eq '^COMPOSE_PROFILES=.*postgres' .env; then
     say ""
     say "External Postgres data will not be deleted."
+    say "Reusing it requires HOUNDDOG_SECRET_KEY from the configuration backup."
 fi
 prompt "Uninstall HoundDog.ai? [y/n, default: n]:"
 case "${REPLY:-n}" in
@@ -66,10 +75,11 @@ say "Removing containers and local Docker volumes..."
 docker compose down --volumes --remove-orphans
 
 heading "DELETE CONFIGURATION"
-say "Deleting $(pwd)/.env..."
-rm -f .env
-say "Deleting ${cli_config_env}..."
-rm -f "$cli_config_env"
+umask 077
+back_up_and_delete "$(pwd)/.env"
+if [ -e "$cli_config_env" ] || [ -L "$cli_config_env" ]; then
+    back_up_and_delete "$cli_config_env"
+fi
 
 heading "UNINSTALL COMPLETE"
 say "HoundDog.ai Self-Hosted has been uninstalled."

@@ -68,9 +68,10 @@ codebases, refreshed on every commit, across every repo.
   and [800+ data sinks](https://github.com/hounddogai/hounddog/blob/main/data-sinks.md) supported out of the box. You
   can also [create your own data element and data sink rules](https://docs.hounddog.ai/platform/scanner-rules/).
 - **Built for large codebases.** Scans 1M+ lines of code in seconds on modern laptops.
-- **Optional AI integration (highly recommended).** Uses your organization's own AI provider and API key (see
-  [FAQ](#does-your-scanner-use-ai)). AI reduces false positives, adds context, and lets you query the data map in plain
-  English. It only sees the code behind each finding: its dataflow trace and the source file where it was detected.
+- **AI integration (highly recommended).** Works out of the box on the HoundDog.ai cloud platform, or with your
+  organization's own AI provider and API key (see [FAQ](#does-your-scanner-use-ai)). AI reduces false positives, adds
+  context, and lets you query the data map in plain English. It only sees the code behind each finding: its dataflow
+  trace and the source file where it was detected.
 
 ## Installation
 
@@ -103,13 +104,17 @@ You can also download the binary from the [releases page](https://github.com/hou
 
 ### Uninstallation
 
+Remove the CLI, its configuration, which can hold API keys, and its local scan state, which holds copies of scanned
+source files:
+
 ```sh
 # Linux and macOS
-rm -rf ~/.hounddog
+rm -rf ~/.hounddog ~/.config/hounddog ~/.local/share/hounddog
 sudo rm -f /usr/local/bin/hounddog  # Only if installed as root
 
 # Windows
-Remove-Item -Recurse -Force "$env:LocalAppData\hounddog"
+Remove-Item -Recurse -Force "$env:LocalAppData\hounddog"  # CLI and local scan state
+Remove-Item -Recurse -Force "$env:AppData\hounddog"       # Configuration, if it exists
 Remove-Item -Recurse -Force "$env:ProgramFiles\hounddog"  # Only if installed as administrator
 ```
 
@@ -167,19 +172,19 @@ organization sets up:
 - **HoundDog.ai platform:** when connected, the scanner uploads scan results, including the source files where dataflows
   were detected, so you can review each finding in context. The self-hosted platform runs entirely inside your network,
   so this code and the resulting data map stay within your infrastructure.
-- **Optional AI integration:** each finding is reviewed using only its dataflow trace and the source file where it was
-  detected, sent directly to the AI provider you configured.
+- **AI integration:** each finding is reviewed using only its dataflow trace and the source file where it was
+  detected, by the HoundDog.ai cloud platform's built-in AI or directly by the AI provider your organization configures.
 
 ### Does your scanner use AI?
 
-Scans run on a deterministic static analysis engine, which keeps them fast, cheap, and free of hallucinations. Nothing
-from a scan is sent to an AI provider unless your organization enables the optional AI integration.
+Scans run on a deterministic static analysis engine, which keeps them fast, cheap, and free of hallucinations.
 
-**Optional AI integration (Enterprise, cloud and self-hosted).** Your organization chooses its own provider (AWS
-Bedrock, Anthropic, OpenAI, Google Gemini, or Microsoft Foundry) and API key. When enabled, findings, traces, and source
-context go directly to that provider under the DPA and terms your organization holds with it. The AI layer auto-closes
-false positives, adjusts severities, and adds context to findings the scanner already produced. The deterministic scan
-still runs in your CI on inexpensive CPU with negligible impact on CI time.
+**AI integration (cloud and self-hosted).** On the HoundDog.ai cloud platform, AI works out of the box with Google
+Vertex AI. Your organization can also choose its own provider (AWS Bedrock, Anthropic, OpenAI, Google Gemini, or
+Microsoft Foundry) and API key, which the self-hosted platform and scanner-side reviews use. Findings, traces, and
+source context then go directly to that provider under the DPA and terms your organization holds with it. The AI layer
+auto-closes false positives, adjusts severities, and adds context to findings the scanner already produced. The
+deterministic scan still runs in your CI on inexpensive CPU with negligible impact on CI time.
 
 **Rule development.** HoundDog.ai uses AI internally to help generate and update detection rules before they ship with
 the scanner. Customer code and scan results are never used for this, and HoundDog.ai does not use customer code,

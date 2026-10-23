@@ -13,6 +13,9 @@
 #
 # Set HOUNDDOG_PORT to change the published port. Set HOUNDDOG_URL to the public HTTPS origin when
 # deploying behind a reverse proxy. All API requests use /api on that origin.
+#
+# Caddy limits sign-in, setup, and password attempts per client IP address. Behind a reverse proxy, set
+# HOUNDDOG_TRUSTED_PROXIES so the limit applies to each client instead of the proxy (see .env.example).
 
 # Keep the stack grouped under this parent project name in Docker Compose and Docker Desktop.
 name: hounddog-self-hosted
@@ -22,16 +25,22 @@ name: hounddog-self-hosted
 x-hounddog-self-hosted: &hounddog-self-hosted
   image: hounddogai/hounddog-self-hosted:latest
   restart: unless-stopped
-  environment:
+  environment: &hounddog-self-hosted-environment
     HOUNDDOG_SECRET_KEY: ${HOUNDDOG_SECRET_KEY:?is required. Run ./install.sh, or set a stable random string of 50+ characters. Encrypted data derives from it, so it must never change}
     # Required only until the first owner exists. Left optional here so upgraded, already-configured
     # installations continue to start; first-run setup fails closed when it is empty.
     HOUNDDOG_SETUP_KEY: ${HOUNDDOG_SETUP_KEY:-}
     HOUNDDOG_POSTGRES_URL: ${HOUNDDOG_POSTGRES_URL:?is required. Run ./install.sh or provide a postgres:// or postgresql:// URL}
     HOUNDDOG_URL: ${HOUNDDOG_URL:-http://localhost:${HOUNDDOG_PORT:-3300}}
+    # The CLI API key that the Trial installer generates; first-run setup stores it. Older installers wrote the
+    # INITIAL_PERSONAL names instead.
+    HOUNDDOG_INITIAL_API_KEY_ID: ${HOUNDDOG_INITIAL_API_KEY_ID:-}
+    HOUNDDOG_INITIAL_API_KEY_HASH: ${HOUNDDOG_INITIAL_API_KEY_HASH:-}
+    HOUNDDOG_INITIAL_API_KEY_PREFIX: ${HOUNDDOG_INITIAL_API_KEY_PREFIX:-}
     HOUNDDOG_INITIAL_PERSONAL_API_KEY_ID: ${HOUNDDOG_INITIAL_PERSONAL_API_KEY_ID:-}
     HOUNDDOG_INITIAL_PERSONAL_API_KEY_HASH: ${HOUNDDOG_INITIAL_PERSONAL_API_KEY_HASH:-}
     HOUNDDOG_INITIAL_PERSONAL_API_KEY_PREFIX: ${HOUNDDOG_INITIAL_PERSONAL_API_KEY_PREFIX:-}
+    HOUNDDOG_API_DOCS: ${HOUNDDOG_API_DOCS:-0}
   security_opt:
     - no-new-privileges:true
 
@@ -71,17 +80,33 @@ services:
   worker:
     <<: *hounddog-self-hosted
     command: worker
+    environment:
+      <<: *hounddog-self-hosted-environment
+      # The worker writes "ready" here while it can claim jobs, record their outcomes, and schedule its periodic jobs.
+      HOUNDDOG_WORKER_HEALTH_FILE: /tmp/hounddog-worker-health
     depends_on:
       api:
         condition: service_healthy
     volumes:
       - hounddog_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "grep -qx ready /tmp/hounddog-worker-health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
 
   # The only service publishing a host port: serves the web UI and proxies /api across API replicas.
   caddy:
     <<: *hounddog-self-hosted
     container_name: hounddog-self-hosted-caddy
     command: caddy
+    # Replaces the shared environment: Caddy needs none of the API's secrets.
+    environment:
+      HOUNDDOG_URL: ${HOUNDDOG_URL:-http://localhost:${HOUNDDOG_PORT:-3300}}
+      HOUNDDOG_AUTH_RATE_LIMIT_EVENTS: ${HOUNDDOG_AUTH_RATE_LIMIT_EVENTS:-10}
+      HOUNDDOG_AUTH_RATE_LIMIT_WINDOW: ${HOUNDDOG_AUTH_RATE_LIMIT_WINDOW:-1m}
+      HOUNDDOG_TRUSTED_PROXIES: ${HOUNDDOG_TRUSTED_PROXIES:-}
     depends_on:
       api:
         condition: service_healthy

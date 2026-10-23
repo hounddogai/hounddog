@@ -1,6 +1,6 @@
 # HoundDog.ai Data Sinks
 
-Generated: 2026-09-29 08:54:41
+Generated: 2026-10-23 23:53:32
 
 🟩 Supported  🟨 Partially Supported  🟥 Not Supported Yet  ⬜ Not Applicable
 
@@ -369,7 +369,7 @@ Generated: 2026-09-29 08:54:41
 | Digital River | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | DigitalOcean | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Discord | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
-| Django | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Django | 🟨 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Docusign | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Domo | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Drift | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |

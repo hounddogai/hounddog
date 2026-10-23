@@ -4,6 +4,12 @@
 	admin off
 	auto_https off
 	persist_config off
+	servers {
+		# Only proxies listed in HOUNDDOG_TRUSTED_PROXIES may report the client address in X-Forwarded-For. Strict mode
+		# reads that header from the right, so a client cannot choose its own address by sending one.
+		trusted_proxies static {$HOUNDDOG_TRUSTED_PROXIES}
+		trusted_proxies_strict
+	}
 }
 
 :3300 {
@@ -11,25 +17,66 @@
 	encode zstd gzip
 
 	header {
-		Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self'; frame-ancestors 'none'; img-src 'self' data: https:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:"
+		Content-Security-Policy "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self' data:; form-action 'self' http: https:; frame-ancestors 'none'; img-src 'self' data: https:; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:"
 		Referrer-Policy "strict-origin-when-cross-origin"
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "DENY"
 	}
 
-	@notAssets not path /assets/*
-	header @notAssets Cache-Control "no-cache"
-	header /assets/* Cache-Control "public, max-age=31536000, immutable"
+	# Hashed asset files never change, so browsers keep them for a year. Every other response is revalidated, including
+	# the 404 for an asset that no longer exists, such as a chunk that a tab opened before an upgrade requests.
+	@immutable {
+		path /assets/*
+		file
+	}
+	@revalidated not {
+		path /assets/*
+		file
+	}
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+	header @revalidated Cache-Control "no-cache"
+
+	# Each sign-in, first-run setup, or password change costs the API over a million PBKDF2 rounds, and signing in
+	# needs no session, so each client address gets a limited number of POSTs under /api/auth/ (logout included).
+	# rate_limit comes from the caddy-ratelimit module and runs before the handlers below. One IPv6 /64 network counts
+	# as one client.
+	rate_limit {
+		zone auth {
+			match {
+				method POST
+				path /api/auth/*
+			}
+			key {client_ip}
+			events {$HOUNDDOG_AUTH_RATE_LIMIT_EVENTS:10}
+			window {$HOUNDDOG_AUTH_RATE_LIMIT_WINDOW:1m}
+			ipv6_prefix 64
+		}
+	}
 
 	# API requests stay on the app origin.
 	# handle_path strips the /api prefix before proxying.
 	handle_path /api/* {
-		reverse_proxy api:8800
+		reverse_proxy api:8800 {
+			# The API records the first X-Forwarded-For address with each session, so send the address Caddy trusts.
+			header_up X-Forwarded-For {client_ip}
+		}
+	}
+
+	# A missing asset is a 404, not index.html, which a browser would refuse to run as a script or style sheet.
+	handle /assets/* {
+		file_server
 	}
 
 	# Serve index.html for client-side routes that were not handled above.
 	handle {
 		try_files {path} /index.html
 		file_server
+	}
+
+	# Answer rate limited requests in the API's error format, without a request ID: the request never reaches the API,
+	# so no log could find it. The rate limiter also sets Retry-After.
+	handle_errors 429 {
+		header Content-Type application/json
+		respond `{"code":"too-many-requests","message":"Too many attempts. Try again in a minute."}` 429
 	}
 }

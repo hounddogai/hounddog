@@ -66,8 +66,12 @@ if [[ "$migration_status" != 0 && "$migration_status" != 2 ]]; then
 fi
 api_scale="$(docker compose ps --all --format '{{.Service}}' | awk '$1 == "api" { count++ } END { print count + 0 }')"
 worker_scale="$(docker compose ps --all --format '{{.Service}}' | awk '$1 == "worker" { count++ } END { print count + 0 }')"
+# Containers removed with `docker compose down` are not listed, so start at least one of each instead of none.
 if [ "${api_scale}" -eq 0 ]; then
     api_scale=1
+fi
+if [ "${worker_scale}" -eq 0 ]; then
+    worker_scale=1
 fi
 scale_args=(--scale "api=${api_scale}" --scale "worker=${worker_scale}")
 say "Stopping the web, API, and worker containers before database migration..."

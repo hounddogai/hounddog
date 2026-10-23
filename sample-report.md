@@ -34,7 +34,7 @@ If you face any issues, please reach out to us at support@hounddog.ai.
 - **Data Elements**: Sensitive data types such as PII (Personally Identifiable Information), PHI (Protected Health Information), PIFI (Personally Identifiable Financial Information), authentication tokens, and other confidential information detected in source code.
 - **Data Element Occurrences**: Specific instances of sensitive data elements detected in the codebase. For example, a variable assignment `var email = 'john@example.com'` is one occurrence of the `email` data element.
 - **Sensitivity**: Data elements are assigned one of the following sensitivity levels:
-  - 🔴 **Critical** (e.g., credit card numbers)
+  - 🔴 **High** (e.g., credit card numbers)
   - 🟠 **Medium** (e.g., phone numbers)
   - 🟡 **Low** (e.g., email addresses)
 
@@ -47,7 +47,7 @@ If you face any issues, please reach out to us at support@hounddog.ai.
     2. Sent to destinations that are generally considered unsafe (e.g., logs, third-party APIs), but the data element is explicitly allowlisted.
 - **Risky Dataflows**: Vulnerable dataflows where sensitive data reaches unsafe sinks without an applicable data-element allowance, potentially exposing it to misuse or leakage.
 - **Severity**: Dataflows are assigned one of the following severity levels:
-  - 🟥 **Critical**
+  - 🟥 **High**
   - 🟧 **Medium**
   - 🟨 **Low**
   - 🟩 **Info** (for safe dataflows)
@@ -92,9 +92,9 @@ The table below shows the sensitive data elements discovered in the codebase and
 
 |Sensitivity|Data Element|Risky Sinks|Safe Sinks|
 |:-|:-|:-|:-|
-|🔴 Critical|[Medical Condition](#data-element-43)|<span style="color:rgba(100, 100, 100, 1)">*None*</span>|[SQL Database](#data-sink-sql-db)|
-|🔴 Critical|[Medical History](#data-element-45)|[OpenAI](#data-sink-openai)|[SQL Database](#data-sink-sql-db)|
-|🔴 Critical|[Medical Record Number](#data-element-47)|<span style="color:rgba(100, 100, 100, 1)">*None*</span>|[SQL Database](#data-sink-sql-db)|
+|🔴 High|[Medical Condition](#data-element-43)|<span style="color:rgba(100, 100, 100, 1)">*None*</span>|[SQL Database](#data-sink-sql-db)|
+|🔴 High|[Medical History](#data-element-45)|[OpenAI](#data-sink-openai)|[SQL Database](#data-sink-sql-db)|
+|🔴 High|[Medical Record Number](#data-element-47)|<span style="color:rgba(100, 100, 100, 1)">*None*</span>|[SQL Database](#data-sink-sql-db)|
 |🟠 Medium|[Blood Cholesterol](#data-element-7)|<span style="color:rgba(100, 100, 100, 1)">*None*</span>|<span style="color:rgba(100, 100, 100, 1)">*None*</span>|
 |🟠 Medium|[Blood Pressure](#data-element-9)|<span style="color:rgba(100, 100, 100, 1)">*None*</span>|<span style="color:rgba(100, 100, 100, 1)">*None*</span>|
 |🟠 Medium|[Blood Type](#data-element-10)|<span style="color:rgba(100, 100, 100, 1)">*None*</span>|[SQL Database](#data-sink-sql-db)|
@@ -111,7 +111,7 @@ The table below shows the sensitive data elements discovered in the codebase and
 <a id="data-element-43"></a>
 ## Medical Condition
 
-**Sensitivity:** 🔴 Critical • **Tags:** PHI • **Occurrences:** 49
+**Sensitivity:** 🔴 High • **Tags:** PHI • **Occurrences:** 49
 
 **Risky Dataflows:**
 
@@ -154,7 +154,7 @@ style sink_sql_db fill:#00800026,stroke:#006400,color:#006400
 <a id="data-element-45"></a>
 ## Medical History
 
-**Sensitivity:** 🔴 Critical • **Tags:** PHI • **Occurrences:** 54
+**Sensitivity:** 🔴 High • **Tags:** PHI • **Occurrences:** 54
 
 **Risky Dataflows:**
 
@@ -231,7 +231,7 @@ style sink_openai fill:#FF000026,stroke:#C80000,color:#C80000
 <a id="data-element-47"></a>
 ## Medical Record Number
 
-**Sensitivity:** 🔴 Critical • **Tags:** PHI • **Occurrences:** 9
+**Sensitivity:** 🔴 High • **Tags:** PHI • **Occurrences:** 9
 
 **Risky Dataflows:**
 
@@ -1325,7 +1325,7 @@ This section shows vulnerable dataflows where sensitive data reaches unsafe sink
 
 ---
 
-🟥 **CRITICAL:** Medical History exposed to OpenAI
+🟥 **HIGH:** Medical History exposed to OpenAI
 in [pages/patient.py:321:36](https://github.com/hounddogai/hounddog-test-python/blob/781c916790f5/pages/patient.py#L321-L321):
 
 ```python
@@ -1335,7 +1335,7 @@ llm.invoke(messages)
 <details>
 <summary>View Details</summary>
 
-This issue was rated as 🟥 **CRITICAL** for exposing the following data element(s) to [OpenAI](#data-sink-openai):
+This issue was rated as 🟥 **HIGH** for exposing the following data element(s) to [OpenAI](#data-sink-openai):
 
 <details>
 <summary>🔴 Medical History</summary>

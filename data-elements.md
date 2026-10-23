@@ -1,49 +1,49 @@
 # HoundDog.ai Data Elements
 
-Generated: 2026-09-29 08:54:41
+Generated: 2026-10-23 23:53:32
 
 | Sensitivity | Count |
 |---|---|
-| 🟥 Critical | 33 |
+| 🟥 High | 33 |
 | 🟧 Medium | 50 |
 | 🟨 Low | 20 |
 | **Total** | 103 |
 
 | Sensitivity | Data Element | Tags |
 |---|---|---|
-| 🟥 Critical | Aadhaar Number | PII |
-| 🟥 Critical | Auth Token | SECRET |
-| 🟥 Critical | Bank Account Number | PIFI |
-| 🟥 Critical | Bank Card Number | PIFI |
-| 🟥 Critical | Biometrics | PHI |
-| 🟥 Critical | Credit History | PIFI |
-| 🟥 Critical | Criminal History | PII |
-| 🟥 Critical | Diagnostic Result | PHI |
-| 🟥 Critical | Doctor's Notes | PHI |
-| 🟥 Critical | Driver's License | PII |
-| 🟥 Critical | Encryption Key | SECRET |
-| 🟥 Critical | Fertility Treatment | PHI |
-| 🟥 Critical | Identity Document | PII |
-| 🟥 Critical | Medical Condition | PHI |
-| 🟥 Critical | Medical Diagnosis | PHI |
-| 🟥 Critical | Medical History | PHI |
-| 🟥 Critical | Medical Record Number | PHI |
-| 🟥 Critical | Medical Test Details | PHI |
-| 🟥 Critical | Mental Health Record | PHI |
-| 🟥 Critical | Mother's Maiden Name | PII |
-| 🟥 Critical | National identity Number | PII |
-| 🟥 Critical | Passport Number | PII |
-| 🟥 Critical | Password | SECRET |
-| 🟥 Critical | Permanent Account Number | PIFI |
-| 🟥 Critical | Pregnancy Information | PHI |
-| 🟥 Critical | Proofing Session | PII |
-| 🟥 Critical | Security Clearance | PII |
-| 🟥 Critical | Sexual History | PII |
-| 🟥 Critical | Signed URL | SECRET |
-| 🟥 Critical | Smart Card ID | PII |
-| 🟥 Critical | Social Security Number | PII |
-| 🟥 Critical | Substance Abuse | PHI |
-| 🟥 Critical | Taxpayer Number | PII |
+| 🟥 High | Aadhaar Number | PII |
+| 🟥 High | Auth Token | SECRET |
+| 🟥 High | Bank Account Number | PIFI |
+| 🟥 High | Bank Card Number | CHD, PIFI |
+| 🟥 High | Biometrics | PHI |
+| 🟥 High | Credit History | PIFI |
+| 🟥 High | Criminal History | PII |
+| 🟥 High | Diagnostic Result | PHI |
+| 🟥 High | Doctor's Notes | PHI |
+| 🟥 High | Driver's License | PII |
+| 🟥 High | Encryption Key | SECRET |
+| 🟥 High | Fertility Treatment | PHI |
+| 🟥 High | Identity Document | PII |
+| 🟥 High | Medical Condition | PHI |
+| 🟥 High | Medical Diagnosis | PHI |
+| 🟥 High | Medical History | PHI |
+| 🟥 High | Medical Record Number | PHI |
+| 🟥 High | Medical Test Details | PHI |
+| 🟥 High | Mental Health Record | PHI |
+| 🟥 High | Mother's Maiden Name | PII |
+| 🟥 High | National identity Number | PII |
+| 🟥 High | Passport Number | PII |
+| 🟥 High | Password | SECRET |
+| 🟥 High | Permanent Account Number | PIFI |
+| 🟥 High | Pregnancy Information | PHI |
+| 🟥 High | Proofing Session | PII |
+| 🟥 High | Security Clearance | PII |
+| 🟥 High | Sexual History | PII |
+| 🟥 High | Signed URL | SECRET |
+| 🟥 High | Smart Card ID | PII |
+| 🟥 High | Social Security Number | PII |
+| 🟥 High | Substance Abuse | PHI |
+| 🟥 High | Taxpayer Number | PII |
 | 🟧 Medium | Background Check | PII |
 | 🟧 Medium | Bank Statement | PIFI |
 | 🟧 Medium | Behavioral History | PII |

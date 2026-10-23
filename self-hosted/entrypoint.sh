@@ -16,9 +16,10 @@ api)
     exec api
     ;;
 worker)
+    shift
     wait-for-db
     echo "Starting pgqueue worker ..."
-    exec worker
+    exec worker "$@"
     ;;
 caddy)
     echo "Starting Caddy (app and /api proxy on port 3300) ..."
