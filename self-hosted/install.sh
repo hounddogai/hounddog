@@ -225,6 +225,9 @@ mv "$cli_config_temp" "$config_env"
 cli_config_temp=""
 
 heading "START DOCKER COMPOSE"
+# Compose would otherwise start an image already on this machine, such as one left by an earlier installation.
+say "Pulling the latest images..."
+docker compose pull || fail "Could not pull the HoundDog.ai images. Check your network connection and try again."
 say "Starting Docker Compose and waiting for HoundDog.ai to become ready..."
 if ! docker compose up -d --wait; then
     docker compose ps || true
