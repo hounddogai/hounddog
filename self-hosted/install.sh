@@ -243,8 +243,8 @@ say "HoundDog.ai is running at ${hounddog_url}."
 say "Server configuration: $(pwd)/.env"
 say "CLI configuration: ${config_env}"
 say ""
-say "Keep a private backup of HOUNDDOG_SECRET_KEY from $(pwd)/.env. It encrypts the credentials stored in the database,"
-say "which cannot be decrypted without it."
+say "Keep a private backup of HOUNDDOG_SECRET_KEY from the server configuration. It encrypts the credentials stored in"
+say "the database, which cannot be decrypted without it."
 
 install_cli
 

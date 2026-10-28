@@ -27,7 +27,8 @@ RUN npm install -g pnpm@11.6.0
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml frontend/.pnpmfile.mjs ./
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY frontend/ ./
-RUN pnpm run build --mode self-hosted
+# `_headers` holds Cloudflare Pages' headers for the cloud frontend; Caddy sets the self-hosted ones itself.
+RUN pnpm run build --mode self-hosted && rm build/client/_headers
 
 # Stock Caddy cannot rate limit, so xcaddy adds the caddy-ratelimit module. The module's only tag (v0.1.0, 2024)
 # predates its Caddyfile validation and ipv6_prefix, so it is pinned to a commit on its main branch.
