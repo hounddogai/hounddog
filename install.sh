@@ -73,6 +73,12 @@ case "$ARCH" in
     aarch64|arm64) ARCH="arm64" ;;
     *) abort "Unsupported CPU architecture. HoundDog CLI requires a AMD64 or ARM64 processor." ;;
 esac
+if [ "$OS" = "macos" ] && [ "$ARCH" = "amd64" ]; then
+    # A shell running under Rosetta reports x86_64 on Apple silicon, which runs the ARM64 build natively.
+    [ "$(sysctl -n hw.optional.arm64 2>/dev/null)" = "1" ] ||
+        abort "HoundDog CLI does not support Intel Macs. Use the Docker image hounddogai/hounddog instead."
+    ARCH="arm64"
+fi
 
 # Check other prerequisites.
 command -v curl >/dev/null 2>&1 || abort "Command 'curl' is required to install HoundDog CLI."

@@ -94,6 +94,8 @@ For use with the cloud platform, or if you prefer results in the console or as M
 curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh
 ```
 
+On macOS, the CLI requires Apple silicon. On an Intel Mac, use the `hounddogai/hounddog` Docker image instead.
+
 **Windows**
 
 ```powershell

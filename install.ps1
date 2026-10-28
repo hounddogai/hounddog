@@ -81,7 +81,8 @@ $ProcessorArchitecture = if ($env:PROCESSOR_ARCHITEW6432) {
 }
 $Arch = switch ($ProcessorArchitecture.ToUpperInvariant()) {
     'AMD64' { 'amd64' }
-    'ARM64' { 'arm64' }
+    # Windows 11 on Arm runs the AMD64 build through its x64 emulation.
+    'ARM64' { 'amd64' }
     default { throw 'Unsupported CPU architecture. HoundDog CLI requires an AMD64 or ARM64 processor.' }
 }
 $ReleaseRootUrl = "https://github.com/hounddogai/hounddog/releases"

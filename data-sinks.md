@@ -1,12 +1,13 @@
 # HoundDog.ai Data Sinks
 
-Generated: 2026-10-23 23:53:32
+Generated: 2026-10-28 21:17:15
 
 🟩 Supported  🟨 Partially Supported  🟥 Not Supported Yet  ⬜ Not Applicable
 
 | Data Sink | Python | TypeScript | Java | C#/.NET | Go |
 |---|---|---|---|---|---|
 | 1Password | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
+| Ably | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | ActiveCampaign | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Ada | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Adobe Commerce | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
@@ -16,6 +17,7 @@ Generated: 2026-10-23 23:53:32
 | AfterShip | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AgentMail | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Aha! | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Airbrake | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Airship | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | Airtable | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Akamai | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
@@ -50,6 +52,7 @@ Generated: 2026-10-23 23:53:32
 | Appwrite | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Arize AI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Asana | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| AssemblyAI | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Astronomer.io | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Atlassian | 🟥 | 🟥 | 🟥 | 🟥 | 🟩 |
 | Atlassian Jira | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -238,6 +241,7 @@ Generated: 2026-10-23 23:53:32
 | AWS WorkMail | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS WorkSpaces | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | AWS X-Ray | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Axiom | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Azure | 🟩 | 🟩 | 🟩 | 🟥 | 🟩 |
 | Azure Advisor | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Azure Analysis Services | 🟥 | 🟩 | 🟥 | 🟥 | 🟩 |
@@ -310,19 +314,25 @@ Generated: 2026-10-23 23:53:32
 | Azure Web PubSub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | BambooHR | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | BentoML | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Better Stack | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | BigCommerce | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Bird | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bitbucket | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bitly | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| BoldSign | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Box | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Braintree | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Braze | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
+| Brevo | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bugsnag | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Bullhorn | ⬜ | 🟩 | 🟩 | ⬜ | ⬜ |
 | Calendly | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Campaign Monitor | 🟩 | ⬜ | 🟩 | 🟩 | ⬜ |
 | Canny | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Cerebras Inference | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Chameleon | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Chargebee | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Checkout.com | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Chroma | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | CircleCI | 🟩 | ⬜ | ⬜ | ⬜ | 🟩 |
 | Cisco Catalyst Center | 🟩 | ⬜ | 🟥 | 🟩 | 🟥 |
@@ -339,6 +349,7 @@ Generated: 2026-10-23 23:53:32
 | ClickSend | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | ClickUp | ⬜ | 🟩 | ⬜ | ⬜ | 🟩 |
 | Cloudflare | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
+| Cloudinary | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | CockroachDB | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
 | Coda | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Codat | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
@@ -354,6 +365,7 @@ Generated: 2026-10-23 23:53:32
 | Coralogix | ⬜ | 🟩 | ⬜ | ⬜ | 🟩 |
 | CoreWeave | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Coupa | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Courier | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | CrewAI | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | CrowdStrike | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Customer.io | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
@@ -361,6 +373,8 @@ Generated: 2026-10-23 23:53:32
 | Datadog | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Datafold | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Deel | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Deepgram | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| DeepL API | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | DeepSeek | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Delighted | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Dell | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -381,6 +395,7 @@ Generated: 2026-10-23 23:53:32
 | EasyPost | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Egnyte | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Elastic | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| ElevenLabs | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Environment Variables | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
 | Eventbrite | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Expedia | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
@@ -389,8 +404,10 @@ Generated: 2026-10-23 23:53:32
 | Favro | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Figma | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Files | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Finch | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Firebase | 🟩 | 🟥 | 🟩 | 🟥 | 🟥 |
 | Fivetran | 🟩 | ⬜ | ⬜ | ⬜ | 🟩 |
+| Flagsmith | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Foundry Tools | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | FreshBooks | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Freshdesk | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
@@ -403,6 +420,7 @@ Generated: 2026-10-23 23:53:32
 | Ghost | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | GitHub | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | GitLab | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| GoCardless | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | GoDaddy | 🟩 | ⬜ | ⬜ | 🟩 | 🟩 |
 | Gong | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Google | 🟩 | 🟩 | 🟨 | 🟩 | 🟩 |
@@ -553,12 +571,15 @@ Generated: 2026-10-23 23:53:32
 | Heroku | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | HiBob | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Hightouch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Honeybadger | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Honeycomb | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | HTTP | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | HubSpot | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Hugging Face | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | IBM | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | ID.me | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ |
+| Increase | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Infobip | 🟩 | ⬜ | 🟩 | 🟩 | 🟩 |
 | Informatica | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Instana | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | Intercom | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -574,7 +595,9 @@ Generated: 2026-10-23 23:53:32
 | Kit | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Klarna | 🟩 | 🟩 | 🟨 | 🟩 | 🟩 |
 | Klaviyo | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
+| Knock | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | LangChain | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Langfuse | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | LangGraph | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | LangSmith | 🟩 | 🟩 | 🟥 | ⬜ | 🟩 |
 | LaunchDarkly | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -593,11 +616,13 @@ Generated: 2026-10-23 23:53:32
 | M-Files | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ |
 | Mailchimp | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Mailgun | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Mailjet | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Marketo | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | Marqeta | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Matomo | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Matrix | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Meilisearch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Mem0 | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Mercury | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Merge | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Microsoft | 🟨 | 🟩 | 🟨 | 🟨 | 🟨 |
@@ -615,17 +640,21 @@ Generated: 2026-10-23 23:53:32
 | Mixpanel | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Modal | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Modern Treasury | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
+| Mollie | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
 | monday.com | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | MongoDB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Moralis | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
+| mParticle | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | MuleSoft | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Mural | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | MX Technologies | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | MySQL | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
 | Neon | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| NeverBounce | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | New Relic | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | NGINX | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Notion | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Novu | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | NVIDIA | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | NVIDIA Dynamo-Triton | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Nylas | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
@@ -633,6 +662,8 @@ Generated: 2026-10-23 23:53:32
 | Ollama | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | OneDrive | 🟩 | 🟩 | 🟩 | ⬜ | 🟩 |
 | OneLogin | 🟩 | ⬜ | 🟩 | 🟩 | ⬜ |
+| OneSignal | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Onfido | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
 | OpenAI | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | OpenRouter | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | OpenTelemetry | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -641,6 +672,7 @@ Generated: 2026-10-23 23:53:32
 | Oracle DB | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Oracle NetSuite | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Ortto | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Ory Network | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Outlook | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Outreach | ⬜ | 🟩 | ⬜ | 🟩 | ⬜ |
 | Paddle | 🟩 | 🟩 | 🟥 | 🟥 | 🟩 |
@@ -657,6 +689,7 @@ Generated: 2026-10-23 23:53:32
 | PlanetScale | ⬜ | 🟩 | ⬜ | ⬜ | 🟩 |
 | Plivo | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Pony ORM | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
+| Portkey | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | PostgreSQL | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | PostHog | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Postmark | ⬜ | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -674,13 +707,17 @@ Generated: 2026-10-23 23:53:32
 | Qumulo | 🟩 | 🟨 | 🟥 | 🟩 | 🟩 |
 | Ramp | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | Range Labs | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Raygun | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Razorpay | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Recombee | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Recurly | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Redis | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Regula | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Replicate | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Replit | 🟩 | 🟩 | 🟥 | 🟩 | 🟩 |
 | Resend | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Revolut | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| RingCentral | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Rippling | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
 | RocketReach | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Rollbar | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -705,11 +742,14 @@ Generated: 2026-10-23 23:53:32
 | SharePoint | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Shippo | 🟩 | 🟩 | 🟩 | 🟩 | 🟥 |
 | Shopify | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| Sift | 🟩 | ⬜ | 🟩 | 🟩 | ⬜ |
+| Sinch | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Slack | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Smartsheet | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Smarty | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Snapchat | 🟩 | ⬜ | 🟩 | ⬜ | 🟩 |
 | Snowflake | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Snowplow | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Snyk | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | SOAP | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Split Software | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
@@ -724,15 +764,19 @@ Generated: 2026-10-23 23:53:32
 | Square | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Standard Error | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Standard Output | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Statsig | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Stitch | 🟩 | ⬜ | 🟩 | ⬜ | ⬜ |
 | Strapi | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
+| Stream | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Stripe | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Stytch | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Supabase | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | SurveyMonkey | ⬜ | 🟩 | 🟩 | 🟩 | ⬜ |
 | Tableau | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
+| TaxJar | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Telegram | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Telesign | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
+| Telnyx | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Tenable | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ |
 | Terraform | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Terrific | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
@@ -749,9 +793,13 @@ Generated: 2026-10-23 23:53:32
 | TrueLayer | ⬜ | 🟩 | 🟩 | 🟩 | ⬜ |
 | Twilio | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Typeform | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ |
+| Typesense | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | UiPath | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
 | Unit | 🟩 | 🟩 | 🟩 | ⬜ | ⬜ |
+| Upstash | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
+| Upstash QStash | 🟩 | 🟩 | ⬜ | ⬜ | 🟩 |
 | Valkey | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
+| Vapi | 🟩 | 🟩 | ⬜ | 🟩 | 🟩 |
 | Veryfi | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Vimeo | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
 | vLLM | 🟩 | 🟩 | ⬜ | ⬜ | ⬜ |
@@ -771,5 +819,6 @@ Generated: 2026-10-23 23:53:32
 | Yandex Cloud | 🟨 | 🟩 | 🟨 | 🟩 | 🟩 |
 | Zendesk | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Zendesk Sell | 🟩 | ⬜ | 🟩 | ⬜ | ⬜ |
+| ZeroBounce | 🟩 | 🟩 | 🟩 | 🟩 | 🟩 |
 | Zoho | 🟩 | 🟩 | 🟩 | 🟩 | ⬜ |
 | Zoom | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ |
