@@ -149,7 +149,9 @@ cli_api_key_prefix=""
 heading "GENERATE SECRETS"
 say "Generating the encryption key and one-time setup key..."
 secret_key="$(generate_secret 48)"
-setup_key="$(generate_secret 48)"
+# The prefix tells the setup key apart from the CLI API key the installer also prints, and the API requires it. The
+# random part is hex, so the whole key is one word that a double-click in the terminal selects.
+setup_key="hd_setup_$(od -An -N32 -tx1 /dev/urandom | tr -d ' \n')"
 if [ "$install_type" = "1" ]; then
     say "Generating a Postgres password and an organization API key for the CLI..."
     # Compose expands these placeholders when it reads the generated .env file.
@@ -247,11 +249,13 @@ say "which cannot be decrypted without it."
 install_cli
 
 heading "NEXT STEPS"
-say "1. Open ${hounddog_url} and create your organization and owner account."
+say "1. Open ${hounddog_url}."
 if [ -t 1 ]; then
-    say "2. Use the one-time setup key ${setup_key}."
+    say "2. Enter the one-time setup key ${setup_key}, name your organization, create your owner account, and connect"
+    say "   an AI provider."
 else
-    say "2. Open .env and use HOUNDDOG_SETUP_KEY when prompted."
+    say "2. Enter the HOUNDDOG_SETUP_KEY from .env, name your organization, create your owner account, and connect an AI"
+    say "   provider."
 fi
 if [ "$install_type" = "1" ]; then
     say "3. Open a new terminal after setup and run: hounddog scan /path/to/repository"

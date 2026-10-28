@@ -24,11 +24,18 @@ The installer will ask you to choose the installation type:
 When the installation finishes:
 
 1. Open the HoundDog.ai URL printed by the installer, such as `http://localhost:3300`.
-2. Enter the one-time setup key printed by the installer.
-3. Create your organization and owner account.
+2. Enter the one-time setup key printed by the installer, which starts with `hd_setup_`.
+3. Name your organization and create your owner account.
+4. Connect an AI provider, such as Anthropic or OpenAI, with your own API key. HoundDog.ai has no built-in AI model
+   when self-hosted, so this is what lets AI review the dataflows each scan finds, updating their severity and ignoring
+   false positives. You can skip it and connect a provider later in Settings > AI.
 
 By default, HoundDog.ai is reachable from other machines on your network. To allow access only from this machine, set
 `HOUNDDOG_BIND_ADDRESS=127.0.0.1` in `.env` and run `docker compose up -d`.
+
+HoundDog.ai reads the list of AI models it offers from `https://hounddog.ai/model-catalog-v1.json` at most once an hour,
+so new models appear without an upgrade. To offer only the models of the installed version instead, for example on a
+server without internet access, set `HOUNDDOG_MODEL_CATALOG_URL=off` in `.env` and run `docker compose up -d`.
 
 The installer saves your configuration in `.env`. Keep a private copy of its `HOUNDDOG_SECRET_KEY`: it encrypts the
 credentials that HoundDog.ai stores in its database, which cannot be decrypted without it.
@@ -86,6 +93,11 @@ HoundDog.ai is briefly unavailable while the upgrade runs.
 ```shell
 git pull && ./upgrade.sh
 ```
+
+HoundDog.ai does not start when `HOUNDDOG_SETUP_KEY` in `.env` is set but does not start with `hd_setup_`, which is
+the case for installations made before setup keys had that prefix. Setup no longer needs the key once it is complete,
+so remove that line from `.env` before upgrading. If setup is not complete yet, replace the value with `hd_setup_`
+followed by a random value instead.
 
 If a prerequisite check fails, existing containers keep running. If migration or startup fails after the drain,
 HoundDog.ai stays stopped. Fix the reported error and run `./upgrade.sh` again, or restore your

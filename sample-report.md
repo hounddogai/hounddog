@@ -45,7 +45,7 @@ If you face any issues, please reach out to us at support@hounddog.ai.
 - **Safe Dataflows**: Dataflows in which the transmission or storage of sensitive data elements are either:
     1. Sent to destinations that are generally known to be safe (e.g., encrypted databases, internal gRPC endpoints).
     2. Sent to destinations that are generally considered unsafe (e.g., logs, third-party APIs), but the data element is explicitly allowlisted.
-- **Risky Dataflows**: Vulnerable dataflows where sensitive data reaches unsafe sinks without an applicable data-element allowance, potentially exposing it to misuse or leakage.
+- **Risky Dataflows**: Dataflows where sensitive data reaches unsafe sinks without an applicable data-element allowance, potentially exposing it to misuse or leakage.
 - **Severity**: Dataflows are assigned one of the following severity levels:
   - 🟥 **High**
   - 🟧 **Medium**
@@ -1321,7 +1321,7 @@ This section lists the data sinks detected and the data elements exposed to them
 
 # Risky Dataflows
 
-This section shows vulnerable dataflows where sensitive data reaches unsafe sinks without an applicable data-element allowance.
+This section shows risky dataflows where sensitive data reaches unsafe sinks without an applicable data-element allowance.
 
 ---
 
@@ -1372,7 +1372,7 @@ This issue was rated as 🟥 **HIGH** for exposing the following data element(s)
 
 Remove the offending code or sanitize the data.
 
-For auto-closing vulnerabilities, see [https://docs.hounddog.ai/scanner/remediation](https://docs.hounddog.ai/scanner/remediation).
+For auto-closing issues, see [https://docs.hounddog.ai/scanner/remediation](https://docs.hounddog.ai/scanner/remediation).
 
 **Compliance Frameworks:** [CWE-201](https://cwe.mitre.org/data/definitions/201.html), [A01:2021](https://owasp.org/Top10/A01_2021), [GDPR-A5-28](https://gdpr-info.eu/art-28-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa), [HIPAA](https://www.hhs.gov/hipaa/index.html), [NIST-800-53](https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final)
 
@@ -1421,7 +1421,7 @@ This issue was rated as 🟧 **MEDIUM** for exposing the following data element(
 
 Remove the offending code or sanitize the data.
 
-For auto-closing vulnerabilities, see [https://docs.hounddog.ai/scanner/remediation](https://docs.hounddog.ai/scanner/remediation).
+For auto-closing issues, see [https://docs.hounddog.ai/scanner/remediation](https://docs.hounddog.ai/scanner/remediation).
 
 **Compliance Frameworks:** [CWE-201](https://cwe.mitre.org/data/definitions/201.html), [A01:2021](https://owasp.org/Top10/A01_2021), [GDPR-A5-28](https://gdpr-info.eu/art-28-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa), [NIST-800-53](https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final)
 
@@ -1478,7 +1478,7 @@ This issue was rated as 🟨 **LOW** for exposing the following data element(s) 
 
 Remove the offending code or sanitize the data.
 
-For auto-closing vulnerabilities, see [https://docs.hounddog.ai/scanner/remediation](https://docs.hounddog.ai/scanner/remediation).
+For auto-closing issues, see [https://docs.hounddog.ai/scanner/remediation](https://docs.hounddog.ai/scanner/remediation).
 
 **Compliance Frameworks:** [CWE-532](https://cwe.mitre.org/data/definitions/532.html), [A09:2021](https://owasp.org/Top10/A09_2021), [GDPR-A5-32](https://gdpr-info.eu/art-32-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa), [NIST-800-53](https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final)
 
@@ -2072,4 +2072,4 @@ Avoid sending sensitive data to unsafe data sinks, even during development and t
 For third parties, the shared data must align with your privacy notice and data processing agreement.
 Adjust or restrict sharing as necessary to maintain compliance and minimize privacy risks.
 For more straightforward sinks like logs, the recommendation is to remove the offending code entirely.
-For auto-closing vulnerabilities, see https://docs.hounddog.ai/scanner/remediation.
+For auto-closing issues, see https://docs.hounddog.ai/scanner/remediation.

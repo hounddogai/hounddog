@@ -57,7 +57,7 @@
 	# handle_path strips the /api prefix before proxying.
 	handle_path /api/* {
 		reverse_proxy api:8800 {
-			# The API records the first X-Forwarded-For address with each session, so send the address Caddy trusts.
+			# The API reads the client address from X-Forwarded-For, so send only the address Caddy trusts.
 			header_up X-Forwarded-For {client_ip}
 		}
 	}

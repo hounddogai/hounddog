@@ -27,8 +27,8 @@ x-hounddog-self-hosted: &hounddog-self-hosted
   restart: unless-stopped
   environment: &hounddog-self-hosted-environment
     HOUNDDOG_SECRET_KEY: ${HOUNDDOG_SECRET_KEY:?is required. Run ./install.sh, or set a stable random string of 50+ characters. Encrypted data derives from it, so it must never change}
-    # Required only until the first owner exists. Left optional here so upgraded, already-configured
-    # installations continue to start; first-run setup fails closed when it is empty.
+    # Required only until the first owner exists, and must start with hd_setup_ when set. Left optional here so
+    # configured installations can remove it; first-run setup fails closed when it is empty.
     HOUNDDOG_SETUP_KEY: ${HOUNDDOG_SETUP_KEY:-}
     HOUNDDOG_POSTGRES_URL: ${HOUNDDOG_POSTGRES_URL:?is required. Run ./install.sh or provide a postgres:// or postgresql:// URL}
     HOUNDDOG_URL: ${HOUNDDOG_URL:-http://localhost:${HOUNDDOG_PORT:-3300}}
@@ -41,6 +41,8 @@ x-hounddog-self-hosted: &hounddog-self-hosted
     HOUNDDOG_INITIAL_PERSONAL_API_KEY_HASH: ${HOUNDDOG_INITIAL_PERSONAL_API_KEY_HASH:-}
     HOUNDDOG_INITIAL_PERSONAL_API_KEY_PREFIX: ${HOUNDDOG_INITIAL_PERSONAL_API_KEY_PREFIX:-}
     HOUNDDOG_API_DOCS: ${HOUNDDOG_API_DOCS:-0}
+    # Where the API reads the AI models it offers; empty means https://hounddog.ai/model-catalog-v1.json.
+    HOUNDDOG_MODEL_CATALOG_URL: ${HOUNDDOG_MODEL_CATALOG_URL:-}
   security_opt:
     - no-new-privileges:true
 

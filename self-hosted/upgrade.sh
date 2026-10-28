@@ -43,6 +43,15 @@ if [ ! -e .env ] && [ ! -L .env ]; then
     fail "No installation was found. Run ./install.sh."
 fi
 
+# HoundDog.ai refuses to start with a setup key without the hd_setup_ prefix, which earlier installers generated, so
+# the upgrade stops here, before anything is pulled or stopped, and says how to fix it.
+setup_key="$(awk -F= '$1 == "HOUNDDOG_SETUP_KEY" { sub(/^[^=]*=/, ""); value = $0 } END { print value }' .env)"
+setup_key="${setup_key#[\"\']}"
+setup_key="${setup_key%[\"\']}"
+if [ -n "$setup_key" ] && [[ "$setup_key" != hd_setup_* ]]; then
+    fail "HOUNDDOG_SETUP_KEY in .env must start with hd_setup_. If setup is complete, remove that line; otherwise, replace its value with hd_setup_ followed by a random value. Then run ./upgrade.sh again."
+fi
+
 heading "UPGRADE HOUNDDOG.AI"
 say "Upgrading keeps your configuration and Docker volumes."
 say "Take a database backup first. HoundDog.ai is unavailable while the database migrates."
