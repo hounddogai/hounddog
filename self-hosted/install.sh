@@ -203,6 +203,8 @@ server_env_temp="$(mktemp "$(pwd)/.env.tmp.XXXXXX")"
 } > "$server_env_temp"
 mv "$server_env_temp" .env
 server_env_temp=""
+# A new installation has no earlier version for an upgrade to go back to.
+rm -f .upgrade-previous-version
 
 config_dir="$(cli_config_dir)"
 config_env="${config_dir}/.env"
@@ -259,8 +261,10 @@ else
 fi
 if [ "$install_type" = "1" ]; then
     say "3. Open a new terminal after setup and run: hounddog scan /path/to/repository"
+    say "   (or ~/.hounddog/bin/hounddog if your shell does not find it)"
     say "   The CLI's organization API key expires a year after setup. Create a new one under API Keys before then."
 else
     say "3. Create an organization API key in HoundDog.ai and add it to ${config_env}."
     say "4. Open a new terminal and run: hounddog scan /path/to/repository"
+    say "   (or ~/.hounddog/bin/hounddog if your shell does not find it)"
 fi

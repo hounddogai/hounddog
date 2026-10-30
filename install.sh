@@ -178,20 +178,25 @@ if [ "$(id -u)" -ne 0 ]; then
             SHELL_RC="$HOME/.config/fish/config.fish"
             PATH_LINE="set -gx PATH \"\$HOME/.hounddog/bin\" \$PATH"
             ;;
-        *) abort "HoundDog CLI only supports Bash, Zsh, and Fish shells." ;;
+        # Other shells, or none, as in many CI containers: install, and leave PATH to the user.
+        *) SHELL_RC="" ;;
     esac
 
     INSTALL_DIR="${HOME}/.hounddog/bin"
     mkdir -p "$INSTALL_DIR"
     install_binary "$INSTALL_DIR"
 
-    # Prepend ~/.hounddog/bin so another hounddog executable cannot shadow the installed version.
-    if ! { [ -f "$SHELL_RC" ] && grep -Fqx "$PATH_LINE" "$SHELL_RC"; }; then
-        echo "Adding ${HOME}/.hounddog/bin to PATH in ${SHELL_RC}..."
-        mkdir -p "$(dirname "$SHELL_RC")"
-        printf "\n%s\n" "$PATH_LINE" >> "$SHELL_RC"
+    if [ -z "$SHELL_RC" ]; then
+        NEXT_STEP="Add ${INSTALL_DIR} to the front of your PATH, then run 'hounddog --help' to get started."
+    else
+        # Prepend ~/.hounddog/bin so another hounddog executable cannot shadow the installed version.
+        if ! { [ -f "$SHELL_RC" ] && grep -Fqx "$PATH_LINE" "$SHELL_RC"; }; then
+            echo "Adding ${HOME}/.hounddog/bin to PATH in ${SHELL_RC}..."
+            mkdir -p "$(dirname "$SHELL_RC")"
+            printf "\n%s\n" "$PATH_LINE" >> "$SHELL_RC"
+        fi
+        NEXT_STEP="Open a new shell and run 'hounddog --help' to get started."
     fi
-    NEXT_STEP="Open a new shell and run 'hounddog --help' to get started."
 
 # If the script is running as root, install to /usr/local/bin/hounddog.
 else

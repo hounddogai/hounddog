@@ -25,7 +25,7 @@ FROM node:26-alpine AS frontend-build
 WORKDIR /frontend
 RUN npm install -g pnpm@11.6.0
 COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml frontend/.pnpmfile.mjs ./
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm install --frozen-lockfile
 COPY frontend/ ./
 # `_headers` holds Cloudflare Pages' headers for the cloud frontend; Caddy sets the self-hosted ones itself.
 RUN pnpm run build --mode self-hosted && rm build/client/_headers

@@ -52,6 +52,15 @@ if [ -n "$setup_key" ] && [[ "$setup_key" != hd_setup_* ]]; then
     fail "HOUNDDOG_SETUP_KEY in .env must start with hd_setup_. If setup is complete, remove that line; otherwise, replace its value with hd_setup_ followed by a random value. Then run ./upgrade.sh again."
 fi
 
+# A pinned image version, such as one set to go back after a failed upgrade, would make this upgrade pull that version
+# again, so the upgrade stops until the pin is removed. Docker Compose resolves the image as it would run it, from .env
+# and the shell alike.
+images="$(docker compose config --images)" || fail "Docker Compose cannot read the configuration. Check .env."
+pinned_image="$(grep '^hounddogai/hounddog-self-hosted:' <<< "$images" | grep -v ':latest$' | head -n 1 || true)"
+if [ -n "$pinned_image" ]; then
+    fail "HOUNDDOG_IMAGE_TAG pins HoundDog.ai to ${pinned_image#*:}. Remove it from .env (and your shell) to upgrade to the latest release, then run ./upgrade.sh again."
+fi
+
 heading "UPGRADE HOUNDDOG.AI"
 say "Upgrading keeps your configuration and Docker volumes."
 say "Take a database backup first. HoundDog.ai is unavailable while the database migrates."
@@ -65,6 +74,24 @@ case "${REPLY:-y}" in
 esac
 
 heading "UPGRADE DOCKER COMPOSE"
+# The version installed before the upgrade is what HOUNDDOG_IMAGE_TAG goes back to if it fails. A failed upgrade has
+# already recreated the containers from the new image, so the version is kept in a file until an upgrade succeeds, and
+# a rerun reads it from there. Only a released version can be pulled again.
+previous_version_file=".upgrade-previous-version"
+previous_version="$(cat "$previous_version_file" 2> /dev/null || true)"
+if [ -z "$previous_version" ]; then
+    api_container="$(docker compose ps --all --quiet api 2> /dev/null | head -n 1 || true)"
+    if [ -n "$api_container" ]; then
+        previous_version="$(docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$api_container" \
+            2> /dev/null | sed -n 's/^HOUNDDOG_VERSION=//p' | head -n 1 || true)"
+    fi
+fi
+rollback_hint=""
+if [[ "$previous_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    rollback_hint=" To go back to version ${previous_version}, stop the api, worker, and caddy containers, restore your database backup, set HOUNDDOG_IMAGE_TAG=${previous_version} in .env, and run 'docker compose up -d'."
+    printf '%s\n' "$previous_version" > "$previous_version_file"
+    say "Upgrading from version ${previous_version}."
+fi
 say "Pulling the latest images..."
 docker compose pull
 say "Checking database migrations before stopping containers..."
@@ -87,17 +114,21 @@ say "Stopping the web, API, and worker containers before database migration..."
 docker compose stop --timeout 900 caddy api worker
 say "Applying database migrations with the new image..."
 if ! docker compose run --rm --no-deps api migrate; then
-    fail "Database migration failed. API and worker containers remain stopped. Fix the migration forward or restore your pre-upgrade database backup before restarting the previous release."
+    fail "Database migration failed. API and worker containers remain stopped. Fix the migration forward and run ./upgrade.sh again.${rollback_hint}"
 fi
 say "Updating scan rules with the new image..."
 if ! docker compose run --rm --no-deps api update-rules; then
-    fail "Scan rule update failed after database migration. Containers remain stopped; rerun the upgrade after correcting the failure."
+    fail "Scan rule update failed after database migration. Containers remain stopped; rerun the upgrade after correcting the failure.${rollback_hint}"
 fi
 say "Starting the upgraded containers while keeping Docker volumes..."
 if ! docker compose up -d --wait --force-recreate --remove-orphans "${scale_args[@]}"; then
     docker compose ps || true
-    fail "HoundDog.ai did not start successfully. Run 'docker compose logs' for details."
+    # Containers that did start would keep serving, and a restarted API would migrate again, so none keeps running.
+    docker compose stop caddy api worker || true
+    fail "HoundDog.ai did not start successfully, so it was stopped. Run 'docker compose logs' for details.${rollback_hint}"
 fi
+# The new release runs, so a later failure, such as of the CLI upgrade below, has nothing to go back to.
+rm -f "$previous_version_file"
 
 heading "UPGRADE HOUNDDOG CLI"
 curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh

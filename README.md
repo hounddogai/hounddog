@@ -155,6 +155,14 @@ hounddog data-sinks list --output-format=html     # Supported data sinks (HTML)
 hounddog [SUBCOMMAND] --help                      # All subcommands and options
 ```
 
+### Exit Codes
+
+- `0`: the scan succeeded.
+- `1`: the scan failed with an error.
+- `2`: the command line is invalid.
+- `3`: `--fail-severity-threshold` found a risky dataflow at or above the threshold, so a CI pipeline can block the
+  change while still telling it apart from a scan error.
+
 ## Pricing
 
 See the [HoundDog.ai Pricing Page](https://hounddog.ai/pricing/).

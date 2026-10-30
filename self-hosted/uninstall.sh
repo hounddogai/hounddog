@@ -77,6 +77,7 @@ docker compose down --volumes --remove-orphans
 heading "DELETE CONFIGURATION"
 umask 077
 back_up_and_delete "$(pwd)/.env"
+rm -f .upgrade-previous-version
 if [ -e "$cli_config_env" ] || [ -L "$cli_config_env" ]; then
     back_up_and_delete "$cli_config_env"
 fi

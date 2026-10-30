@@ -100,8 +100,10 @@ so remove that line from `.env` before upgrading. If setup is not complete yet, 
 followed by a random value instead.
 
 If a prerequisite check fails, existing containers keep running. If migration or startup fails after the drain,
-HoundDog.ai stays stopped. Fix the reported error and run `./upgrade.sh` again, or restore your
-database backup before going back to the previous version.
+HoundDog.ai stays stopped. Fix the reported error and run `./upgrade.sh` again, or go back to the previous version:
+run `docker compose stop caddy api worker`, restore your database backup, set `HOUNDDOG_IMAGE_TAG` in `.env` to that
+version (`./upgrade.sh` prints it), and run `docker compose up -d`. Remove `HOUNDDOG_IMAGE_TAG` again before the next
+upgrade, which refuses to run while it pins a version.
 
 ## Reset
 

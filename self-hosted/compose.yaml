@@ -23,7 +23,7 @@ name: hounddog-self-hosted
 # Shared definition for the containers running the hounddogai/hounddog-self-hosted image; the role is
 # selected by `command`.
 x-hounddog-self-hosted: &hounddog-self-hosted
-  image: hounddogai/hounddog-self-hosted:latest
+  image: hounddogai/hounddog-self-hosted:${HOUNDDOG_IMAGE_TAG:-latest}
   restart: unless-stopped
   environment: &hounddog-self-hosted-environment
     HOUNDDOG_SECRET_KEY: ${HOUNDDOG_SECRET_KEY:?is required. Run ./install.sh, or set a stable random string of 50+ characters. Encrypted data derives from it, so it must never change}
