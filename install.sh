@@ -9,7 +9,7 @@ PENDING_INSTALL_PATH=""
 
 cleanup() {
     if [ -n "$PENDING_INSTALL_PATH" ]; then
-        rm -f "$PENDING_INSTALL_PATH" > /dev/null 2>&1
+        rm -rf "$PENDING_INSTALL_PATH" > /dev/null 2>&1
     fi
     if [ -n "$TEMP_DIR" ]; then
         rm -rf "$TEMP_DIR" > /dev/null 2>&1
@@ -29,11 +29,15 @@ usage() {
 Usage: sh install.sh [--version VERSION]
 
 Options:
-  -v, --version VERSION  Install a specific release version.
+  -v, --version VERSION  Install a specific release version, and turn automatic
+                         updates off so that it stays.
                          Allowed formats: x.y.z, x.y.z-alpha, x.y.z-beta.
                          Do not include a leading "v".
-                         Defaults to "latest".
+                         Defaults to "latest", which updates itself.
   -h, --help             Show this help message.
+
+Run as root, it installs to /usr/local/bin for every user, and that copy never
+updates itself: run this script again as root to upgrade it.
 EOF
 }
 
@@ -146,6 +150,9 @@ STAGED_BINARY="${EXTRACT_DIR}/hounddog"
 chmod 755 "$STAGED_BINARY"
 STAGED_VERSION=$("$STAGED_BINARY" --version) || abort "The downloaded HoundDog CLI executable could not be run."
 [ -n "$STAGED_VERSION" ] || abort "The downloaded HoundDog CLI executable did not report a version."
+case "$STAGED_VERSION" in
+    *[!0-9A-Za-z.-]*) abort "The downloaded HoundDog CLI executable reported an invalid version: ${STAGED_VERSION}" ;;
+esac
 
 install_binary() {
     INSTALL_DIR="$1"
@@ -161,7 +168,30 @@ install_binary() {
     [ "$INSTALLED_VERSION" = "$STAGED_VERSION" ] || abort "The installed HoundDog CLI executable failed verification."
 }
 
-# If the script is not running as root, install to ~/.hounddog/bin/hounddog.
+# Installs the staged binary into the managed layout in $1, which `hounddog update` keeps current:
+# versions/<version>/hounddog, and bin/hounddog, a link to the current version that an update replaces in one rename.
+# A plain bin/hounddog that an earlier installer put there becomes the link, so the PATH stays as it was.
+install_managed() {
+    HOME_DIR="$1"
+    mkdir -p "${HOME_DIR}/versions" "${HOME_DIR}/bin"
+    PENDING_INSTALL_PATH=$(mktemp -d "${HOME_DIR}/versions/.hounddog.XXXXXX") \
+        || abort "Failed to create a temporary installation folder in ${HOME_DIR}/versions."
+    chmod 755 "$PENDING_INSTALL_PATH"
+    cp "$STAGED_BINARY" "${PENDING_INSTALL_PATH}/hounddog"
+    chmod 755 "${PENDING_INSTALL_PATH}/hounddog"
+    rm -rf "${HOME_DIR}/versions/${STAGED_VERSION}"
+    mv "$PENDING_INSTALL_PATH" "${HOME_DIR}/versions/${STAGED_VERSION}"
+    PENDING_INSTALL_PATH="${HOME_DIR}/bin/.hounddog.link.$$"
+    ln -s "../versions/${STAGED_VERSION}/hounddog" "$PENDING_INSTALL_PATH"
+    mv -f "$PENDING_INSTALL_PATH" "${HOME_DIR}/bin/hounddog"
+    PENDING_INSTALL_PATH=""
+
+    INSTALLED_VERSION=$("${HOME_DIR}/bin/hounddog" --version) \
+        || abort "The installed HoundDog CLI executable could not be run."
+    [ "$INSTALLED_VERSION" = "$STAGED_VERSION" ] || abort "The installed HoundDog CLI executable failed verification."
+}
+
+# If the script is not running as root, install to ~/.hounddog, with the CLI at ~/.hounddog/bin/hounddog.
 if [ "$(id -u)" -ne 0 ]; then
     # Detect shell configuration file.
     SHELL_NAME=$(basename "${SHELL:-}")
@@ -183,8 +213,20 @@ if [ "$(id -u)" -ne 0 ]; then
     esac
 
     INSTALL_DIR="${HOME}/.hounddog/bin"
-    mkdir -p "$INSTALL_DIR"
-    install_binary "$INSTALL_DIR"
+    install_managed "${HOME}/.hounddog"
+
+    # A given version stays until the user asks for another, so it turns automatic updates off, and installing the
+    # latest version turns them on again. A version too old to have automatic updates refuses the command.
+    UPDATES_NOTE=""
+    if [ "$VERSION" != "latest" ]; then
+        if "${INSTALL_DIR}/hounddog" update --auto off > /dev/null 2>&1; then
+            UPDATES_NOTE="Automatic updates are off, so ${INSTALLED_VERSION} stays. Run 'hounddog update --auto on' to turn them on."
+        fi
+    elif [ -f "${HOME}/.hounddog/update.json" ] && grep -q '"automatic": false' "${HOME}/.hounddog/update.json"; then
+        if "${INSTALL_DIR}/hounddog" update --auto on > /dev/null 2>&1; then
+            UPDATES_NOTE="Automatic updates are on again."
+        fi
+    fi
 
     if [ -z "$SHELL_RC" ]; then
         NEXT_STEP="Add ${INSTALL_DIR} to the front of your PATH, then run 'hounddog --help' to get started."
@@ -198,7 +240,8 @@ if [ "$(id -u)" -ne 0 ]; then
         NEXT_STEP="Open a new shell and run 'hounddog --help' to get started."
     fi
 
-# If the script is running as root, install to /usr/local/bin/hounddog.
+# If the script is running as root, install to /usr/local/bin/hounddog, which only root may change, so the CLI there
+# does not update itself: run this script again to upgrade it.
 else
     # Check prerequisites.
     [ -d "/usr/local/bin" ] || abort "Directory '/usr/local/bin' does not exist. Aborting installation."
@@ -209,10 +252,12 @@ else
     esac
 
     install_binary "/usr/local/bin"
+    UPDATES_NOTE="Installed for every user, so it does not update itself: run this script again as root to upgrade it."
     NEXT_STEP="Run 'hounddog --help' to get started."
 fi
 
 echo ""
 echo "HoundDog CLI installed successfully."
 echo "Installed version: ${INSTALLED_VERSION}"
+[ -z "$UPDATES_NOTE" ] || echo "$UPDATES_NOTE"
 echo "$NEXT_STEP"

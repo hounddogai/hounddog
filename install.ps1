@@ -176,6 +176,9 @@ try {
     if ([string]::IsNullOrWhiteSpace($StagedVersion)) {
         throw 'The downloaded HoundDog CLI executable did not report a version.'
     }
+    if ($StagedVersion -notmatch '^[0-9A-Za-z.-]+$') {
+        throw "The downloaded HoundDog CLI executable reported an invalid version: $StagedVersion"
+    }
 
     # Replace only the CLI executable and leave any unrelated files in the directory intact.
     New-Item -ItemType Directory -Path $InstallPath -Force | Out-Null
@@ -219,6 +222,51 @@ try {
         $BackupInstallPath = $null
     }
 
+    # Keep the version in versions\<version> and name it in bin\current, the layout `hounddog update` keeps current:
+    # it copies a newer version into bin and renames the running copy aside. An install for all users, which only an
+    # administrator may change, never updates itself: running this script again as an administrator upgrades it, so it
+    # keeps neither, and loses those an earlier installer made.
+    $HomePath = Split-Path -Parent $InstallPath
+    $UpdatesNote = $null
+    if ($IsAdmin) {
+        Remove-Item -LiteralPath (Join-Path $InstallPath 'current') -Force -ErrorAction SilentlyContinue
+        Remove-Item -LiteralPath (Join-Path $HomePath 'versions') -Recurse -Force -ErrorAction SilentlyContinue
+        $UpdatesNote = 'Installed for all users, so it does not update itself: run this script again as an administrator to upgrade it.'
+    } else {
+        $VersionPath = Join-Path (Join-Path $HomePath 'versions') $StagedVersion
+        New-Item -ItemType Directory -Path $VersionPath -Force | Out-Null
+        Copy-Item -LiteralPath $ExtractedBinary -Destination (Join-Path $VersionPath 'hounddog.exe') -Force
+        Set-Content -LiteralPath (Join-Path $InstallPath 'current') -Value $StagedVersion -NoNewline -Encoding ascii
+        # A given version stays until the user asks for another, so it turns automatic updates off, and installing the
+        # latest version turns them on again. A version too old to have automatic updates refuses the command.
+        $StatePath = Join-Path $HomePath 'update.json'
+        $Automatic = $null
+        if ($Version -ne 'latest') {
+            $Automatic = 'off'
+        } elseif ((Test-Path -LiteralPath $StatePath -PathType Leaf) -and
+            (Select-String -LiteralPath $StatePath -SimpleMatch '"automatic": false' -Quiet)) {
+            $Automatic = 'on'
+        }
+        if ($Automatic) {
+            # Windows PowerShell stops on a native command's error output while errors stop the script.
+            $PreviousPreference = $ErrorActionPreference
+            $ErrorActionPreference = 'Continue'
+            try {
+                & $InstalledBinary update --auto $Automatic *> $null
+                $IsSwitched = $LASTEXITCODE -eq 0
+            } catch {
+                $IsSwitched = $false
+            } finally {
+                $ErrorActionPreference = $PreviousPreference
+            }
+            if ($IsSwitched -and $Automatic -eq 'off') {
+                $UpdatesNote = "Automatic updates are off, so $InstalledVersion stays. Run 'hounddog update --auto on' to turn them on."
+            } elseif ($IsSwitched) {
+                $UpdatesNote = 'Automatic updates are on again.'
+            }
+        }
+    }
+
     # Prepend the installation directory in both the persistent and current-session PATH values. The persistent value is
     # read and written in the registry as stored: the Environment API expands entries such as %SystemRoot% and saves the
     # whole value as a plain string, which would freeze those entries for every program started afterwards.
@@ -251,6 +299,9 @@ try {
 
     Write-Host "`nHoundDog CLI installed successfully."
     Write-Host "Installed version: $InstalledVersion"
+    if ($UpdatesNote) {
+        Write-Host $UpdatesNote
+    }
     Write-Host "Run 'hounddog --help' to get started."
 } catch {
     throw "$($_.Exception.Message) Aborting installation."

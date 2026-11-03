@@ -60,7 +60,7 @@ The table below shows the configuration parameters used for this scan.
 
 |Parameter|Value|
 |:-|:-|
-|Scanner Version|dev|
+|CLI Version|dev|
 |Scanner Build|dev|
 |Was `HOUNDDOG_API_KEY` provided?|No|
 |Scan Target Directory|<span style="color:rgba(51, 113, 212, 1);">/Users/joohwan/hounddog-workspace/hounddog-test-python</span>|

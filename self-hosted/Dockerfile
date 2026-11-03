@@ -1,34 +1,39 @@
+# syntax=docker/dockerfile:1
 # Build from the private monorepo root with -f public/self-hosted/Dockerfile.
-# cargo-chef compiles the backend dependencies in their own layer, as in docker/backend/Dockerfile.
-FROM rust:1.99-slim-bookworm AS backend-chef
+# cargo-chef compiles the backend dependencies in their own layer, as in docker/platform/Dockerfile.
+FROM rust:1-slim-bookworm AS backend-chef
 ARG CARGO_BUILD_JOBS=2
 ENV CARGO_BUILD_JOBS=$CARGO_BUILD_JOBS
 WORKDIR /build
+# The toolchain file names the Rust channel; rustup installs it here, once per change of the file.
+COPY rust-toolchain.toml ./
+RUN rustup toolchain install
 RUN apt-get update && apt-get install --no-install-recommends -y build-essential cmake libssl-dev pkg-config \
     && rm -rf /var/lib/apt/lists/* \
     && cargo install cargo-chef --locked --version 0.1.78
 
 FROM backend-chef AS backend-planner
 COPY Cargo.toml Cargo.lock ./
-COPY crates ./crates
+COPY --exclude=server/ui crates ./crates
 RUN cargo chef prepare --recipe-path recipe.json
 
 FROM backend-chef AS backend-build
 COPY --from=backend-planner /build/recipe.json ./
-RUN cargo chef cook --release --locked --package hounddog-app --bins --recipe-path recipe.json
+RUN cargo chef cook --release --locked --package hounddog-server --bins --recipe-path recipe.json
 COPY Cargo.toml Cargo.lock ./
-COPY crates ./crates
-COPY prompts ./prompts
-RUN cargo install --locked --path crates/app --root /out --target-dir target --bins
+COPY --exclude=server/ui crates ./crates
+RUN cargo install --locked --path crates/server --root /out --target-dir target --bins
 
 FROM node:26-alpine AS frontend-build
 WORKDIR /frontend
-RUN npm install -g pnpm@11.6.0
-COPY frontend/package.json frontend/pnpm-lock.yaml frontend/pnpm-workspace.yaml frontend/.pnpmfile.mjs ./
+COPY crates/server/ui/package.json crates/server/ui/pnpm-lock.yaml crates/server/ui/pnpm-workspace.yaml \
+    crates/server/ui/.pnpmfile.mjs ./
+COPY crates/server/ui/patches ./patches
+# Node ships without Corepack since version 25, so npm installs the pnpm that package.json names.
+RUN npm install --global "$(node --print 'require("./package.json").packageManager')"
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm install --frozen-lockfile
-COPY frontend/ ./
-# `_headers` holds Cloudflare Pages' headers for the cloud frontend; Caddy sets the self-hosted ones itself.
-RUN pnpm run build --mode self-hosted && rm build/client/_headers
+COPY crates/server/ui ./
+RUN pnpm run build --mode self-hosted
 
 # Stock Caddy cannot rate limit, so xcaddy adds the caddy-ratelimit module. The module's only tag (v0.1.0, 2024)
 # predates its Caddyfile validation and ipv6_prefix, so it is pinned to a commit on its main branch.
@@ -43,7 +48,6 @@ ENV HOUNDDOG_ENV=self-hosted \
     HOUNDDOG_LISTEN=0.0.0.0:8800 \
     HOUNDDOG_DATA_DIR=/data \
     HOUNDDOG_RULES_DIR=/rules \
-    HOUNDDOG_PROMPTS_DIR=/prompts \
     RUST_LOG=info
 WORKDIR /app
 RUN groupadd -r hounddog && useradd -m -r -g hounddog -s /bin/bash hounddog \
@@ -54,9 +58,8 @@ COPY --from=backend-build /out/bin/ /usr/local/bin/
 COPY --from=caddy /usr/bin/caddy /usr/local/bin/caddy
 COPY --from=frontend-build /frontend/build/client /srv/frontend
 COPY public/self-hosted/Caddyfile ./Caddyfile
-COPY crates/models/migrations ./migrations
+COPY crates/db/migrations ./migrations
 COPY rules /rules
-COPY prompts /prompts
 COPY public/self-hosted/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 USER hounddog

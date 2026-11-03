@@ -104,6 +104,12 @@ irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
 
 You can also download the binary from the [releases page](https://github.com/hounddogai/hounddog/releases).
 
+The CLI that the scripts install keeps itself up to date: at most once a day, a command downloads a newer release in
+the background for the next one. It does not in CI, in containers, when installed as root or for all Windows users, or
+when installed at a given version (`sh -s -- --version 4.1.0`, or `HOUNDDOG_VERSION` on Windows), which then stays. Run
+`hounddog update` to update by hand, `hounddog update --auto on` or `off` to choose, and `hounddog update --rollback`
+to go back to the version an update replaced.
+
 ### Uninstallation
 
 Remove the CLI, its configuration, which can hold API keys, and its local scan state, which holds copies of scanned
@@ -127,9 +133,11 @@ hounddog scan [OPTIONS] [PATH]
 ```
 
 - **Self-hosted platform:** results appear at http://localhost:3300. Trial installs connect the CLI automatically;
-  for Production installs, create a CLI API key in the web app after setup.
+  for Production installs, create a CLI API key in the web app after setup, and set `HOUNDDOG_URL` to the platform's
+  URL, such as `https://hounddog.example.com`, and `HOUNDDOG_API_KEY` to the key.
 - **Cloud platform:** set `HOUNDDOG_API_KEY` to your API key and results are uploaded to the platform.
-- **CLI only:** results are displayed in the console.
+- **CLI only:** pass `--local` (or `--no-cloud`), and results are displayed in the console. `--no-cloud-upload` uses
+  the platform's settings without uploading the results.
 
 For a quick demo, scan our Python test repository:
 
@@ -154,6 +162,50 @@ hounddog data-elements list --output-format=html  # Supported data elements (HTM
 hounddog data-sinks list --output-format=html     # Supported data sinks (HTML)
 hounddog [SUBCOMMAND] --help                      # All subcommands and options
 ```
+
+### Docker
+
+The `hounddogai/hounddog` image runs the scanner on Linux (amd64 and arm64) without installing it. Mount the root of a
+Git checkout at `/data`, the image's working directory, and pass the API key from your environment:
+
+```sh
+docker run --rm -v "$PWD:/data" -e HOUNDDOG_API_KEY hounddogai/hounddog hounddog scan
+```
+
+- The image scans Git repositories only: Git metadata names the repository whose results the scan replaces.
+- The image never updates itself. Pin a tag and move to a newer one deliberately, or pull the tag you run again when
+  it moves.
+- Docker passes on only the variables you name, so pass your CI provider's too, for Jenkins `-e JENKINS_URL
+  -e BRANCH_NAME -e CHANGE_TARGET -e CHANGE_BRANCH -e CHANGE_FORK`. Without them, the scanner cannot tell that it runs
+  in CI, or a pull request build from a branch build. Without `HOUNDDOG_API_KEY`, the scan uses the bundled rules
+  only, uploads nothing, and warns.
+- Self-hosted platforms also need `-e HOUNDDOG_URL`. Write output files under `/data`, such as
+  `--output-path=/data/report.md`, to keep them.
+
+### CI Pipelines
+
+`--fail-severity-threshold=<info|low|medium|high>` fails the build with exit code 3 on a risky dataflow at or above the
+threshold, after every output and the upload. `--severity` only chooses what the outputs show; it never changes what
+fails the build. Dataflows whose issue is ignored or snoozed on the platform never fail it, and severities that a user
+or an AI review set on the platform apply.
+
+- **Pull request builds** fail only on risky dataflows that are new to the pull request's target branch. The scanner
+  reads the target branch from the CI provider's variables, such as Jenkins' `CHANGE_TARGET` (Jenkins is detected by
+  `JENKINS_URL`, or named with `--ci=jenkins`), or from `HOUNDDOG_GIT_BASE_BRANCH`, which takes precedence. Without a
+  target branch, every risky dataflow counts as new.
+- **Branch builds**, such as those of `main`, have no target branch, so every risky dataflow at or above the threshold
+  fails the build until it is fixed, or ignored on the platform.
+- In CI, the scan fails when `HOUNDDOG_API_KEY` is not set, so a credential that is not bound to the build cannot pass
+  every build without uploading. Pass `--local` to scan with the bundled rules only.
+
+### Excluded Files
+
+The scanner skips the files that the repository's `.gitignore` files exclude, and the files that one of these lists
+excludes, in this order of precedence:
+
+1. A `.hounddogignore` file at the repository's root, in `.gitignore` syntax.
+2. The file patterns on the HoundDog.ai platform, when the scan uses an API key.
+3. The default patterns, which the platform's patterns also start with.
 
 ### Exit Codes
 
@@ -182,19 +234,19 @@ organization sets up:
 - **HoundDog.ai platform:** when connected, the scanner uploads scan results, including the source files where dataflows
   were detected, so you can review each finding in context. The self-hosted platform runs entirely inside your network,
   so this code and the resulting data map stay within your infrastructure.
-- **AI integration:** each finding is reviewed using only its dataflow trace and the source file where it was
-  detected, by the HoundDog.ai cloud platform's built-in AI or directly by the AI provider your organization configures.
+- **AI integration:** the platform reviews each uploaded finding using only its dataflow trace and the source file where
+  it was detected, with the HoundDog.ai cloud platform's built-in AI or the AI provider your organization configures.
 
 ### Does your scanner use AI?
 
 Scans run on a deterministic static analysis engine, which keeps them fast, cheap, and free of hallucinations.
 
 **AI integration (cloud and self-hosted).** On the HoundDog.ai cloud platform, AI works out of the box with Google
-Vertex AI. Your organization can also choose its own provider (AWS Bedrock, Anthropic, OpenAI, Google Gemini, or
-Microsoft Foundry) and API key, which the self-hosted platform and scanner-side reviews use. Findings, traces, and
+Vertex AI. Your organization can also choose its own provider (AWS Bedrock, Anthropic, OpenAI, Google Gemini, Google
+Agent Platform, Microsoft Foundry, or xAI) and API key, on the cloud or self-hosted platform. Findings, traces, and
 source context then go directly to that provider under the DPA and terms your organization holds with it. The AI layer
-auto-closes false positives, adjusts severities, and adds context to findings the scanner already produced. The
-deterministic scan still runs in your CI on inexpensive CPU with negligible impact on CI time.
+runs on the platform: it auto-closes false positives, adjusts severities, and adds context to findings the scanner
+already produced. The deterministic scan still runs in your CI on inexpensive CPU with negligible impact on CI time.
 
 **Rule development.** HoundDog.ai uses AI internally to help generate and update detection rules before they ship with
 the scanner. Customer code and scan results are never used for this, and HoundDog.ai does not use customer code,
