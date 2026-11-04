@@ -18,6 +18,9 @@
 # and for macOS on arm64, named hounddog-<os>-<arch>, and a SHA256SUMS file that each download must match before it
 # replaces the installed CLI. Windows installs with install.ps1 instead.
 #
+# HOUNDDOG_INSTALL_BRIEF=1 says only where the CLI went, and how it reaches the PATH, for an installer that runs this
+# one as a step of its own.
+#
 # HOUNDDOG_RELEASES_URL replaces https://github.com/hounddogai/hounddog/releases, such as with a mirror or a test's
 # server, which serves the same paths: <url>/latest/download/<file> and <url>/download/<version>/<file>.
 
@@ -32,7 +35,7 @@ fail() {
 }
 
 say() {
-    printf '%s\n' "$@"
+    [ -n "${brief}" ] || printf '%s\n' "$@"
 }
 
 # $1 with the home folder written as ~, which reads shorter.
@@ -54,6 +57,8 @@ is_version() {
     printf '%s\n' "$1" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'
 }
 
+brief=''
+[ "${HOUNDDOG_INSTALL_BRIEF:-}" != 1 ] || brief=1
 # Bold marks the title and the commands to copy, in a terminal that shows it.
 bold='' reset=''
 if [ -t 1 ] && [ "${TERM:-dumb}" != dumb ] && [ -z "${NO_COLOR:-}" ]; then
@@ -206,7 +211,8 @@ else
     if [ -n "${version}" ]; then
         if "${home}/bin/hounddog" update --auto off > /dev/null 2>&1; then
             updates="Automatic updates are off, so it stays at ${reported}."
-            updates="${updates} Run hounddog update --auto on to turn them on."
+            # An installer that runs this one keeps the CLI at the version it names.
+            [ -n "${brief}" ] || updates="${updates} Run hounddog update --auto on to turn them on."
         fi
     elif [ -f "${home}/settings.json" ] && grep -q '"automatic": false' "${home}/settings.json" &&
         "${home}/bin/hounddog" update --auto on > /dev/null 2>&1; then
@@ -218,6 +224,7 @@ trap - EXIT
 shown="$(shorten "${directory}")"
 binary="$(shorten "${directory}/hounddog")"
 say "Downloaded and verified ${cli} for ${os_name} (${arch})." "Installed binary at ${binary}."
+[ -z "${brief}" ] || printf '%s\n' "Installed ${cli} at ${binary}."
 [ -z "${updates}" ] || printf '%s\n' "${updates}"
 
 # Puts the folder on the PATH in the profile of the user's shell, and says how: zsh and fish do not read ~/.profile, and

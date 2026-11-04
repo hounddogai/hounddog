@@ -43,6 +43,10 @@ RUN xcaddy build --output /usr/bin/caddy \
 
 FROM debian:bookworm-slim AS runtime
 ARG HOUNDDOG_VERSION=dev
+LABEL org.opencontainers.image.title="HoundDog.ai Self-Hosted" \
+      org.opencontainers.image.vendor="HoundDog.ai" \
+      org.opencontainers.image.url="https://hounddog.ai" \
+      org.opencontainers.image.version="${HOUNDDOG_VERSION}"
 ENV HOUNDDOG_ENV=self-hosted \
     HOUNDDOG_VERSION=$HOUNDDOG_VERSION \
     HOUNDDOG_LISTEN=0.0.0.0:8800 \
@@ -60,8 +64,7 @@ COPY --from=frontend-build /frontend/build/client /srv/frontend
 COPY public/self-hosted/Caddyfile ./Caddyfile
 COPY crates/db/migrations ./migrations
 COPY rules /rules
-COPY public/self-hosted/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY --chmod=755 public/self-hosted/entrypoint.sh /usr/local/bin/entrypoint.sh
 USER hounddog
 EXPOSE 3300 8800
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

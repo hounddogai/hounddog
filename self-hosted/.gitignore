@@ -1,3 +1,6 @@
+# The configuration install.sh generates, and the backups reset.sh and uninstall.sh keep, which hold secrets, and the
+# version upgrade.sh upgraded from.
 .env
+.env.tmp.*
 .env.backup.*
 .upgrade-previous-version
