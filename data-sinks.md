@@ -1,6 +1,6 @@
 # HoundDog.ai Data Sinks
 
-Generated: 2026-11-04 08:37:38
+Generated: 2026-11-04 12:34:30
 
 🟩 Supported  🟨 Partially Supported  🟥 Not Supported Yet  ⬜ Not Applicable
 

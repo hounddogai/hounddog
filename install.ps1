@@ -14,7 +14,7 @@
 # administrator, the script installs the CLI for every user, in %ProgramFiles%\hounddog\bin or HOUNDDOG_INSTALL_DIR,
 # first on the system's PATH, and that CLI never updates itself: running this script again as an administrator
 # upgrades it. Releases have
-# builds for Windows on x86_64 and aarch64, named hounddog-windows-<arch>.exe, and a SHA256SUMS file that each download
+# builds for Windows on amd64 and arm64, named hounddog-windows-<arch>.exe, and a SHA256SUMS file that each download
 # must match before it replaces the installed CLI. Linux and macOS install with install.sh instead.
 #
 # HOUNDDOG_RELEASES_URL replaces https://github.com/hounddogai/hounddog/releases, such as with a mirror or a test's
@@ -76,9 +76,9 @@
     # A 32-bit PowerShell on 64-bit Windows finds the computer's architecture in PROCESSOR_ARCHITEW6432.
     $Machine = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
     $Arch = switch ($Machine) {
-        'AMD64' { 'x86_64' }
-        'ARM64' { 'aarch64' }
-        default { throw "HoundDog.ai CLI runs on x86_64 and aarch64.`nThis computer is $Machine." }
+        'AMD64' { 'amd64' }
+        'ARM64' { 'arm64' }
+        default { throw "HoundDog.ai CLI runs on amd64 and arm64.`nThis computer is $Machine." }
     }
     $Releases = 'https://github.com/hounddogai/hounddog/releases'
     if ($env:HOUNDDOG_RELEASES_URL) {
