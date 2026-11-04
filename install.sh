@@ -1,263 +1,270 @@
 #!/bin/sh
-set -e  # Exit on error
-set -u  # Exit on using unset variable
+#
+# Installs the HoundDog.ai CLI from its GitHub releases. The latest release:
+#
+#   curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh
+#
+# Or a version, which then stays: it turns the CLI's automatic updates off, and installing the latest release turns
+# them on again:
+#
+#   curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh -s -- --version 4.0.0
+#
+# The CLI installs to ~/.local/bin, or to HOUNDDOG_INSTALL_DIR, which goes on the PATH in the profile of the user's
+# shell, zsh, bash, or fish, unless it is already there. The command there is a link into ~/.hounddog, where each
+# version keeps a folder, versions/<version>, and bin/hounddog names the current one, which `hounddog update` repoints
+# to update the CLI in place. A plain binary that an earlier installer put there becomes the link. Run as root, the
+# script installs the CLI for every user, as a plain binary in /usr/local/bin or HOUNDDOG_INSTALL_DIR, which never
+# updates itself: running the script again as root upgrades it. Releases have builds for Linux on x86_64 and aarch64
+# and for macOS on aarch64, named hounddog-<os>-<arch>, and a SHA256SUMS file that each download must match before it
+# replaces the installed CLI. Windows installs with install.ps1 instead.
+#
+# HOUNDDOG_RELEASES_URL replaces https://github.com/hounddogai/hounddog/releases, such as with a mirror or a test's
+# server, which serves the same paths: <url>/latest/download/<file> and <url>/download/<version>/<file>.
 
-echo "Installing HoundDog CLI ..."
+set -eu
 
-TEMP_DIR=""
-PENDING_INSTALL_PATH=""
-
-cleanup() {
-    if [ -n "$PENDING_INSTALL_PATH" ]; then
-        rm -rf "$PENDING_INSTALL_PATH" > /dev/null 2>&1
-    fi
-    if [ -n "$TEMP_DIR" ]; then
-        rm -rf "$TEMP_DIR" > /dev/null 2>&1
-    fi
-}
-
-abort() {
-    echo "$@" 1>&2
+# Prints each argument as a line of an error, and stops.
+fail() {
+    printf 'Error: %s\n' "$1" >&2
+    shift
+    [ "$#" -eq 0 ] || printf '%s\n' "$@" >&2
     exit 1
 }
 
-trap cleanup 0
-trap 'cleanup; exit 1' HUP INT TERM
-
-usage() {
-    cat <<EOF
-Usage: sh install.sh [--version VERSION]
-
-Options:
-  -v, --version VERSION  Install a specific release version, and turn automatic
-                         updates off so that it stays.
-                         Allowed formats: x.y.z, x.y.z-alpha, x.y.z-beta.
-                         Do not include a leading "v".
-                         Defaults to "latest", which updates itself.
-  -h, --help             Show this help message.
-
-Run as root, it installs to /usr/local/bin for every user, and that copy never
-updates itself: run this script again as root to upgrade it.
-EOF
+say() {
+    printf '%s\n' "$@"
 }
 
-VERSION="${HOUNDDOG_VERSION:-latest}"
+# $1 with the home folder written as ~, which reads shorter.
+# The ~ is printed as is, for the reader.
+# shellcheck disable=SC2088
+shorten() {
+    case "$1" in
+        "${HOME:-}"/*) printf '~/%s' "${1#"${HOME}/"}" ;;
+        *) printf '%s' "$1" ;;
+    esac
+}
 
+# Whether $1 is a version, which is a release's tag, such as 1.2.3 or 1.2.3-beta.1. The character check also refuses
+# line breaks, which grep would read as separate lines.
+is_version() {
+    case "$1" in
+        *[!0-9A-Za-z.-]*) return 1 ;;
+    esac
+    printf '%s\n' "$1" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$'
+}
+
+# Bold marks the title and the commands to copy, in a terminal that shows it.
+bold='' reset=''
+if [ -t 1 ] && [ "${TERM:-dumb}" != dumb ] && [ -z "${NO_COLOR:-}" ]; then
+    bold="$(printf '\033[1m')" reset="$(printf '\033[0m')"
+fi
+scripts='https://raw.githubusercontent.com/hounddogai/hounddog/main'
+usage() {
+    printf '%s\n' "Usage: curl -fsSL ${scripts}/install.sh | sh -s -- [--version <version>]" '' \
+        '  -v, --version <version>  Install this version, such as 1.2.3 or 1.2.3-beta.1, which then stays:' \
+        '                           it turns automatic updates off. Without it, the latest release installs.' \
+        '  -h, --help               Show this help.'
+}
+version='' is_version_given=''
 while [ "$#" -gt 0 ]; do
     case "$1" in
-        -v|--version)
-            [ "$#" -ge 2 ] || abort "Missing value for $1."
-            VERSION="$2"
+        -v | --version)
+            [ "$#" -ge 2 ] || fail "$1 needs a version, such as $1 1.2.3."
+            version="$2" is_version_given=1
             shift 2
             ;;
-        -h|--help)
+        -h | --help)
             usage
             exit 0
             ;;
-        *)
-            abort "Unknown option: $1. Use --help to see supported options."
-            ;;
+        *) fail "Unknown option: $1" 'Run with --help to see the options.' ;;
     esac
 done
+[ -z "${is_version_given}" ] || is_version "${version}" ||
+    fail "${version} is not a version of HoundDog.ai CLI." 'A version looks like 1.2.3 or 1.2.3-beta.1.'
 
-[ -n "$VERSION" ] || abort "Version cannot be empty."
-
-# Check operating system.
-OS=$(uname -s)
-case "$OS" in
-    Linux*) OS="linux" ;;
-    Darwin*) OS="macos" ;;
-    *) abort "This HoundDog CLI installation script only supports Linux and macOS." ;;
-esac
-
-# Check CPU architecture.
-ARCH=$(uname -m)
-case "$ARCH" in
-    x86_64) ARCH="amd64" ;;
-    aarch64|arm64) ARCH="arm64" ;;
-    *) abort "Unsupported CPU architecture. HoundDog CLI requires a AMD64 or ARM64 processor." ;;
-esac
-if [ "$OS" = "macos" ] && [ "$ARCH" = "amd64" ]; then
-    # A shell running under Rosetta reports x86_64 on Apple silicon, which runs the ARM64 build natively.
-    [ "$(sysctl -n hw.optional.arm64 2>/dev/null)" = "1" ] ||
-        abort "HoundDog CLI does not support Intel Macs. Use the Docker image hounddogai/hounddog instead."
-    ARCH="arm64"
-fi
-
-# Check other prerequisites.
-command -v curl >/dev/null 2>&1 || abort "Command 'curl' is required to install HoundDog CLI."
-command -v tar >/dev/null 2>&1 || abort "Command 'tar' is required to install HoundDog CLI."
-command -v awk >/dev/null 2>&1 || abort "Command 'awk' is required to install HoundDog CLI."
-if [ "$OS" = "macos" ]; then
-    command -v shasum >/dev/null 2>&1 || abort "Command 'shasum' is required to install HoundDog CLI."
-else
-    command -v sha256sum >/dev/null 2>&1 || abort "Command 'sha256sum' is required to install HoundDog CLI."
-fi
-
-if [ "$VERSION" != "latest" ]; then
-    printf '%s\n' "$VERSION" | awk 'BEGIN { ok = 0 } /^[0-9]+\.[0-9]+\.[0-9]+(-(alpha|beta))?$/ { ok = 1 } END { exit(ok ? 0 : 1) }' \
-        || abort "Invalid version '${VERSION}'. Use x.y.z, x.y.z-alpha, or x.y.z-beta (without a leading 'v')."
-fi
-
-# Download the tarball and checksum files to a private temporary directory.
-TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/hounddog.XXXXXX") || abort "Failed to create a temporary directory."
-TARBALL_PATH="${TEMP_DIR}/hounddog.tar.gz"
-CHECKSUM_PATH="${TEMP_DIR}/hounddog.sha256"
-EXTRACT_DIR="${TEMP_DIR}/extract"
-
-download_release_assets() {
-    RELEASES_URL="https://github.com/hounddogai/hounddog/releases"
-    ARTIFACT="hounddog-${OS}-${ARCH}.tar.gz"
-    TAGS_TO_TRY=""
-
-    if [ "$VERSION" = "latest" ]; then
-        TAGS_TO_TRY="latest"
-    else
-        TAGS_TO_TRY="${VERSION} v${VERSION}"
-    fi
-
-    for TAG in $TAGS_TO_TRY; do
-        if [ "$TAG" = "latest" ]; then
-            DL_URL="${RELEASES_URL}/latest/download"
-        else
-            DL_URL="${RELEASES_URL}/download/${TAG}"
+case "$(uname -s)" in
+    Linux) os=linux os_name=Linux ;;
+    Darwin) os=macos os_name=macOS ;;
+    # Git Bash, MSYS2, and Cygwin on Windows.
+    MINGW* | MSYS* | CYGWIN*)
+        if [ -n "${version}" ]; then
+            fail 'On Windows, install HoundDog.ai CLI in PowerShell:' \
+                "  & ([scriptblock]::Create((irm ${scripts}/install.ps1))) -Version ${version}"
         fi
-
-        if curl -fsSL "${DL_URL}/${ARTIFACT}" -o "$TARBALL_PATH" \
-            && curl -fsSL "${DL_URL}/${ARTIFACT}.sha256" -o "$CHECKSUM_PATH"; then
-            return
-        fi
-    done
-
-    abort "Failed to download HoundDog CLI version '${VERSION}'. Ensure the release exists and uses x.y.z, x.y.z-alpha, or x.y.z-beta."
-}
-
-download_release_assets
-
-# Verify checksum.
-EXPECTED_CHECKSUM=$(awk '{print $1}' "$CHECKSUM_PATH")
-if [ "$OS" = "macos" ]; then
-    ACTUAL_CHECKSUM=$(shasum -a 256 "$TARBALL_PATH" | awk '{print $1}')
-else
-    ACTUAL_CHECKSUM=$(sha256sum "$TARBALL_PATH" | awk '{print $1}')
-fi
-[ "$EXPECTED_CHECKSUM" = "$ACTUAL_CHECKSUM" ] || abort "Checksum mismatch. Aborting installation."
-
-mkdir "$EXTRACT_DIR"
-tar -x -f "$TARBALL_PATH" -C "$EXTRACT_DIR" hounddog
-STAGED_BINARY="${EXTRACT_DIR}/hounddog"
-[ -f "$STAGED_BINARY" ] || abort "The release archive does not contain the HoundDog CLI executable."
-chmod 755 "$STAGED_BINARY"
-STAGED_VERSION=$("$STAGED_BINARY" --version) || abort "The downloaded HoundDog CLI executable could not be run."
-[ -n "$STAGED_VERSION" ] || abort "The downloaded HoundDog CLI executable did not report a version."
-case "$STAGED_VERSION" in
-    *[!0-9A-Za-z.-]*) abort "The downloaded HoundDog CLI executable reported an invalid version: ${STAGED_VERSION}" ;;
+        fail 'On Windows, install HoundDog.ai CLI in PowerShell:' "  irm ${scripts}/install.ps1 | iex"
+        ;;
+    *) fail 'HoundDog.ai CLI runs on Linux, macOS, and Windows.' "This computer runs $(uname -s)." ;;
 esac
+case "$(uname -m)" in
+    x86_64 | amd64) arch=x86_64 ;;
+    aarch64 | arm64) arch=aarch64 ;;
+    *) fail 'HoundDog.ai CLI runs on x86_64 and aarch64.' "This computer is $(uname -m)." ;;
+esac
+# A shell that runs under Rosetta on Apple silicon reports x86_64, and the aarch64 build runs natively there.
+if [ "${os}" = macos ] && [ "${arch}" = x86_64 ] && [ "$(sysctl -n hw.optional.arm64 2> /dev/null)" = 1 ]; then
+    arch=aarch64
+fi
+command -v curl > /dev/null 2>&1 || fail 'Install curl, then run this again.'
+# Both print the checksum of standard input first: sha256sum on Linux, and shasum on macOS.
+if command -v sha256sum > /dev/null 2>&1; then
+    hash_file() { sha256sum < "$1"; }
+elif command -v shasum > /dev/null 2>&1; then
+    hash_file() { shasum -a 256 < "$1"; }
+else
+    fail 'Install sha256sum or shasum to verify downloads,' 'then run this again.'
+fi
 
-install_binary() {
-    INSTALL_DIR="$1"
-    INSTALL_PATH="${INSTALL_DIR}/hounddog"
-    PENDING_INSTALL_PATH=$(mktemp "${INSTALL_DIR}/.hounddog.XXXXXX") \
-        || abort "Failed to create a temporary installation file in ${INSTALL_DIR}."
-    cp "$STAGED_BINARY" "$PENDING_INSTALL_PATH"
-    chmod 755 "$PENDING_INSTALL_PATH"
-    mv -f "$PENDING_INSTALL_PATH" "$INSTALL_PATH"
-    PENDING_INSTALL_PATH=""
+releases="${HOUNDDOG_RELEASES_URL:-https://github.com/hounddogai/hounddog/releases}"
+releases="${releases%/}"
+if [ -n "${version}" ]; then
+    files="${releases}/download/${version}"
+    release="HoundDog.ai CLI ${version}"
+else
+    files="${releases}/latest/download"
+    release='the latest HoundDog.ai CLI release'
+fi
+asset="hounddog-${os}-${arch}"
 
-    INSTALLED_VERSION=$("$INSTALL_PATH" --version) || abort "The installed HoundDog CLI executable could not be run."
-    [ "$INSTALLED_VERSION" = "$STAGED_VERSION" ] || abort "The installed HoundDog CLI executable failed verification."
-}
-
-# Installs the staged binary into the managed layout in $1, which `hounddog update` keeps current:
-# versions/<version>/hounddog, and bin/hounddog, a link to the current version that an update replaces in one rename.
-# A plain bin/hounddog that an earlier installer put there becomes the link, so the PATH stays as it was.
-install_managed() {
-    HOME_DIR="$1"
-    mkdir -p "${HOME_DIR}/versions" "${HOME_DIR}/bin"
-    PENDING_INSTALL_PATH=$(mktemp -d "${HOME_DIR}/versions/.hounddog.XXXXXX") \
-        || abort "Failed to create a temporary installation folder in ${HOME_DIR}/versions."
-    chmod 755 "$PENDING_INSTALL_PATH"
-    cp "$STAGED_BINARY" "${PENDING_INSTALL_PATH}/hounddog"
-    chmod 755 "${PENDING_INSTALL_PATH}/hounddog"
-    rm -rf "${HOME_DIR}/versions/${STAGED_VERSION}"
-    mv "$PENDING_INSTALL_PATH" "${HOME_DIR}/versions/${STAGED_VERSION}"
-    PENDING_INSTALL_PATH="${HOME_DIR}/bin/.hounddog.link.$$"
-    ln -s "../versions/${STAGED_VERSION}/hounddog" "$PENDING_INSTALL_PATH"
-    mv -f "$PENDING_INSTALL_PATH" "${HOME_DIR}/bin/hounddog"
-    PENDING_INSTALL_PATH=""
-
-    INSTALLED_VERSION=$("${HOME_DIR}/bin/hounddog" --version) \
-        || abort "The installed HoundDog CLI executable could not be run."
-    [ "$INSTALLED_VERSION" = "$STAGED_VERSION" ] || abort "The installed HoundDog CLI executable failed verification."
-}
-
-# If the script is not running as root, install to ~/.hounddog, with the CLI at ~/.hounddog/bin/hounddog.
-if [ "$(id -u)" -ne 0 ]; then
-    # Detect shell configuration file.
-    SHELL_NAME=$(basename "${SHELL:-}")
-    case "$SHELL_NAME" in
-        bash)
-            SHELL_RC="$HOME/.bashrc"
-            PATH_LINE="export PATH=\"\$HOME/.hounddog/bin:\$PATH\""
+# Downloads the release's file named $1 to $2, or fails with the lines after them when the release does not have it.
+download_file() {
+    url="${files}/$1"
+    status="$(curl -sSL -o "$2" -w '%{http_code}' "${url}")" ||
+        fail 'Cannot download:' "  ${url}" 'Check your connection, then run this again.'
+    case "${status}" in
+        2??) ;;
+        404)
+            shift 2
+            fail "$@"
             ;;
-        zsh)
-            SHELL_RC="$HOME/.zshrc"
-            PATH_LINE="export PATH=\"\$HOME/.hounddog/bin:\$PATH\""
-            ;;
-        fish)
-            SHELL_RC="$HOME/.config/fish/config.fish"
-            PATH_LINE="set -gx PATH \"\$HOME/.hounddog/bin\" \$PATH"
-            ;;
-        # Other shells, or none, as in many CI containers: install, and leave PATH to the user.
-        *) SHELL_RC="" ;;
+        *) fail 'Cannot download:' "  ${url}" "Server answered HTTP ${status}." ;;
     esac
+}
 
-    INSTALL_DIR="${HOME}/.hounddog/bin"
-    install_managed "${HOME}/.hounddog"
+say "${bold}Installing HoundDog.ai CLI...${reset}" ''
+is_root=''
+[ "$(id -u)" != 0 ] || is_root=1
+if [ -n "${is_root}" ]; then
+    directory="${HOUNDDOG_INSTALL_DIR:-/usr/local/bin}"
+else
+    directory="${HOUNDDOG_INSTALL_DIR:-${HOME}/.local/bin}"
+fi
+mkdir -p "${directory}"
+# Download beside the destination and rename, so a failed download never replaces a working CLI.
+download="$(mktemp "${directory}/.hounddog.XXXXXX")"
+sums="$(mktemp "${directory}/.hounddog.XXXXXX")"
+trap 'rm -f "${download}" "${sums}"' EXIT
+download_file SHA256SUMS "${sums}" "Cannot find ${release}, or its SHA256SUMS." 'See releases at:' "  ${releases}"
+download_file "${asset}" "${download}" "There is no build for ${os_name} on ${arch} in ${release}." \
+    'See releases at:' "  ${releases}"
 
+# SHA256SUMS lists each file as <checksum>  <name>, or <checksum> *<name> in binary mode.
+expected="$(awk -v name="${asset}" '$2 == name || $2 == "*" name { print tolower($1); exit }' "${sums}")"
+case "${expected}" in
+    '' | *[!0-9a-f]*) fail "SHA256SUMS of ${release} has no checksum for ${asset}." ;;
+esac
+actual="$(hash_file "${download}" | awk '{ print tolower($1) }')"
+[ "${actual}" = "${expected}" ] ||
+    fail "Download of ${asset} does not match SHA256SUMS." \
+        'Installed CLI is unchanged.' \
+        'Run this again. A repeated failure means downloads get damaged in transit.'
+chmod 755 "${download}"
+# The release the download is, as the CLI tells it, such as `4.0.0`, which names its folder.
+reported="$("${download}" --version 2> /dev/null | awk 'NR == 1 { print $NF }')" || reported=''
+case "${reported}" in
+    '' | *[!0-9A-Za-z.-]*) fail "The downloaded HoundDog.ai CLI does not run here, or reports no version." ;;
+esac
+cli="HoundDog.ai CLI ${reported}"
+# The note on automatic updates for the summary.
+updates=''
+if [ -n "${is_root}" ]; then
+    # For every user, a plain binary that only root changes, which never updates itself. It replaces what is there,
+    # such as a link into root's own ~/.hounddog that an earlier installer made, which other users could not run.
+    mv -f "${download}" "${directory}/hounddog"
+    updates='It is installed for every user, so it does not update itself: run this script again as root to upgrade it.'
+else
+    home="${HOME}/.hounddog"
+    mkdir -p "${home}/versions" "${home}/bin"
+    staged="$(mktemp -d "${home}/versions/.hounddog.XXXXXX")"
+    trap 'rm -f "${download}" "${sums}"; rm -rf "${staged}"' EXIT
+    chmod 755 "${staged}"
+    mv -f "${download}" "${staged}/hounddog"
+    rm -rf "${home}/versions/${reported}"
+    mv "${staged}" "${home}/versions/${reported}"
+    # Each link is made beside its place and renamed over it, so a command never finds the CLI missing.
+    link="${home}/bin/.hounddog.link.$$"
+    ln -s "../versions/${reported}/hounddog" "${link}"
+    mv -f "${link}" "${home}/bin/hounddog"
+    if [ "$(cd "${directory}" && pwd -P)" != "$(cd "${home}/bin" && pwd -P)" ]; then
+        link="${directory}/.hounddog.link.$$"
+        ln -s "${home}/bin/hounddog" "${link}"
+        mv -f "${link}" "${directory}/hounddog"
+    fi
     # A given version stays until the user asks for another, so it turns automatic updates off, and installing the
-    # latest version turns them on again. A version too old to have automatic updates refuses the command.
-    UPDATES_NOTE=""
-    if [ "$VERSION" != "latest" ]; then
-        if "${INSTALL_DIR}/hounddog" update --auto off > /dev/null 2>&1; then
-            UPDATES_NOTE="Automatic updates are off, so ${INSTALLED_VERSION} stays. Run 'hounddog update --auto on' to turn them on."
+    # latest release turns them on again. A release too old to have automatic updates refuses the command.
+    if [ -n "${version}" ]; then
+        if "${home}/bin/hounddog" update --auto off > /dev/null 2>&1; then
+            updates="Automatic updates are off, so it stays at ${reported}."
+            updates="${updates} Run hounddog update --auto on to turn them on."
         fi
-    elif [ -f "${HOME}/.hounddog/update.json" ] && grep -q '"automatic": false' "${HOME}/.hounddog/update.json"; then
-        if "${INSTALL_DIR}/hounddog" update --auto on > /dev/null 2>&1; then
-            UPDATES_NOTE="Automatic updates are on again."
-        fi
+    elif [ -f "${home}/settings.json" ] && grep -q '"automatic": false' "${home}/settings.json" &&
+        "${home}/bin/hounddog" update --auto on > /dev/null 2>&1; then
+        updates='Automatic updates are on again.'
     fi
-
-    if [ -z "$SHELL_RC" ]; then
-        NEXT_STEP="Add ${INSTALL_DIR} to the front of your PATH, then run 'hounddog --help' to get started."
-    else
-        # Prepend ~/.hounddog/bin so another hounddog executable cannot shadow the installed version.
-        if ! { [ -f "$SHELL_RC" ] && grep -Fqx "$PATH_LINE" "$SHELL_RC"; }; then
-            echo "Adding ${HOME}/.hounddog/bin to PATH in ${SHELL_RC}..."
-            mkdir -p "$(dirname "$SHELL_RC")"
-            printf "\n%s\n" "$PATH_LINE" >> "$SHELL_RC"
-        fi
-        NEXT_STEP="Open a new shell and run 'hounddog --help' to get started."
-    fi
-
-# If the script is running as root, install to /usr/local/bin/hounddog, which only root may change, so the CLI there
-# does not update itself: run this script again to upgrade it.
-else
-    # Check prerequisites.
-    [ -d "/usr/local/bin" ] || abort "Directory '/usr/local/bin' does not exist. Aborting installation."
-    [ -w "/usr/local/bin" ] || abort "No write permission to '/usr/local/bin'. Aborting installation."
-    case ":$PATH:" in
-        *:/usr/local/bin:*) ;;
-        *) abort "Directory '/usr/local/bin' is not in PATH. Aborting installation." ;;
-    esac
-
-    install_binary "/usr/local/bin"
-    UPDATES_NOTE="Installed for every user, so it does not update itself: run this script again as root to upgrade it."
-    NEXT_STEP="Run 'hounddog --help' to get started."
 fi
+rm -f "${sums}"
+trap - EXIT
+shown="$(shorten "${directory}")"
+binary="$(shorten "${directory}/hounddog")"
+say "Downloaded and verified ${cli} for ${os_name} (${arch})." "Installed binary at ${binary}."
+[ -z "${updates}" ] || printf '%s\n' "${updates}"
 
-echo ""
-echo "HoundDog CLI installed successfully."
-echo "Installed version: ${INSTALLED_VERSION}"
-[ -z "$UPDATES_NOTE" ] || echo "$UPDATES_NOTE"
-echo "$NEXT_STEP"
+# Puts the folder on the PATH in the profile of the user's shell, and says how: zsh and fish do not read ~/.profile, and
+# bash reads ~/.bashrc in Linux terminals, which start shells that are not login shells, and ~/.bash_profile in macOS's,
+# which start them. Another shell's user adds the folder by hand.
+case ":${PATH}:" in
+    *":${directory}:"*) next='HoundDog.ai CLI is installed. Next:' ;;
+    *)
+        # The folder as the profile names it, under $HOME when it is there, so the line reads the same for every user.
+        case "${directory}" in
+            "${HOME:-}"/*) entry="\$HOME/${directory#"${HOME}/"}" ;;
+            *) entry="${directory}" ;;
+        esac
+        profile=''
+        # A folder whose name the profile's quotes cannot hold goes on the PATH by hand.
+        case "${directory}" in
+            *[\"\`\\$]*) ;;
+            *)
+                case "${SHELL:-}" in
+                    */zsh) profile="${ZDOTDIR:-${HOME}}/.zshrc" line="export PATH=\"${entry}:\$PATH\"" ;;
+                    */bash)
+                        profile="${HOME}/.bashrc"
+                        [ "${os}" != macos ] || profile="${HOME}/.bash_profile"
+                        line="export PATH=\"${entry}:\$PATH\""
+                        ;;
+                    */fish)
+                        profile="${XDG_CONFIG_HOME:-${HOME}/.config}/fish/config.fish"
+                        line="fish_add_path \"${entry}\""
+                        ;;
+                esac
+                ;;
+        esac
+        if [ -n "${profile}" ] && [ -f "${profile}" ] && grep -Fqx "${line}" "${profile}"; then
+            next='HoundDog.ai CLI is installed. Open a new terminal, then:'
+        elif [ -n "${profile}" ] && mkdir -p "$(dirname "${profile}")" 2> /dev/null &&
+            printf '\n# HoundDog.ai CLI\n%s\n' "${line}" >> "${profile}" 2> /dev/null; then
+            printf '%s\n' "Added ${shown} to your PATH in $(shorten "${profile}")."
+            next='HoundDog.ai CLI is installed. Open a new terminal, then:'
+        else
+            printf '%s\n' "Add ${shown} to your PATH, such as in your shell's profile:" \
+                "  export PATH=\"${entry}:\$PATH\""
+            next='HoundDog.ai CLI is installed. Once it is on your PATH:'
+        fi
+        ;;
+esac
+
+say '' "${next}" '' \
+    '  Scan a repository, from its root folder:' '' \
+    "     ${bold}hounddog scan${reset}" '' \
+    '  To upload the results, set HOUNDDOG_API_KEY to a HoundDog.ai API key.'

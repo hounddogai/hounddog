@@ -65,9 +65,9 @@ codebases, refreshed on every commit, across every repo.
   controlled (a database) or high-risk (an LLM prompt or application logs).
 - **Broad coverage, fully
   customizable.** [100+ sensitive data types](https://github.com/hounddogai/hounddog/blob/main/data-elements.md)
-  and [800+ data sinks](https://github.com/hounddogai/hounddog/blob/main/data-sinks.md) supported out of the box. You
+  and [900+ data sinks](https://github.com/hounddogai/hounddog/blob/main/data-sinks.md) supported out of the box. You
   can also [create your own data element and data sink rules](https://docs.hounddog.ai/platform/scanner-rules/).
-- **Built for large codebases.** Scans 1M+ lines of code in seconds on modern laptops.
+- **Built for large codebases.** Scans millions of lines of code in under a minute on a modern laptop.
 - **AI integration (highly recommended).** Works out of the box on the HoundDog.ai cloud platform, or with your
   organization's own AI provider and API key (see [FAQ](#does-your-scanner-use-ai)). AI reduces false positives, adds
   context, and lets you query the data map in plain English. It only sees the code behind each finding: its dataflow
@@ -94,7 +94,9 @@ For use with the cloud platform, or if you prefer results in the console or as M
 curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh
 ```
 
-On macOS, the CLI requires Apple silicon. On an Intel Mac, use the `hounddogai/hounddog` Docker image instead.
+The script installs the CLI to `~/.local/bin`, a link into `~/.hounddog`, and adds that folder to your `PATH` in your
+shell's profile. On macOS, the CLI requires Apple silicon. On an Intel Mac, use the `hounddogai/hounddog` Docker image
+instead.
 
 **Windows**
 
@@ -102,13 +104,25 @@ On macOS, the CLI requires Apple silicon. On an Intel Mac, use the `hounddogai/h
 irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
 ```
 
-You can also download the binary from the [releases page](https://github.com/hounddogai/hounddog/releases).
+The script installs the CLI to `%LOCALAPPDATA%\hounddog\bin`, or for all users to `%ProgramFiles%\hounddog\bin` when
+run as an administrator, and adds it to the `PATH`. You can also download a binary, `hounddog-<os>-<arch>`, from the
+[releases page](https://github.com/hounddogai/hounddog/releases), and check it against the release's `SHA256SUMS`.
+
+To install a given version, which then stays:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh -s -- --version 4.0.0
+```
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1))) -Version 4.0.0
+```
 
 The CLI that the scripts install keeps itself up to date: at most once a day, a command downloads a newer release in
-the background for the next one. It does not in CI, in containers, when installed as root or for all Windows users, or
-when installed at a given version (`sh -s -- --version 4.1.0`, or `HOUNDDOG_VERSION` on Windows), which then stays. Run
-`hounddog update` to update by hand, `hounddog update --auto on` or `off` to choose, and `hounddog update --rollback`
-to go back to the version an update replaced.
+the background for the next one. It does not in CI, in containers, when installed as root or as a Windows
+administrator, or when installed at a given version, which then stays. Run `hounddog update` to update by hand,
+`hounddog update --auto on` or `off` to choose, and `hounddog update --rollback` to go back to the version an update
+replaced. `HOUNDDOG_DISABLE_AUTOUPDATE=1` turns automatic updates off for one command or a whole environment.
 
 ### Uninstallation
 
@@ -117,7 +131,7 @@ source files:
 
 ```sh
 # Linux and macOS
-rm -rf ~/.hounddog ~/.config/hounddog ~/.local/share/hounddog
+rm -rf ~/.local/bin/hounddog ~/.hounddog ~/.config/hounddog ~/.local/share/hounddog
 sudo rm -f /usr/local/bin/hounddog  # Only if installed as root
 
 # Windows
@@ -158,9 +172,19 @@ We recommend the Markdown Viewer Chrome extension for viewing reports
 ### More Options
 
 ```sh
+hounddog scan --output-format=json                # Results as versioned JSON (also sarif, markdown, and agent)
 hounddog data-elements list --output-format=html  # Supported data elements (HTML)
 hounddog data-sinks list --output-format=html     # Supported data sinks (HTML)
 hounddog [SUBCOMMAND] --help                      # All subcommands and options
+```
+
+### Coding Agents
+
+`hounddog mcp` serves the repository's scan results to coding agents over MCP, on standard input and output. Add it to
+Claude Code from the repository's folder:
+
+```sh
+claude mcp add hounddog -- hounddog mcp
 ```
 
 ### Docker

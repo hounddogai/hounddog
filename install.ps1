@@ -1,316 +1,316 @@
-#Requires -Version 5.1
+# Installs the HoundDog.ai CLI on Windows from its GitHub releases, in PowerShell. The latest release:
+#
+#   irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
+#
+# Or a version, which then stays: it turns the CLI's automatic updates off, and installing the latest release turns
+# them on again:
+#
+#   $Script = irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1
+#   & ([scriptblock]::Create($Script)) -Version 4.0.0
+#
+# The CLI installs to %LOCALAPPDATA%\hounddog\bin, or to HOUNDDOG_INSTALL_DIR, and the folder goes first on the user's
+# PATH. A folder named bin also keeps each version in versions\<version> beside it and names the current one in
+# bin\current, the layout that `hounddog update` keeps current; another folder holds just the binary. Run as an
+# administrator, the script installs the CLI for every user, in %ProgramFiles%\hounddog\bin or HOUNDDOG_INSTALL_DIR,
+# first on the system's PATH, and that CLI never updates itself: running this script again as an administrator
+# upgrades it. Releases have
+# builds for Windows on x86_64 and aarch64, named hounddog-windows-<arch>.exe, and a SHA256SUMS file that each download
+# must match before it replaces the installed CLI. Linux and macOS install with install.sh instead.
+#
+# HOUNDDOG_RELEASES_URL replaces https://github.com/hounddogai/hounddog/releases, such as with a mirror or a test's
+# server, which serves the same paths: <url>/latest/download/<file> and <url>/download/<version>/<file>.
 
-[CmdletBinding()]
-param(
-    [Parameter(Mandatory = $false)]
-    [string]$Version = $env:HOUNDDOG_VERSION
-)
+# The installation runs in a script block of its own, so that iex leaves no variables or preferences behind in the
+# session that runs it.
+& {
+    param([object[]]$Arguments)
 
-# Stop the script on errors.
-$ErrorActionPreference = 'Stop'
-# Disable progress bar for faster downloads.
-$ProgressPreference = 'SilentlyContinue'
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    # The progress bar slows downloads in Windows PowerShell several times over.
+    $ProgressPreference = 'SilentlyContinue'
 
-# GitHub requires TLS 1.2, which is not always enabled by default in Windows PowerShell 5.1.
-[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
-
-if ([string]::IsNullOrWhiteSpace($Version)) {
-    $Version = 'latest'
-}
-
-function Test-HoundDogVersionFormat {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Candidate
-    )
-
-    return $Candidate -match '^\d+\.\d+\.\d+(-(alpha|beta))?$'
-}
-
-# Tell running programs, such as Explorer, that the environment changed, so the programs they start see the new PATH.
-# The Environment API does this for its own writes; the installer writes the registry directly.
-function Send-EnvironmentChange {
-    try {
-        if (-not ('HoundDogInstaller.NativeMethods' -as [type])) {
-            Add-Type -Namespace HoundDogInstaller -Name NativeMethods -MemberDefinition @'
-[DllImport("user32.dll", CharSet = CharSet.Unicode)]
-public static extern IntPtr SendMessageTimeout(
-    IntPtr hWnd, uint msg, UIntPtr wParam, string lParam, uint flags, uint timeout, out UIntPtr result);
-'@
-        }
-        $Result = [UIntPtr]::Zero
-        # HWND_BROADCAST and WM_SETTINGCHANGE, giving up on a hung window (SMTO_ABORTIFHUNG) after 5 seconds.
-        [void][HoundDogInstaller.NativeMethods]::SendMessageTimeout(
-            [IntPtr]0xffff, 0x1A, [UIntPtr]::Zero, 'Environment', 2, 5000, [ref]$Result)
-    } catch {
-        Write-Warning "Open a new terminal, or sign in again, to use the updated PATH: $($_.Exception.Message)"
-    }
-}
-
-function Get-PathWithEntryFirst {
-    param(
-        [Parameter(Mandatory = $false)]
-        [AllowNull()]
-        [AllowEmptyString()]
-        [string]$PathValue,
-
-        [Parameter(Mandatory = $true)]
-        [string]$Entry
-    )
-
-    $PathSeparators = [char[]]@('\', '/')
-    $NormalizedEntry = $Entry.Trim().TrimEnd($PathSeparators)
-    $RemainingEntries = @()
-    if (-not [string]::IsNullOrWhiteSpace($PathValue)) {
-        $RemainingEntries = @(
-            $PathValue.Split(';') | Where-Object {
-                -not [string]::IsNullOrWhiteSpace($_) -and
-                $_.Trim().TrimEnd($PathSeparators) -ine $NormalizedEntry
+    $Scripts = 'https://raw.githubusercontent.com/hounddogai/hounddog/main'
+    $Version = ''
+    $IsVersionGiven = $false
+    for ($Index = 0; $Index -lt $Arguments.Count; $Index++) {
+        $Argument = [string]$Arguments[$Index]
+        if ($Argument -in @('-Version', '-v', '--version')) {
+            if ($Index + 1 -ge $Arguments.Count) {
+                throw "$Argument needs a version, such as $Argument 1.2.3."
             }
-        )
-    }
-
-    return (@($Entry) + $RemainingEntries) -join ';'
-}
-
-# Check CPU architecture.
-$ProcessorArchitecture = if ($env:PROCESSOR_ARCHITEW6432) {
-    $env:PROCESSOR_ARCHITEW6432
-} else {
-    $env:PROCESSOR_ARCHITECTURE
-}
-$Arch = switch ($ProcessorArchitecture.ToUpperInvariant()) {
-    'AMD64' { 'amd64' }
-    # Windows 11 on Arm runs the AMD64 build through its x64 emulation.
-    'ARM64' { 'amd64' }
-    default { throw 'Unsupported CPU architecture. HoundDog CLI requires an AMD64 or ARM64 processor.' }
-}
-$ReleaseRootUrl = "https://github.com/hounddogai/hounddog/releases"
-$Version = $Version.Trim()
-if ($Version -ne 'latest' -and -not (Test-HoundDogVersionFormat -Candidate $Version)) {
-    throw "Invalid version '$Version'. Use x.y.z, x.y.z-alpha, or x.y.z-beta (without a leading 'v')."
-}
-
-$TagsToTry = if ($Version -eq 'latest') {
-    @('latest')
-} else {
-    @($Version, "v$Version")
-}
-$TempDir = Join-Path ([System.IO.Path]::GetTempPath()) ([System.IO.Path]::GetRandomFileName())
-$PendingInstallPath = $null
-$BackupInstallPath = $null
-
-try {
-    # Determine if running with admin privileges.
-    $IsAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-
-    # Set installation path and PATH scope based on privileges.
-    if ($IsAdmin) {
-        # Admin: Install to Program Files and update System PATH.
-        $InstallPath = Join-Path $env:ProgramFiles "hounddog\bin"
-        $PathScope = "Machine"
-        Write-Host "Installing HoundDog CLI for all users..."
-    } else {
-        # Non-admin: Install to user's local app data and update User PATH.
-        $InstallPath = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'hounddog\bin'
-        $PathScope = "User"
-        Write-Host "Installing HoundDog CLI for current user only..."
-    }
-
-    # Create a temporary directory for downloading the ZIP archive.
-    New-Item -ItemType Directory -Path $TempDir -Force | Out-Null
-
-    # Download the ZIP archive and checksum file.
-    $ZipPath = Join-Path $TempDir 'hounddog.zip'
-    $ChecksumPath = Join-Path $TempDir 'hounddog.zip.sha256'
-    $ResolvedTag = $null
-    foreach ($Tag in $TagsToTry) {
-        if ($Tag -eq 'latest') {
-            $BaseDownloadUrl = "$ReleaseRootUrl/latest/download"
+            $Index++
+            $Version = [string]$Arguments[$Index]
+            $IsVersionGiven = $true
+        } elseif ($Argument -in @('-Help', '-h', '--help')) {
+            Write-Host "Usage: & ([scriptblock]::Create((irm $Scripts/install.ps1))) [-Version <version>]"
+            Write-Host ''
+            Write-Host '  -v, -Version <version>  Install this version, such as 1.2.3 or 1.2.3-beta.1, which'
+            Write-Host '                          then stays: it turns automatic updates off. Without it, the'
+            Write-Host '                          latest release installs.'
+            Write-Host '  -h, -Help               Show this help.'
+            return
         } else {
-            $BaseDownloadUrl = "$ReleaseRootUrl/download/$Tag"
+            throw "Unknown option: $Argument`nRun with -Help to see the options."
         }
+    }
+    # Bold marks the title and the commands to copy, in a console that shows it.
+    $Bold = ''
+    $Reset = ''
+    if (-not [Console]::IsOutputRedirected -and $Host.UI.SupportsVirtualTerminal -and -not $env:NO_COLOR) {
+        $Bold = "$([char]27)[1m"
+        $Reset = "$([char]27)[0m"
+    }
+    # A version is a release's tag, such as 1.2.3 or 1.2.3-beta.1. \z ends the match at the very end, where $ would
+    # also allow a line break.
+    if ($IsVersionGiven -and $Version -cnotmatch '^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?\z') {
+        throw "$Version is not a version of HoundDog.ai CLI.`nA version looks like 1.2.3 or 1.2.3-beta.1."
+    }
+    if ($env:OS -ne 'Windows_NT') {
+        $Command = "curl -fsSL $Scripts/install.sh | sh"
+        if ($Version) {
+            $Command += " -s -- --version $Version"
+        }
+        throw "This script installs HoundDog.ai CLI on Windows.`nOn Linux and macOS, run:`n  $Command"
+    }
+    # A 32-bit PowerShell on 64-bit Windows finds the computer's architecture in PROCESSOR_ARCHITEW6432.
+    $Machine = if ($env:PROCESSOR_ARCHITEW6432) { $env:PROCESSOR_ARCHITEW6432 } else { $env:PROCESSOR_ARCHITECTURE }
+    $Arch = switch ($Machine) {
+        'AMD64' { 'x86_64' }
+        'ARM64' { 'aarch64' }
+        default { throw "HoundDog.ai CLI runs on x86_64 and aarch64.`nThis computer is $Machine." }
+    }
+    $Releases = 'https://github.com/hounddogai/hounddog/releases'
+    if ($env:HOUNDDOG_RELEASES_URL) {
+        $Releases = $env:HOUNDDOG_RELEASES_URL.TrimEnd('/')
+    }
+    if ($Version) {
+        $Files = "$Releases/download/$Version"
+        $Release = "HoundDog.ai CLI $Version"
+    } else {
+        $Files = "$Releases/latest/download"
+        $Release = 'the latest HoundDog.ai CLI release'
+    }
+    $Asset = "hounddog-windows-$Arch.exe"
 
-        Remove-Item -Path $ZipPath, $ChecksumPath -Force -ErrorAction SilentlyContinue
-        $DownloadUrl = "$BaseDownloadUrl/hounddog-windows-$Arch.zip"
-        Write-Host "Downloading ZIP from $DownloadUrl ..."
+    # Downloads the release's file named $Name to $Path, or fails with $Missing when the release does not have it.
+    function Get-ReleaseFile([string]$Name, [string]$Path, [string]$Missing) {
+        $Url = "$Files/$Name"
         try {
-            Invoke-WebRequest -Uri $DownloadUrl -OutFile $ZipPath -UseBasicParsing
-            Invoke-WebRequest -Uri "$DownloadUrl.sha256" -OutFile $ChecksumPath -UseBasicParsing
-            $ResolvedTag = $Tag
-            break
+            Invoke-WebRequest -Uri $Url -OutFile $Path -UseBasicParsing
         } catch {
-            continue
-        }
-    }
-
-    if (-not $ResolvedTag) {
-        throw "Failed to download HoundDog CLI version '$Version'. Ensure the release exists and uses x.y.z, x.y.z-alpha, or x.y.z-beta."
-    }
-
-    # Download the SHA256 checksum file and verify the integrity of the binary.
-    Write-Host "Verifying checksum ..."
-    $ChecksumContent = (Get-Content -Path $ChecksumPath -Raw).Trim()
-    if ($ChecksumContent -notmatch '^(?<Hash>[0-9a-fA-F]{64})(?:\s|$)') {
-        throw 'The downloaded checksum file is invalid.'
-    }
-    $ExpectedHash = $Matches.Hash
-    $ActualHash = Get-FileHash -Path $ZipPath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-    if ($ActualHash -ine $ExpectedHash) {
-        throw 'Checksum verification failed.'
-    }
-
-    # Extract and validate the new executable before replacing an existing installation.
-    $ExtractPath = Join-Path $TempDir 'extract'
-    Expand-Archive -Path $ZipPath -DestinationPath $ExtractPath -Force
-    $ExtractedBinary = Join-Path $ExtractPath 'hounddog.exe'
-    if (-not (Test-Path -LiteralPath $ExtractedBinary -PathType Leaf)) {
-        throw 'The release archive does not contain hounddog.exe.'
-    }
-
-    $StagedVersionOutput = @(& $ExtractedBinary --version)
-    if ($LASTEXITCODE -ne 0) {
-        throw 'The downloaded HoundDog CLI executable could not be run.'
-    }
-    $StagedVersion = ($StagedVersionOutput -join [Environment]::NewLine).Trim()
-    if ([string]::IsNullOrWhiteSpace($StagedVersion)) {
-        throw 'The downloaded HoundDog CLI executable did not report a version.'
-    }
-    if ($StagedVersion -notmatch '^[0-9A-Za-z.-]+$') {
-        throw "The downloaded HoundDog CLI executable reported an invalid version: $StagedVersion"
-    }
-
-    # Replace only the CLI executable and leave any unrelated files in the directory intact.
-    New-Item -ItemType Directory -Path $InstallPath -Force | Out-Null
-    $InstalledBinary = Join-Path $InstallPath 'hounddog.exe'
-    $PendingInstallPath = Join-Path $InstallPath "hounddog-$([Guid]::NewGuid().ToString('N')).tmp"
-    Copy-Item -LiteralPath $ExtractedBinary -Destination $PendingInstallPath
-    if (Test-Path -LiteralPath $InstalledBinary -PathType Leaf) {
-        $BackupInstallPath = Join-Path $InstallPath "hounddog-$([Guid]::NewGuid().ToString('N')).bak"
-        [System.IO.File]::Replace($PendingInstallPath, $InstalledBinary, $BackupInstallPath)
-    } else {
-        [System.IO.File]::Move($PendingInstallPath, $InstalledBinary)
-    }
-    $PendingInstallPath = $null
-
-    try {
-        $InstalledVersionOutput = @(& $InstalledBinary --version)
-        if ($LASTEXITCODE -ne 0) {
-            throw 'The installed HoundDog CLI executable could not be run.'
-        }
-        $InstalledVersion = ($InstalledVersionOutput -join [Environment]::NewLine).Trim()
-        if ($InstalledVersion -ne $StagedVersion) {
-            throw 'The installed HoundDog CLI executable failed verification.'
-        }
-    } catch {
-        $InstallFailure = $_
-        if ($BackupInstallPath -and (Test-Path -LiteralPath $BackupInstallPath -PathType Leaf)) {
-            try {
-                Copy-Item -LiteralPath $BackupInstallPath -Destination $InstalledBinary -Force
-            } catch {
-                throw "The installed executable failed verification and the previous installation could not be restored. The backup remains at '$BackupInstallPath': $($_.Exception.Message)"
+            $Response = $_.Exception.PSObject.Properties['Response']
+            if ($Response -and $Response.Value -and [int]$Response.Value.StatusCode -eq 404) {
+                throw $Missing
             }
-            Remove-Item -LiteralPath $BackupInstallPath -Force -ErrorAction SilentlyContinue
-            $BackupInstallPath = $null
-        } else {
-            Remove-Item -LiteralPath $InstalledBinary -Force -ErrorAction SilentlyContinue
+            throw "Cannot download:`n  $Url`n$($_.Exception.Message)"
         }
-        throw $InstallFailure
-    }
-    if ($BackupInstallPath) {
-        Remove-Item -LiteralPath $BackupInstallPath -Force
-        $BackupInstallPath = $null
     }
 
-    # Keep the version in versions\<version> and name it in bin\current, the layout `hounddog update` keeps current:
-    # it copies a newer version into bin and renames the running copy aside. An install for all users, which only an
-    # administrator may change, never updates itself: running this script again as an administrator upgrades it, so it
-    # keeps neither, and loses those an earlier installer made.
-    $HomePath = Split-Path -Parent $InstallPath
-    $UpdatesNote = $null
-    if ($IsAdmin) {
-        Remove-Item -LiteralPath (Join-Path $InstallPath 'current') -Force -ErrorAction SilentlyContinue
-        Remove-Item -LiteralPath (Join-Path $HomePath 'versions') -Recurse -Force -ErrorAction SilentlyContinue
-        $UpdatesNote = 'Installed for all users, so it does not update itself: run this script again as an administrator to upgrade it.'
-    } else {
-        $VersionPath = Join-Path (Join-Path $HomePath 'versions') $StagedVersion
-        New-Item -ItemType Directory -Path $VersionPath -Force | Out-Null
-        Copy-Item -LiteralPath $ExtractedBinary -Destination (Join-Path $VersionPath 'hounddog.exe') -Force
-        Set-Content -LiteralPath (Join-Path $InstallPath 'current') -Value $StagedVersion -NoNewline -Encoding ascii
+    $Identity = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+    $IsAdministrator = $Identity.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    $Directory = $env:HOUNDDOG_INSTALL_DIR
+    if (-not $Directory -and $IsAdministrator) {
+        $Directory = Join-Path $env:ProgramFiles 'hounddog\bin'
+    } elseif (-not $Directory) {
+        $Directory = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'hounddog\bin'
+    }
+    New-Item -ItemType Directory -Path $Directory -Force | Out-Null
+    $Directory = (Resolve-Path -LiteralPath $Directory).ProviderPath
+    # A drive's root keeps its separator, since C: alone names the drive's current folder.
+    if ($Directory -notmatch '^[A-Za-z]:\\$') {
+        $Directory = $Directory.TrimEnd('\')
+    }
+    # A semicolon splits a PATH's folders, and Windows reads %NAME% in one as a variable.
+    if ($Directory -match '[;%]') {
+        throw "A PATH cannot hold a folder named with a semicolon or a percent sign:`n  $Directory`n" +
+            'Choose another folder with HOUNDDOG_INSTALL_DIR.'
+    }
+    $Binary = Join-Path $Directory 'hounddog.exe'
+    # One installation into the folder at a time, so none deletes the files another is using. The lock file goes when
+    # its handle closes, also when PowerShell ends.
+    try {
+        # Typed arguments, since PowerShell would read the options as a Boolean and pick another constructor.
+        $Lock = [IO.FileStream]::new((Join-Path $Directory '.hounddog.lock'), [IO.FileMode]::OpenOrCreate,
+            [IO.FileAccess]::ReadWrite, [IO.FileShare]::None, 1, [IO.FileOptions]::DeleteOnClose)
+    } catch {
+        $Cause = if ($_.Exception.InnerException) { $_.Exception.InnerException } else { $_.Exception }
+        # 32 is ERROR_SHARING_VIOLATION: another installation holds the lock.
+        if (($Cause.HResult -band 0xFFFF) -eq 32) {
+            throw "Another installation of HoundDog.ai CLI into $Directory is running.`nRun this again once that installation ends."
+        }
+        throw
+    }
+    # Download beside the destination and rename, so a failed download never replaces a working CLI.
+    $Download = Join-Path $Directory ".hounddog-$([Guid]::NewGuid().ToString('N')).exe"
+    $Sums = Join-Path $Directory ".hounddog-$([Guid]::NewGuid().ToString('N')).sums"
+    # Windows PowerShell offers servers only TLS 1.0 and older unless the system's settings say otherwise, and GitHub
+    # refuses them, so TLS 1.2 is offered too while the CLI downloads. The system's default, 0, which older .NET
+    # releases have no name for and PowerShell 7 uses, offers it already.
+    $Protocols = [Net.ServicePointManager]::SecurityProtocol
+    try {
+        if ([int]$Protocols -ne 0) {
+            [Net.ServicePointManager]::SecurityProtocol = $Protocols -bor [Net.SecurityProtocolType]::Tls12
+        }
+        # What an earlier installation left: a CLI that was running as it was replaced, or a download it did not finish.
+        Get-ChildItem -LiteralPath $Directory -Filter '.hounddog-*' -Force |
+            Remove-Item -Force -ErrorAction SilentlyContinue
+        Write-Host "${Bold}Installing HoundDog.ai CLI...$Reset"
+        Write-Host ''
+        Get-ReleaseFile 'SHA256SUMS' $Sums "Cannot find $Release, or its SHA256SUMS.`nSee releases at:`n  $Releases"
+        Get-ReleaseFile $Asset $Download ("There is no build for Windows on $Arch in $Release.`n" +
+            "See releases at:`n  $Releases")
+        # SHA256SUMS lists each file as <checksum>  <name>, or <checksum> *<name> in binary mode.
+        $Expected = $null
+        foreach ($Line in Get-Content -LiteralPath $Sums) {
+            if ($Line -match '^([0-9A-Fa-f]{64}) [ *](.+)$' -and $Matches[2] -ceq $Asset) {
+                $Expected = $Matches[1]
+                break
+            }
+        }
+        if (-not $Expected) {
+            throw "SHA256SUMS of $Release has no checksum for $Asset."
+        }
+        # -ne compares regardless of case, since Get-FileHash answers in upper case.
+        if ((Get-FileHash -LiteralPath $Download -Algorithm SHA256).Hash -ne $Expected) {
+            throw "Download of $Asset does not match SHA256SUMS.`n" +
+                "Installed CLI is unchanged.`n" +
+                'Run this again. A repeated failure means downloads get damaged in transit.'
+        }
+        # Windows cannot replace a program while it runs, such as the CLI a coding agent runs as its MCP server, but it
+        # can rename it. The running CLI moves aside, and the next installation deletes it.
+        $Previous = $null
+        if (Test-Path -LiteralPath $Binary) {
+            $Previous = Join-Path $Directory ".hounddog-$([Guid]::NewGuid().ToString('N')).old"
+            Move-Item -LiteralPath $Binary -Destination $Previous
+        }
+        try {
+            Move-Item -LiteralPath $Download -Destination $Binary
+        } catch {
+            if ($Previous) {
+                Move-Item -LiteralPath $Previous -Destination $Binary
+            }
+            throw
+        }
+        if ($Previous) {
+            Remove-Item -LiteralPath $Previous -Force -ErrorAction SilentlyContinue
+        }
+    } finally {
+        Remove-Item -LiteralPath $Download, $Sums -Force -ErrorAction SilentlyContinue
+        [Net.ServicePointManager]::SecurityProtocol = $Protocols
+        $Lock.Dispose()
+    }
+    # The release a download of the latest one is, as the CLI tells it, such as `4.0.0`.
+    if (-not $Version) {
+        try {
+            $Told = @(& $Binary --version 2> $null)
+            if ($Told.Count -gt 0 -and "$($Told[0])" -match '(\S+)\s*$') {
+                $Version = $Matches[1]
+            }
+        } catch {
+            # A CLI that does not run on this computer tells no release, and the summary names the latest instead.
+        }
+    }
+    $Cli = if ($Version) { "HoundDog.ai CLI $Version" } else { 'the latest HoundDog.ai CLI' }
+    # A folder for every user, which only an administrator may change, never updates itself.
+    $IsShared = $false
+    foreach ($Shared in @($env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:ProgramW6432, $env:ProgramData)) {
+        if ($Shared -and $Directory.StartsWith($Shared.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) {
+            $IsShared = $true
+        }
+    }
+    # The note on automatic updates for the summary.
+    $Updates = $null
+    # The layout `hounddog update` keeps current, beside a folder named bin: it copies a newer version into bin and
+    # renames the running copy aside, as this script does.
+    if (-not $IsShared -and $Version -match '^[0-9A-Za-z.-]+$' -and (Split-Path -Leaf $Directory) -eq 'bin') {
+        $Kept = Join-Path (Join-Path (Split-Path -Parent $Directory) 'versions') $Version
+        New-Item -ItemType Directory -Path $Kept -Force | Out-Null
+        Copy-Item -LiteralPath $Binary -Destination (Join-Path $Kept 'hounddog.exe') -Force
+        Set-Content -LiteralPath (Join-Path $Directory 'current') -Value $Version -NoNewline -Encoding ascii
         # A given version stays until the user asks for another, so it turns automatic updates off, and installing the
-        # latest version turns them on again. A version too old to have automatic updates refuses the command.
-        $StatePath = Join-Path $HomePath 'update.json'
+        # latest release turns them on again. A release too old to have automatic updates refuses the command.
+        $Settings = Join-Path (Split-Path -Parent $Directory) 'settings.json'
         $Automatic = $null
-        if ($Version -ne 'latest') {
+        if ($IsVersionGiven) {
             $Automatic = 'off'
-        } elseif ((Test-Path -LiteralPath $StatePath -PathType Leaf) -and
-            (Select-String -LiteralPath $StatePath -SimpleMatch '"automatic": false' -Quiet)) {
+        } elseif ((Test-Path -LiteralPath $Settings -PathType Leaf) -and
+            (Select-String -LiteralPath $Settings -SimpleMatch '"automatic": false' -Quiet)) {
             $Automatic = 'on'
         }
         if ($Automatic) {
-            # Windows PowerShell stops on a native command's error output while errors stop the script.
-            $PreviousPreference = $ErrorActionPreference
+            # Windows PowerShell stops at a program's error output while errors stop the script.
+            $Preference = $ErrorActionPreference
             $ErrorActionPreference = 'Continue'
             try {
-                & $InstalledBinary update --auto $Automatic *> $null
+                & $Binary update --auto $Automatic *> $null
                 $IsSwitched = $LASTEXITCODE -eq 0
             } catch {
                 $IsSwitched = $false
             } finally {
-                $ErrorActionPreference = $PreviousPreference
+                $ErrorActionPreference = $Preference
             }
             if ($IsSwitched -and $Automatic -eq 'off') {
-                $UpdatesNote = "Automatic updates are off, so $InstalledVersion stays. Run 'hounddog update --auto on' to turn them on."
+                $Updates = "Automatic updates are off, so it stays at $Version. Run hounddog update --auto on to turn them on."
             } elseif ($IsSwitched) {
-                $UpdatesNote = 'Automatic updates are on again.'
+                $Updates = 'Automatic updates are on again.'
             }
         }
+    } else {
+        # A binary whose version is unknown must not pass for the one bin\current names.
+        Remove-Item -LiteralPath (Join-Path $Directory 'current') -Force -ErrorAction SilentlyContinue
+        if ($IsShared) {
+            $Updates = 'It is installed for every user, so it does not update itself: run this script again as an administrator to upgrade it.'
+        }
+    }
+    # The folder as the summary names it, from %LOCALAPPDATA% when it is there, which reads shorter.
+    $LocalAppData = [Environment]::GetFolderPath('LocalApplicationData').TrimEnd('\')
+    $Shown = $Directory
+    if ($Shown.StartsWith("$LocalAppData\", [StringComparison]::OrdinalIgnoreCase)) {
+        $Shown = '%LOCALAPPDATA%' + $Shown.Substring($LocalAppData.Length)
+    }
+    Write-Host "Downloaded and verified $Cli for Windows ($Arch)."
+    Write-Host "Installed binary at $(Join-Path $Shown 'hounddog.exe')."
+    if ($Updates) {
+        Write-Host $Updates
     }
 
-    # Prepend the installation directory in both the persistent and current-session PATH values. The persistent value is
-    # read and written in the registry as stored: the Environment API expands entries such as %SystemRoot% and saves the
-    # whole value as a plain string, which would freeze those entries for every program started afterwards.
-    $EnvironmentKey = if ($PathScope -eq 'Machine') {
-        [Microsoft.Win32.Registry]::LocalMachine.OpenSubKey(
-            'SYSTEM\CurrentControlSet\Control\Session Manager\Environment', $true)
+    # The folder goes first on the PATH, the system's for a folder for every user and the user's otherwise, which the
+    # registry holds with its variables unexpanded, such as %USERPROFILE%, and which they keep. Terminals opened from
+    # now on find the CLI, and so does this session.
+    $IsOther = { param($Entry) $Entry -and $Entry.TrimEnd('\') -ine $Directory.TrimEnd('\') }
+    $Scope = if ($IsShared) { 'Machine' } else { 'User' }
+    $Key = if ($IsShared) {
+        [Microsoft.Win32.Registry]::LocalMachine.CreateSubKey('SYSTEM\CurrentControlSet\Control\Session Manager\Environment')
     } else {
-        [Microsoft.Win32.Registry]::CurrentUser.OpenSubKey('Environment', $true)
-    }
-    if (-not $EnvironmentKey) {
-        throw "Failed to open the $PathScope environment in the registry."
+        [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey('Environment')
     }
     try {
-        $CurrentPath = [string]$EnvironmentKey.GetValue(
-            'Path', '', [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames)
-        $NewPath = Get-PathWithEntryFirst -PathValue $CurrentPath -Entry $InstallPath
-        if ($NewPath -ne $CurrentPath) {
-            try {
-                $EnvironmentKey.SetValue('Path', $NewPath, [Microsoft.Win32.RegistryValueKind]::ExpandString)
-            } catch {
-                throw "Failed to update the $PathScope PATH: $($_.Exception.Message)"
-            }
-            Send-EnvironmentChange
-            Write-Host "Added HoundDog CLI to the beginning of the $PathScope PATH."
+        $StoredPath = [string]$Key.GetValue('Path', '', 'DoNotExpandEnvironmentNames')
+        $NewPath = (@($Directory) + @($StoredPath.Split(';') | Where-Object { & $IsOther $_ })) -join ';'
+        if ($NewPath -ne $StoredPath) {
+            # A PATH stored as plain text stays plain, so a % in one of its folders' names keeps meaning a %.
+            $Kind = if ($Key.GetValueNames() -contains 'Path') { $Key.GetValueKind('Path') } else { 'ExpandString' }
+            $Key.SetValue('Path', $NewPath, $Kind)
+            # Setting a variable through .NET tells running programs, such as Explorer, that the environment changed,
+            # so the terminals they open read the new PATH.
+            $Notice = "HOUNDDOG_$([Guid]::NewGuid().ToString('N'))"
+            [Environment]::SetEnvironmentVariable($Notice, '1', $Scope)
+            [Environment]::SetEnvironmentVariable($Notice, [NullString]::Value, $Scope)
+            Write-Host "Added $Shown to your PATH."
         }
     } finally {
-        $EnvironmentKey.Close()
+        $Key.Dispose()
     }
-    $env:Path = Get-PathWithEntryFirst -PathValue $env:Path -Entry $InstallPath
+    $env:Path = (@($Directory) + @($env:Path.Split(';') | Where-Object { & $IsOther $_ })) -join ';'
 
-    Write-Host "`nHoundDog CLI installed successfully."
-    Write-Host "Installed version: $InstalledVersion"
-    if ($UpdatesNote) {
-        Write-Host $UpdatesNote
-    }
-    Write-Host "Run 'hounddog --help' to get started."
-} catch {
-    throw "$($_.Exception.Message) Aborting installation."
-} finally {
-    if ($PendingInstallPath -and (Test-Path -LiteralPath $PendingInstallPath)) {
-        Remove-Item -LiteralPath $PendingInstallPath -Force -ErrorAction SilentlyContinue
-    }
-    # Clean up the temporary directory.
-    if (Test-Path $TempDir) {
-        Remove-Item -Path $TempDir -Recurse -Force -ErrorAction SilentlyContinue
-    }
-}
+    # This session finds the CLI too, so the next steps need no new terminal.
+    Write-Host ''
+    Write-Host 'HoundDog.ai CLI is installed. Next:'
+    Write-Host ''
+    Write-Host '  Scan a repository, from its root folder:'
+    Write-Host ''
+    Write-Host "     ${Bold}hounddog scan$Reset"
+    Write-Host ''
+    Write-Host '  To upload the results, set HOUNDDOG_API_KEY to a HoundDog.ai API key.'
+} $args
