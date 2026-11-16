@@ -94,6 +94,11 @@ if [[ "$previous_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 fi
 say "Pulling the latest images..."
 docker compose pull
+# The migration commands run without dependencies, so the bundled database of a Trial install must already be up, even
+# after `docker compose stop` or `down`.
+if docker compose config --services | grep -qx postgres; then
+    docker compose up -d --wait --no-recreate postgres
+fi
 say "Checking database migrations before stopping containers..."
 migration_status=0
 docker compose run --rm --no-deps api migrate --check || migration_status=$?

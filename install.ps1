@@ -1,4 +1,5 @@
-# Installs the HoundDog.ai CLI on Windows from its GitHub releases, in PowerShell. The latest release:
+# Installs the HoundDog.ai CLI on Windows from its GitHub releases, or from HoundDog.ai's copy of them on Google Cloud
+# when GitHub does not answer, in PowerShell. The latest release:
 #
 #   irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
 #
@@ -11,14 +12,15 @@
 # The CLI installs to %LOCALAPPDATA%\hounddog\bin, or to HOUNDDOG_INSTALL_DIR, and the folder goes first on the user's
 # PATH. A folder named bin also keeps each version in versions\<version> beside it and names the current one in
 # bin\current, the layout that `hounddog update` keeps current; another folder holds just the binary. Run as an
-# administrator, the script installs the CLI for every user, in %ProgramFiles%\hounddog\bin or HOUNDDOG_INSTALL_DIR,
-# first on the system's PATH, and that CLI never updates itself: running this script again as an administrator
-# upgrades it. Releases have
-# builds for Windows on amd64 and arm64, named hounddog-windows-<arch>.exe, and a SHA256SUMS file that each download
-# must match before it replaces the installed CLI. Linux and macOS install with install.sh instead.
+# administrator, the script installs the CLI for every user, in %ProgramFiles%\hounddog\bin, first on the system's
+# PATH, and that CLI never updates itself: running this script again as an administrator upgrades it. An
+# administrator's install in a folder outside Program Files, as HOUNDDOG_INSTALL_DIR may name, is installed as a user's is.
+# Releases have builds for Windows on amd64 and arm64, named hounddog-windows-<arch>.exe, and a SHA256SUMS file that
+# each download must match before it replaces the installed CLI. Linux and macOS install with install.sh instead.
 #
-# HOUNDDOG_RELEASES_URL replaces https://github.com/hounddogai/hounddog/releases, such as with a mirror or a test's
-# server, which serves the same paths: <url>/latest/download/<file> and <url>/download/<version>/<file>.
+# HOUNDDOG_RELEASES_URL replaces https://github.com/hounddogai/hounddog/releases, and HOUNDDOG_RELEASES_MIRROR_URL the
+# copy, https://storage.googleapis.com/hounddog-releases. Each serves the same paths, as a test's server does:
+# <url>/latest/download/<file> and <url>/download/<version>/<file>.
 
 # The installation runs in a script block of its own, so that iex leaves no variables or preferences behind in the
 # session that runs it.
@@ -84,26 +86,40 @@
     if ($env:HOUNDDOG_RELEASES_URL) {
         $Releases = $env:HOUNDDOG_RELEASES_URL.TrimEnd('/')
     }
+    $Mirror = 'https://storage.googleapis.com/hounddog-releases'
+    if ($env:HOUNDDOG_RELEASES_MIRROR_URL) {
+        $Mirror = $env:HOUNDDOG_RELEASES_MIRROR_URL.TrimEnd('/')
+    }
     if ($Version) {
-        $Files = "$Releases/download/$Version"
+        $Folder = "download/$Version"
         $Release = "HoundDog.ai CLI $Version"
     } else {
-        $Files = "$Releases/latest/download"
+        $Folder = 'latest/download'
         $Release = 'the latest HoundDog.ai CLI release'
     }
     $Asset = "hounddog-windows-$Arch.exe"
 
-    # Downloads the release's file named $Name to $Path, or fails with $Missing when the release does not have it.
-    function Get-ReleaseFile([string]$Name, [string]$Path, [string]$Missing) {
-        $Url = "$Files/$Name"
-        try {
-            Invoke-WebRequest -Uri $Url -OutFile $Path -UseBasicParsing
-        } catch {
-            $Response = $_.Exception.PSObject.Properties['Response']
-            if ($Response -and $Response.Value -and [int]$Response.Value.StatusCode -eq 404) {
-                throw $Missing
+    # Downloads SHA256SUMS to $Sums, and this computer's build to $Download, from the releases at $Source. Answers
+    # nothing when both arrive, or else the HTTP status of the first that did not, 0 when no server answered, its name,
+    # and the error. A server error or a timeout is tried again, three times, waiting a second, then two, then four,
+    # since GitHub sometimes answers with one for a moment, and Windows PowerShell's Invoke-WebRequest cannot retry.
+    function Get-Release([string]$Source) {
+        foreach ($Name in @('SHA256SUMS', $Asset)) {
+            $Path = if ($Name -eq 'SHA256SUMS') { $Sums } else { $Download }
+            for ($Attempt = 1; ; $Attempt++) {
+                try {
+                    Invoke-WebRequest -Uri "$Source/$Folder/$Name" -OutFile $Path -UseBasicParsing
+                    break
+                } catch {
+                    $Response = $_.Exception.PSObject.Properties['Response']
+                    $Status = if ($Response -and $Response.Value) { [int]$Response.Value.StatusCode } else { 0 }
+                    $IsTransient = ($Status -eq 0) -or ($Status -eq 408) -or ($Status -eq 429) -or ($Status -ge 500)
+                    if (-not $IsTransient -or $Attempt -gt 3) {
+                        return [pscustomobject]@{ Status = $Status; Name = $Name; Message = $_.Exception.Message }
+                    }
+                    Start-Sleep -Seconds ([math]::Pow(2, $Attempt - 1))
+                }
             }
-            throw "Cannot download:`n  $Url`n$($_.Exception.Message)"
         }
     }
 
@@ -157,9 +173,25 @@
             Remove-Item -Force -ErrorAction SilentlyContinue
         Write-Host "${Bold}Installing HoundDog.ai CLI...$Reset"
         Write-Host ''
-        Get-ReleaseFile 'SHA256SUMS' $Sums "Cannot find $Release, or its SHA256SUMS.`nSee releases at:`n  $Releases"
-        Get-ReleaseFile $Asset $Download ("There is no build for Windows on $Arch in $Release.`n" +
-            "See releases at:`n  $Releases")
+        $Source = $Releases
+        $Failure = Get-Release $Releases
+        # Both files come from one place, so they belong to the same release. GitHub answering that a file is missing
+        # settles it, and any other failure turns to the copy.
+        if ($Failure -and $Failure.Status -ne 404) {
+            Write-Host 'Cannot download from GitHub, so downloading from the copy on Google Cloud instead.'
+            Write-Host ''
+            $Source = $Mirror
+            $Failure = Get-Release $Mirror
+        }
+        if ($Failure -and $Failure.Status -eq 404 -and $Failure.Name -eq 'SHA256SUMS') {
+            throw "Cannot find $Release, or its SHA256SUMS.`nSee releases at:`n  $Releases"
+        }
+        if ($Failure -and $Failure.Status -eq 404) {
+            throw "There is no build for Windows on $Arch in $Release.`nSee releases at:`n  $Releases"
+        }
+        if ($Failure) {
+            throw "Cannot download:`n  $Source/$Folder/$($Failure.Name)`n$($Failure.Message)"
+        }
         # SHA256SUMS lists each file as <checksum>  <name>, or <checksum> *<name> in binary mode.
         $Expected = $null
         foreach ($Line in Get-Content -LiteralPath $Sums) {
@@ -212,9 +244,10 @@
         }
     }
     $Cli = if ($Version) { "HoundDog.ai CLI $Version" } else { 'the latest HoundDog.ai CLI' }
-    # A folder for every user, which only an administrator may change, never updates itself.
+    # A folder for every user, which only an administrator may change, never updates itself. ProgramData is not one: a
+    # folder made there lets every user add files, so on the system's PATH it would run any program one put there.
     $IsShared = $false
-    foreach ($Shared in @($env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:ProgramW6432, $env:ProgramData)) {
+    foreach ($Shared in @($env:ProgramFiles, ${env:ProgramFiles(x86)}, $env:ProgramW6432)) {
         if ($Shared -and $Directory.StartsWith($Shared.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) {
             $IsShared = $true
         }

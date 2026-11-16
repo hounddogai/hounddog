@@ -41,7 +41,7 @@ x-hounddog-self-hosted: &hounddog-self-hosted
     HOUNDDOG_INITIAL_PERSONAL_API_KEY_HASH: ${HOUNDDOG_INITIAL_PERSONAL_API_KEY_HASH:-}
     HOUNDDOG_INITIAL_PERSONAL_API_KEY_PREFIX: ${HOUNDDOG_INITIAL_PERSONAL_API_KEY_PREFIX:-}
     HOUNDDOG_API_DOCS: ${HOUNDDOG_API_DOCS:-0}
-    # Where the API reads the AI models it offers; empty means https://hounddog.ai/model-catalog-v1.json.
+    # Where the API reads the AI models it offers; empty means https://hounddog.ai/model-catalog.json.
     HOUNDDOG_MODEL_CATALOG_URL: ${HOUNDDOG_MODEL_CATALOG_URL:-}
   security_opt:
     - no-new-privileges:true

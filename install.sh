@@ -1,6 +1,7 @@
 #!/bin/sh
 #
-# Installs the HoundDog.ai CLI from its GitHub releases. The latest release:
+# Installs the HoundDog.ai CLI from its GitHub releases, or from HoundDog.ai's copy of them on Google Cloud when GitHub
+# does not answer. The latest release:
 #
 #   curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh
 #
@@ -21,8 +22,9 @@
 # HOUNDDOG_INSTALL_BRIEF=1 says only where the CLI went, and how it reaches the PATH, for an installer that runs this
 # one as a step of its own.
 #
-# HOUNDDOG_RELEASES_URL replaces https://github.com/hounddogai/hounddog/releases, such as with a mirror or a test's
-# server, which serves the same paths: <url>/latest/download/<file> and <url>/download/<version>/<file>.
+# HOUNDDOG_RELEASES_URL replaces https://github.com/hounddogai/hounddog/releases, and HOUNDDOG_RELEASES_MIRROR_URL the
+# copy, https://storage.googleapis.com/hounddog-releases, or set empty, turns it off. Each serves the same paths, as a
+# test's server does: <url>/latest/download/<file> and <url>/download/<version>/<file>.
 
 set -eu
 
@@ -42,10 +44,16 @@ say() {
 # The ~ is printed as is, for the reader.
 # shellcheck disable=SC2088
 shorten() {
-    case "$1" in
-        "${HOME:-}"/*) printf '~/%s' "${1#"${HOME}/"}" ;;
-        *) printf '%s' "$1" ;;
-    esac
+    # Without a HOME, such as under `env -i` or cloud-init, no path is under it.
+    if [ -n "${HOME:-}" ]; then
+        case "$1" in
+            "${HOME}"/*)
+                printf '~/%s' "${1#"${HOME}/"}"
+                return
+                ;;
+        esac
+    fi
+    printf '%s' "$1"
 }
 
 # Whether $1 is a version, which is a release's tag, such as 1.2.3 or 1.2.3-beta.1. The character check also refuses
@@ -123,28 +131,35 @@ fi
 
 releases="${HOUNDDOG_RELEASES_URL:-https://github.com/hounddogai/hounddog/releases}"
 releases="${releases%/}"
+mirror="${HOUNDDOG_RELEASES_MIRROR_URL-https://storage.googleapis.com/hounddog-releases}"
+mirror="${mirror%/}"
 if [ -n "${version}" ]; then
-    files="${releases}/download/${version}"
+    folder="download/${version}"
     release="HoundDog.ai CLI ${version}"
 else
-    files="${releases}/latest/download"
+    folder='latest/download'
     release='the latest HoundDog.ai CLI release'
 fi
 asset="hounddog-${os}-${arch}"
 
-# Downloads the release's file named $1 to $2, or fails with the lines after them when the release does not have it.
-download_file() {
-    url="${files}/$1"
-    status="$(curl -sSL -o "$2" -w '%{http_code}' "${url}")" ||
-        fail 'Cannot download:' "  ${url}" 'Check your connection, then run this again.'
-    case "${status}" in
-        2??) ;;
-        404)
-            shift 2
-            fail "$@"
-            ;;
-        *) fail 'Cannot download:' "  ${url}" "Server answered HTTP ${status}." ;;
-    esac
+# Downloads SHA256SUMS to $sums, and this computer's build to $download, from the releases at $1. Prints nothing when
+# both arrive, or else the HTTP status of the first that did not, 000 when no server answered, and its name. curl tries
+# a server error or a timeout again, three times, waiting a second, then two, then four, since GitHub sometimes answers
+# with one for a moment.
+download_release() {
+    for name in SHA256SUMS "${asset}"; do
+        target="${download}"
+        [ "${name}" != SHA256SUMS ] || target="${sums}"
+        status="$(curl -sSL --retry 3 --connect-timeout 10 -o "${target}" -w '%{http_code}' "$1/${folder}/${name}")" ||
+            status=000
+        case "${status}" in
+            2??) ;;
+            *)
+                printf '%s %s' "${status}" "${name}"
+                return
+                ;;
+        esac
+    done
 }
 
 say "${bold}Installing HoundDog.ai CLI...${reset}" ''
@@ -160,9 +175,25 @@ mkdir -p "${directory}"
 download="$(mktemp "${directory}/.hounddog.XXXXXX")"
 sums="$(mktemp "${directory}/.hounddog.XXXXXX")"
 trap 'rm -f "${download}" "${sums}"' EXIT
-download_file SHA256SUMS "${sums}" "Cannot find ${release}, or its SHA256SUMS." 'See releases at:' "  ${releases}"
-download_file "${asset}" "${download}" "There is no build for ${os_name} on ${arch} in ${release}." \
-    'See releases at:' "  ${releases}"
+source="${releases}"
+failure="$(download_release "${releases}")"
+# Both files come from one place, so they belong to the same release. GitHub answering that a file is missing settles
+# it, and any other failure turns to the copy.
+if [ -n "${failure}" ] && [ "${failure%% *}" != 404 ] && [ -n "${mirror}" ]; then
+    say 'Cannot download from GitHub, so downloading from the copy on Google Cloud instead.' ''
+    source="${mirror}"
+    failure="$(download_release "${mirror}")"
+fi
+status="${failure%% *}" name="${failure#* }"
+case "${status}" in
+    '') ;;
+    404)
+        [ "${name}" != SHA256SUMS ] || fail "Cannot find ${release}, or its SHA256SUMS." 'See releases at:' "  ${releases}"
+        fail "There is no build for ${os_name} on ${arch} in ${release}." 'See releases at:' "  ${releases}"
+        ;;
+    000) fail 'Cannot download:' "  ${source}/${folder}/${name}" 'Check your connection, then run this again.' ;;
+    *) fail 'Cannot download:' "  ${source}/${folder}/${name}" "Server answered HTTP ${status}." ;;
+esac
 
 # SHA256SUMS lists each file as <checksum>  <name>, or <checksum> *<name> in binary mode.
 expected="$(awk -v name="${asset}" '$2 == name || $2 == "*" name { print tolower($1); exit }' "${sums}")"
@@ -234,10 +265,12 @@ case ":${PATH}:" in
     *":${directory}:"*) next='HoundDog.ai CLI is installed. Next:' ;;
     *)
         # The folder as the profile names it, under $HOME when it is there, so the line reads the same for every user.
-        case "${directory}" in
-            "${HOME:-}"/*) entry="\$HOME/${directory#"${HOME}/"}" ;;
-            *) entry="${directory}" ;;
-        esac
+        entry="${directory}"
+        if [ -n "${HOME:-}" ]; then
+            case "${directory}" in
+                "${HOME}"/*) entry="\$HOME/${directory#"${HOME}/"}" ;;
+            esac
+        fi
         profile=''
         # A folder whose name the profile's quotes cannot hold goes on the PATH by hand.
         case "${directory}" in

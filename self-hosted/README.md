@@ -26,16 +26,16 @@ When the installation finishes:
 1. Open the HoundDog.ai URL printed by the installer, such as `http://localhost:3300`.
 2. Enter the one-time setup key printed by the installer, which starts with `hd_setup_`.
 3. Name your organization and create your owner account.
-4. Connect an AI provider, such as Anthropic or OpenAI, with your own API key. HoundDog.ai has no built-in AI model
-   when self-hosted, so this is what lets AI review the dataflows each scan finds, updating their severity and ignoring
-   false positives. You can skip it and connect a provider later in Settings > AI.
+4. Connect an AI provider, such as Anthropic or OpenAI, with your own API key, so AI reviews the dataflows each scan
+   finds, updating their severity and ignoring false positives. Self-hosted HoundDog.ai has no built-in AI model. You
+   can skip this and connect a provider later in Settings > AI.
 
 By default, HoundDog.ai is reachable from other machines on your network. To allow access only from this machine, set
 `HOUNDDOG_BIND_ADDRESS=127.0.0.1` in `.env` and run `docker compose up -d`.
 
-HoundDog.ai reads the list of AI models it offers from `https://hounddog.ai/model-catalog-v1.json` at most once an hour,
-so new models appear without an upgrade. To offer only the models of the installed version instead, for example on a
-server without internet access, set `HOUNDDOG_MODEL_CATALOG_URL=off` in `.env` and run `docker compose up -d`.
+HoundDog.ai reads the list of AI models it offers from `https://hounddog.ai/model-catalog.json` at most once an hour, so
+new models appear without an upgrade. To offer only the models of the installed version instead, for example on a server
+without internet access, set `HOUNDDOG_MODEL_CATALOG_URL=off` in `.env` and run `docker compose up -d`.
 
 The installer saves your configuration in `.env`. Keep a private copy of its `HOUNDDOG_SECRET_KEY`: it encrypts the
 credentials that HoundDog.ai stores in its database, which cannot be decrypted without it.
@@ -46,29 +46,29 @@ In Trial mode, the installer automatically sets up a CLI API key so you can scan
 hounddog scan /path/to/repository
 ```
 
-The installer's key is an organization API key named "HoundDog CLI": it can scan and upload results, but cannot read
-or change anything else, so it is also the right kind of key for CI. It expires one year after setup. Before then,
-create a new organization API key under API Keys and put it in `HOUNDDOG_API_KEY` in `~/.config/hounddog/.env`.
+The installer's key is an organization API key named "HoundDog CLI": it can scan and upload results, but cannot read or
+change anything else, so it is also the right kind of key for CI. It expires one year after setup. Before then, create a
+new organization API key under API Keys and put it in `HOUNDDOG_API_KEY` in `~/.config/hounddog/.env`.
 
 ## Accounts and Sign-In
 
-Owners and admins add users in Settings > Users, which gives each new user a temporary password to change at their
-first sign-in. Owners and admins also reset passwords there, except that only owners reset the passwords of admins and
-other owners.
+Owners and admins add users in Settings > Users, which gives each new user a temporary password to change at their first
+sign-in. Owners and admins also reset passwords there, except that only owners reset the passwords of admins and other
+owners.
 
 After 10 failed sign-ins in a row to the same email address from one IP address, that address cannot sign in to it for
 15 minutes. Sign-ins from other addresses still work, and resetting the password lifts the lock. Settings > Users shows
 which users are locked, and the Audit Log records sign-ins, failed sign-ins, locks, sign-outs, and password changes.
 
-If nobody can reset a password in the web app, for example because the only owner forgot it, issue a temporary
-password from this directory:
+If nobody can reset a password in the web app, for example because the only owner forgot it, issue a temporary password
+from this directory:
 
 ```shell
 docker compose exec api reset-password owner@example.com
 ```
 
-It signs the account out everywhere, lifts its locks, and prints a temporary password, which must be changed at the
-next sign-in.
+It signs the account out everywhere, lifts its locks, and prints a temporary password, which must be changed at the next
+sign-in.
 
 ## Reverse Proxy
 
@@ -87,23 +87,18 @@ The proxy must send the client address in the `X-Forwarded-For` header. Run `doc
 
 ## Upgrade
 
-Upgrading keeps your configuration and data, and also upgrades the CLI. Back up your database first, because
-HoundDog.ai is briefly unavailable while the upgrade runs.
+Upgrading keeps your configuration and data, and also upgrades the CLI. Back up your database first, because HoundDog.ai
+is briefly unavailable while the upgrade runs.
 
 ```shell
 git pull && ./upgrade.sh
 ```
 
-HoundDog.ai does not start when `HOUNDDOG_SETUP_KEY` in `.env` is set but does not start with `hd_setup_`, which is
-the case for installations made before setup keys had that prefix. Setup no longer needs the key once it is complete,
-so remove that line from `.env` before upgrading. If setup is not complete yet, replace the value with `hd_setup_`
-followed by a random value instead.
-
 If a prerequisite check fails, existing containers keep running. If migration or startup fails after the drain,
-HoundDog.ai stays stopped. Fix the reported error and run `./upgrade.sh` again, or go back to the previous version:
-run `docker compose stop caddy api worker`, restore your database backup, set `HOUNDDOG_IMAGE_TAG` in `.env` to that
-version (`./upgrade.sh` prints it), and run `docker compose up -d`. Remove `HOUNDDOG_IMAGE_TAG` again before the next
-upgrade, which refuses to run while it pins a version.
+HoundDog.ai stays stopped. Fix the reported error and run `./upgrade.sh` again, or go back to the previous version: run
+`docker compose stop caddy api worker`, restore your database backup, set `HOUNDDOG_IMAGE_TAG` in `.env` to that version
+(`./upgrade.sh` prints it), and run `docker compose up -d`. Remove `HOUNDDOG_IMAGE_TAG` again before the next upgrade,
+which refuses to run while it pins a version.
 
 ## Reset
 
@@ -123,6 +118,6 @@ configuration backups, this directory, and your own Postgres database.
 ./uninstall.sh
 ```
 
-Reset and uninstall back up `.env` to `.env.backup.<timestamp>.<random>` in this directory, and the CLI configuration
-in `~/.config/hounddog/` the same way. To use your own Postgres database again, copy the backup to `.env` and run
+Reset and uninstall back up `.env` to `.env.backup.<timestamp>.<random>` in this directory, and the CLI configuration in
+`~/.config/hounddog/` the same way. To use your own Postgres database again, copy the backup to `.env` and run
 `docker compose up -d`, because only its `HOUNDDOG_SECRET_KEY` can decrypt the credentials stored in that database.

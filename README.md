@@ -53,9 +53,6 @@ status.
 
 ![HoundDog.ai assistant answering a plain-English question with a filtered view of risky third-party and AI dataflows](images/assistant-dataflow-query.png)
 
-The data map becomes more than documentation. It becomes an interface to sensitive data flow evidence across your
-codebases, refreshed on every commit, across every repo.
-
 ## Technical Highlights
 
 - **Deterministic static analysis.** The same commit produces the same result, every time. No prompt sensitivity, and
@@ -63,22 +60,20 @@ codebases, refreshed on every commit, across every repo.
 - **Deep dataflow tracing.** Tracks sensitive data such as PII, PHI, CHD, and auth tokens through transformations across
   files, functions, and procedures, regardless of nesting depth. Flows are flagged when they reach a sink, whether
   controlled (a database) or high-risk (an LLM prompt or application logs).
-- **Broad coverage, fully
-  customizable.** [100+ sensitive data types](https://github.com/hounddogai/hounddog/blob/main/data-elements.md)
-  and [900+ data sinks](https://github.com/hounddogai/hounddog/blob/main/data-sinks.md) supported out of the box. You
-  can also [create your own data element and data sink rules](https://docs.hounddog.ai/platform/scanner-rules/).
+- **Broad coverage, fully customizable.**
+  [100+ sensitive data types](https://github.com/hounddogai/hounddog/blob/main/data-elements.md) and
+  [900+ data sinks](https://github.com/hounddogai/hounddog/blob/main/data-sinks.md) supported out of the box. You can
+  also [create your own data element and data sink rules](https://docs.hounddog.ai/platform/scanner-rules/).
 - **Built for large codebases.** Scans millions of lines of code in under a minute on a modern laptop.
-- **AI integration (highly recommended).** Works out of the box on the HoundDog.ai cloud platform, or with your
-  organization's own AI provider and API key (see [FAQ](#does-your-scanner-use-ai)). AI reduces false positives, adds
-  context, and lets you query the data map in plain English. It only sees the code behind each finding: its dataflow
-  trace and the source file where it was detected.
+- **AI integration (highly recommended).** AI reduces false positives, adds context, and lets you query the data map in
+  plain English, using only each finding's dataflow trace and source file (see [FAQ](#does-your-scanner-use-ai)).
 
 ## Installation
 
 ### Self-Hosted Platform + CLI Scanner (recommended)
 
-Follow
-the [self-hosted platform installation instructions](https://github.com/hounddogai/hounddog/tree/main/self-hosted). The
+Follow the
+[self-hosted platform installation instructions](https://github.com/hounddogai/hounddog/tree/main/self-hosted). The
 platform runs in lightweight Docker containers on a developer's machine (ideal for POCs) and includes the CLI scanner.
 
 [Enable the AI integration](https://docs.hounddog.ai/platform/ai-settings/) with your organization's API key for the
@@ -104,8 +99,8 @@ instead.
 irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1 | iex
 ```
 
-The script installs the CLI to `%LOCALAPPDATA%\hounddog\bin`, or for all users to `%ProgramFiles%\hounddog\bin` when
-run as an administrator, and adds it to the `PATH`. You can also download a binary, `hounddog-<os>-<arch>`, from the
+The script installs the CLI to `%LOCALAPPDATA%\hounddog\bin`, or for all users to `%ProgramFiles%\hounddog\bin` when run
+as an administrator, and adds it to the `PATH`. You can also download a binary, `hounddog-<os>-<arch>`, from the
 [releases page](https://github.com/hounddogai/hounddog/releases), and check it against the release's `SHA256SUMS`.
 
 To install a given version, which then stays:
@@ -118,11 +113,11 @@ curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh
 & ([scriptblock]::Create((irm https://raw.githubusercontent.com/hounddogai/hounddog/main/install.ps1))) -Version 4.0.0
 ```
 
-The CLI that the scripts install keeps itself up to date: at most once a day, a command downloads a newer release in
-the background for the next one. It does not in CI, in containers, when installed as root or as a Windows
-administrator, or when installed at a given version, which then stays. Run `hounddog update` to update by hand,
-`hounddog update --auto on` or `off` to choose, and `hounddog update --rollback` to go back to the version an update
-replaced. `HOUNDDOG_DISABLE_AUTOUPDATE=1` turns automatic updates off for one command or a whole environment.
+Otherwise, the CLI keeps itself up to date: at most once a day, a command downloads a newer release in the background
+for the next one. It does not in CI, in containers, or when installed for all users, as root or by a Windows
+administrator. `hounddog update` updates by hand, `hounddog update --auto on` or `off` chooses, and
+`hounddog update --rollback` goes back to the version an update replaced. `HOUNDDOG_DISABLE_AUTOUPDATE=1` turns
+automatic updates off for one command or a whole environment.
 
 ### Uninstallation
 
@@ -146,12 +141,12 @@ Remove-Item -Recurse -Force "$env:ProgramFiles\hounddog"  # Only if installed as
 hounddog scan [OPTIONS] [PATH]
 ```
 
-- **Self-hosted platform:** results appear at http://localhost:3300. Trial installs connect the CLI automatically;
-  for Production installs, create a CLI API key in the web app after setup, and set `HOUNDDOG_URL` to the platform's
-  URL, such as `https://hounddog.example.com`, and `HOUNDDOG_API_KEY` to the key.
+- **Self-hosted platform:** results appear at http://localhost:3300. Trial installs connect the CLI automatically; for
+  Production installs, create a CLI API key in the web app after setup, and set `HOUNDDOG_URL` to the platform's URL,
+  such as `https://hounddog.example.com`, and `HOUNDDOG_API_KEY` to the key.
 - **Cloud platform:** set `HOUNDDOG_API_KEY` to your API key and results are uploaded to the platform.
-- **CLI only:** pass `--local` (or `--no-cloud`), and results are displayed in the console. `--no-cloud-upload` uses
-  the platform's settings without uploading the results.
+- **CLI only:** pass `--local` (or `--no-cloud`), and results are displayed in the console. `--no-cloud-upload` uses the
+  platform's settings without uploading the results.
 
 For a quick demo, scan our Python test repository:
 
@@ -166,8 +161,8 @@ Generate a Markdown report with `--output-format=markdown`:
 hounddog scan hounddog-test-python --output-format=markdown --output-path=report.md
 ```
 
-We recommend the Markdown Viewer Chrome extension for viewing reports
-(see [setup and sample report](https://github.com/hounddogai/hounddog/blob/main/sample-report.md)).
+We recommend the Markdown Viewer Chrome extension for viewing reports (see
+[setup and sample report](https://github.com/hounddogai/hounddog/blob/main/sample-report.md)).
 
 ### More Options
 
@@ -197,12 +192,12 @@ docker run --rm -v "$PWD:/data" -e HOUNDDOG_API_KEY hounddogai/hounddog hounddog
 ```
 
 - The image scans Git repositories only: Git metadata names the repository whose results the scan replaces.
-- The image never updates itself. Pin a tag and move to a newer one deliberately, or pull the tag you run again when
-  it moves.
-- Docker passes on only the variables you name, so pass your CI provider's too, for Jenkins `-e JENKINS_URL
-  -e BRANCH_NAME -e CHANGE_TARGET -e CHANGE_BRANCH -e CHANGE_FORK`. Without them, the scanner cannot tell that it runs
-  in CI, or a pull request build from a branch build. Without `HOUNDDOG_API_KEY`, the scan uses the bundled rules
-  only, uploads nothing, and warns.
+- The image never updates itself. Pin a tag and move to a newer one deliberately, or pull the tag you run again when it
+  moves.
+- Docker passes on only the variables you name, so pass your CI provider's too, for Jenkins
+  `-e JENKINS_URL -e BRANCH_NAME -e CHANGE_TARGET -e CHANGE_BRANCH -e CHANGE_FORK`. Without them, the scanner cannot
+  tell that it runs in CI, or a pull request build from a branch build. Without `HOUNDDOG_API_KEY`, the scan uses the
+  bundled rules only, uploads nothing, and warns.
 - Self-hosted platforms also need `-e HOUNDDOG_URL`. Write output files under `/data`, such as
   `--output-path=/data/report.md`, to keep them.
 
@@ -221,6 +216,8 @@ or an AI review set on the platform apply.
   fails the build until it is fixed, or ignored on the platform.
 - In CI, the scan fails when `HOUNDDOG_API_KEY` is not set, so a credential that is not bound to the build cannot pass
   every build without uploading. Pass `--local` to scan with the bundled rules only.
+- In CI, a scan that uploads needs Git metadata, which names the scanned repository: with `--no-git`, or outside a Git
+  checkout, it fails unless `--no-cloud-upload` skips the upload.
 
 ### Excluded Files
 
@@ -230,6 +227,9 @@ excludes, in this order of precedence:
 1. A `.hounddogignore` file at the repository's root, in `.gitignore` syntax.
 2. The file patterns on the HoundDog.ai platform, when the scan uses an API key.
 3. The default patterns, which the platform's patterns also start with.
+
+A scan of a sub-directory covers the files that a scan of the repository's root covers in it, so a directory that these
+rules exclude has no files to scan.
 
 ### Exit Codes
 
@@ -270,7 +270,7 @@ Vertex AI. Your organization can also choose its own provider (AWS Bedrock, Anth
 Agent Platform, Microsoft Foundry, or xAI) and API key, on the cloud or self-hosted platform. Findings, traces, and
 source context then go directly to that provider under the DPA and terms your organization holds with it. The AI layer
 runs on the platform: it auto-closes false positives, adjusts severities, and adds context to findings the scanner
-already produced. The deterministic scan still runs in your CI on inexpensive CPU with negligible impact on CI time.
+already produced.
 
 **Rule development.** HoundDog.ai uses AI internally to help generate and update detection rules before they ship with
 the scanner. Customer code and scan results are never used for this, and HoundDog.ai does not use customer code,
@@ -319,9 +319,9 @@ logger.info("data=%s", bar)
 Semgrep and CodeQL are powerful and highly customizable, but their rules take significant upfront investment to learn
 and maintain.
 
-HoundDog.ai works out of the box: broad, high-quality coverage of data elements and sinks from day one,
-with [custom rules](https://docs.hounddog.ai/platform/scanner-rules/) when you need them. It is purpose-built for
-dataflow analysis, scales efficiently to large codebases, and detects complex flows that general-purpose tools miss.
+HoundDog.ai works out of the box: broad, high-quality coverage of data elements and sinks from day one, with
+[custom rules](https://docs.hounddog.ai/platform/scanner-rules/) when you need them. It is purpose-built for dataflow
+analysis, scales efficiently to large codebases, and detects complex flows that general-purpose tools miss.
 
 ### Your scanner missed a dataflow!
 

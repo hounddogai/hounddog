@@ -71,7 +71,13 @@ hash_secret() {
 
 install_cli() {
     heading "INSTALL HOUNDDOG CLI"
-    curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh
+    # The server already runs, so a CLI that cannot be installed here, such as where GitHub is blocked, still leaves
+    # the next steps to follow.
+    if ! curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh; then
+        say "Could not install the HoundDog CLI. Install it later with:"
+        say "  curl -fsSL https://raw.githubusercontent.com/hounddogai/hounddog/main/install.sh | sh"
+        return
+    fi
 
     export PATH="${HOME}/.hounddog/bin:${PATH}"
     command -v hounddog > /dev/null 2>&1 || fail "The HoundDog CLI was installed but was not found in PATH."
