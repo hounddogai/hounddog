@@ -1372,8 +1372,6 @@ This issue was rated as 🟥 **HIGH** for exposing the following data element(s)
 
 Remove the offending code or sanitize the data.
 
-For auto-closing issues, see [https://docs.hounddog.ai/scanner/remediation](https://docs.hounddog.ai/scanner/remediation).
-
 **Compliance Frameworks:** [CWE-201](https://cwe.mitre.org/data/definitions/201.html), [A01:2021](https://owasp.org/Top10/A01_2021), [GDPR-A5-28](https://gdpr-info.eu/art-28-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa), [HIPAA](https://www.hhs.gov/hipaa/index.html), [NIST-800-53](https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final)
 
 </details>
@@ -1420,8 +1418,6 @@ This issue was rated as 🟧 **MEDIUM** for exposing the following data element(
 **Remediation:**
 
 Remove the offending code or sanitize the data.
-
-For auto-closing issues, see [https://docs.hounddog.ai/scanner/remediation](https://docs.hounddog.ai/scanner/remediation).
 
 **Compliance Frameworks:** [CWE-201](https://cwe.mitre.org/data/definitions/201.html), [A01:2021](https://owasp.org/Top10/A01_2021), [GDPR-A5-28](https://gdpr-info.eu/art-28-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa), [NIST-800-53](https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final)
 
@@ -1477,8 +1473,6 @@ This issue was rated as 🟨 **LOW** for exposing the following data element(s) 
 **Remediation:**
 
 Remove the offending code or sanitize the data.
-
-For auto-closing issues, see [https://docs.hounddog.ai/scanner/remediation](https://docs.hounddog.ai/scanner/remediation).
 
 **Compliance Frameworks:** [CWE-532](https://cwe.mitre.org/data/definitions/532.html), [A09:2021](https://owasp.org/Top10/A09_2021), [GDPR-A5-32](https://gdpr-info.eu/art-32-gdpr/), [CCPA](https://oag.ca.gov/privacy/ccpa), [NIST-800-53](https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final)
 
@@ -2072,4 +2066,3 @@ Avoid sending sensitive data to unsafe data sinks, even during development and t
 For third parties, the shared data must align with your privacy notice and data processing agreement.
 Adjust or restrict sharing as necessary to maintain compliance and minimize privacy risks.
 For more straightforward sinks like logs, the recommendation is to remove the offending code entirely.
-For auto-closing issues, see https://docs.hounddog.ai/scanner/remediation.

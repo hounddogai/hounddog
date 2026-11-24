@@ -75,8 +75,8 @@ fi
 scripts='https://raw.githubusercontent.com/hounddogai/hounddog/main'
 usage() {
     printf '%s\n' "Usage: curl -fsSL ${scripts}/install.sh | sh -s -- [--version <version>]" '' \
-        '  -v, --version <version>  Install this version, such as 1.2.3 or 1.2.3-beta.1, which then stays:' \
-        '                           it turns automatic updates off. Without it, the latest release installs.' \
+        '  -v, --version <version>  Install a specific version, such as 1.2.3 or 1.2.3-beta.1, and turn' \
+        '                           automatic updates off. Without it, the script installs the latest release.' \
         '  -h, --help               Show this help.'
 }
 version='' is_version_given=''
@@ -113,7 +113,7 @@ esac
 case "$(uname -m)" in
     x86_64 | amd64) arch=amd64 ;;
     aarch64 | arm64) arch=arm64 ;;
-    *) fail 'HoundDog.ai CLI runs on amd64 and arm64.' "This computer is $(uname -m)." ;;
+    *) fail 'HoundDog.ai CLI runs on AMD64 and ARM64.' "This computer is $(uname -m)." ;;
 esac
 # A shell that runs under Rosetta on Apple silicon reports x86_64, and the arm64 build runs natively there.
 if [ "${os}" = macos ] && [ "${arch}" = amd64 ] && [ "$(sysctl -n hw.optional.arm64 2> /dev/null)" = 1 ]; then
@@ -180,7 +180,7 @@ failure="$(download_release "${releases}")"
 # Both files come from one place, so they belong to the same release. GitHub answering that a file is missing settles
 # it, and any other failure turns to the copy.
 if [ -n "${failure}" ] && [ "${failure%% *}" != 404 ] && [ -n "${mirror}" ]; then
-    say 'Cannot download from GitHub, so downloading from the copy on Google Cloud instead.' ''
+    say 'Could not download from GitHub. Trying the mirror on Google Cloud instead.' ''
     source="${mirror}"
     failure="$(download_release "${mirror}")"
 fi
@@ -188,11 +188,11 @@ status="${failure%% *}" name="${failure#* }"
 case "${status}" in
     '') ;;
     404)
-        [ "${name}" != SHA256SUMS ] || fail "Cannot find ${release}, or its SHA256SUMS." 'See releases at:' "  ${releases}"
+        [ "${name}" != SHA256SUMS ] || fail "Cannot find ${release}." 'See releases at:' "  ${releases}"
         fail "There is no build for ${os_name} on ${arch} in ${release}." 'See releases at:' "  ${releases}"
         ;;
-    000) fail 'Cannot download:' "  ${source}/${folder}/${name}" 'Check your connection, then run this again.' ;;
-    *) fail 'Cannot download:' "  ${source}/${folder}/${name}" "Server answered HTTP ${status}." ;;
+    000) fail 'Cannot download:' "  ${source}/${folder}/${name}" 'Check your network connection, then run this again.' ;;
+    *) fail 'Cannot download:' "  ${source}/${folder}/${name}" "The server returned HTTP ${status}." ;;
 esac
 
 # SHA256SUMS lists each file as <checksum>  <name>, or <checksum> *<name> in binary mode.
@@ -202,14 +202,14 @@ case "${expected}" in
 esac
 actual="$(hash_file "${download}" | awk '{ print tolower($1) }')"
 [ "${actual}" = "${expected}" ] ||
-    fail "Download of ${asset} does not match SHA256SUMS." \
-        'Installed CLI is unchanged.' \
-        'Run this again. A repeated failure means downloads get damaged in transit.'
+    fail "The download of ${asset} does not match its checksum in SHA256SUMS." \
+        'The installed CLI is unchanged.' \
+        'Run this again. If it keeps failing, something on the network may be changing downloads.'
 chmod 755 "${download}"
 # The release the download is, as the CLI tells it, such as `4.0.0`, which names its folder.
 reported="$("${download}" --version 2> /dev/null | awk 'NR == 1 { print $NF }')" || reported=''
 case "${reported}" in
-    '' | *[!0-9A-Za-z.-]*) fail "The downloaded HoundDog.ai CLI does not run here, or reports no version." ;;
+    '' | *[!0-9A-Za-z.-]*) fail 'The downloaded HoundDog.ai CLI does not run on this computer or reports no version.' ;;
 esac
 cli="HoundDog.ai CLI ${reported}"
 # The note on automatic updates for the summary.
@@ -218,7 +218,7 @@ if [ -n "${is_root}" ]; then
     # For every user, a plain binary that only root changes, which never updates itself. It replaces what is there,
     # such as a link into root's own ~/.hounddog that an earlier installer made, which other users could not run.
     mv -f "${download}" "${directory}/hounddog"
-    updates='It is installed for every user, so it does not update itself: run this script again as root to upgrade it.'
+    updates='It is installed for all users and does not update itself. To upgrade it, run this script again as root.'
 else
     home="${HOME}/.hounddog"
     mkdir -p "${home}/versions" "${home}/bin"
@@ -241,9 +241,9 @@ else
     # latest release turns them on again. A release too old to have automatic updates refuses the command.
     if [ -n "${version}" ]; then
         if "${home}/bin/hounddog" update --auto off > /dev/null 2>&1; then
-            updates="Automatic updates are off, so it stays at ${reported}."
+            updates="Automatic updates are off. The CLI stays at ${reported}."
             # An installer that runs this one keeps the CLI at the version it names.
-            [ -n "${brief}" ] || updates="${updates} Run hounddog update --auto on to turn them on."
+            [ -n "${brief}" ] || updates="${updates} To turn them on, run: hounddog update --auto on"
         fi
     elif [ -f "${home}/settings.json" ] && grep -q '"automatic": false' "${home}/settings.json" &&
         "${home}/bin/hounddog" update --auto on > /dev/null 2>&1; then
@@ -297,7 +297,7 @@ case ":${PATH}:" in
             printf '%s\n' "Added ${shown} to your PATH in $(shorten "${profile}")."
             next='HoundDog.ai CLI is installed. Open a new terminal, then:'
         else
-            printf '%s\n' "Add ${shown} to your PATH, such as in your shell's profile:" \
+            printf '%s\n' "Add ${shown} to your PATH, for example with this line in your shell's profile:" \
                 "  export PATH=\"${entry}:\$PATH\""
             next='HoundDog.ai CLI is installed. Once it is on your PATH:'
         fi
